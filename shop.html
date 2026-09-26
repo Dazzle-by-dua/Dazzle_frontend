@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop — Dazzle by Dua</title>
+<meta name="description" content="Browse the Dazzle by Dua jewellery collection. Necklaces, earrings, bracelets and rings.">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+<!-- Announcement -->
+<div class="announcement-bar">
+  Free shipping on orders above &#8377;2500 &nbsp;|&nbsp; Use code <strong>DAZZLE10</strong> for 10% off
+  <a href="offers.html">View Offers &rarr;</a>
+</div>
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-name">Dazzle by Dua</span>
+      <span class="nav-logo-tagline">Fine Jewellery</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="shop.html" class="nav-link">Shop</a></li>
+      <li><a href="offers.html" class="nav-link">Offers</a></li>
+      <li><a href="orders.html" class="nav-link">My Orders</a></li>
+      <li><a href="wishlist.html" class="nav-link">Wishlist</a></li>
+      <li><a href="contact.html" class="nav-link">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="wishlist.html" class="nav-icon" title="Wishlist">
+        <i class="fa fa-heart"></i>
+        <span class="nav-badge wish-badge">0</span>
+      </a>
+      <a href="orders.html" class="nav-icon" title="My Orders">
+        <i class="fa fa-shopping-bag"></i>
+        <span class="nav-badge cart-badge">0</span>
+      </a>
+      <button class="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<!-- Mobile Menu -->
+<div class="mobile-menu">
+  <div class="mobile-menu-header">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-name">Dazzle by Dua</span>
+      <span class="nav-logo-tagline">Fine Jewellery</span>
+    </a>
+    <button class="mobile-menu-close">&times;</button>
+  </div>
+  <ul class="mobile-nav-links">
+    <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+    <li><a href="shop.html" class="mobile-nav-link">Shop</a></li>
+    <li><a href="offers.html" class="mobile-nav-link">Offers &amp; Combos</a></li>
+    <li><a href="orders.html" class="mobile-nav-link">My Orders</a></li>
+    <li><a href="wishlist.html" class="mobile-nav-link">Wishlist</a></li>
+    <li><a href="contact.html" class="mobile-nav-link">Contact</a></li>
+  </ul>
+</div>
+<!-- Page Hero -->
+<div class="page-hero">
+  <div class="container">
+    <nav class="breadcrumb"><a href="index.html">Home</a><span>/</span><span>Shop</span></nav>
+    <h1 style="font-size:2rem">Shop Our Collection</h1>
+    <p>Find pieces that match your style.</p>
+  </div>
+</div>
+
+<!-- Shop Layout -->
+<div class="container">
+  <div class="shop-layout">
+    <!-- Sidebar -->
+    <aside class="shop-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-heading">Category</div>
+        <label class="filter-option"><input type="checkbox" checked onchange="applyFilters()"> Necklaces <span class="filter-count">12</span></label>
+        <label class="filter-option"><input type="checkbox" checked onchange="applyFilters()"> Earrings <span class="filter-count">18</span></label>
+        <label class="filter-option"><input type="checkbox" checked onchange="applyFilters()"> Bracelets <span class="filter-count">8</span></label>
+        <label class="filter-option"><input type="checkbox" checked onchange="applyFilters()"> Rings <span class="filter-count">6</span></label>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-heading">Price Range</div>
+        <div class="price-range-inputs">
+          <input class="price-input" type="number" placeholder="&#8377;0" id="price-min" value="0">
+          <input class="price-input" type="number" placeholder="&#8377;10000" id="price-max" value="10000">
+        </div>
+        <input type="range" class="range-slider" min="0" max="10000" value="10000" oninput="document.getElementById('price-max').value=this.value;applyFilters()">
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-heading">Availability</div>
+        <label class="filter-option"><input type="checkbox" checked onchange="applyFilters()"> In Stock <span class="filter-count">32</span></label>
+        <label class="filter-option"><input type="checkbox" onchange="applyFilters()"> Out of Stock <span class="filter-count">4</span></label>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-heading">Sort By</div>
+        <label class="filter-option"><input type="radio" name="sort" value="newest" checked onchange="applyFilters()"> Newest</label>
+        <label class="filter-option"><input type="radio" name="sort" value="price-asc" onchange="applyFilters()"> Price: Low to High</label>
+        <label class="filter-option"><input type="radio" name="sort" value="price-desc" onchange="applyFilters()"> Price: High to Low</label>
+        <label class="filter-option"><input type="radio" name="sort" value="rating" onchange="applyFilters()"> Top Rated</label>
+      </div>
+      <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center;margin-top:.5rem" onclick="clearFilters()">Clear Filters</button>
+    </aside>
+
+    <!-- Products -->
+    <main>
+      <div class="shop-toolbar">
+        <div class="toolbar-result">Showing <strong id="product-count">8</strong> products</div>
+        <div class="toolbar-right">
+          <select class="sort-select" onchange="applyFilters()" id="sort-select">
+            <option value="newest">Newest</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="rating">Top Rated</option>
+          </select>
+          <div class="view-toggle">
+            <button class="view-btn active" title="Grid" onclick="setView('grid',this)"><i class="fa fa-th-large"></i></button>
+            <button class="view-btn" title="List" onclick="setView('list',this)"><i class="fa fa-list"></i></button>
+          </div>
+        </div>
+      </div>
+      <div class="active-filters" id="active-filters"></div>
+      <div class="grid-4" id="shop-grid"></div>
+      <div class="pagination">
+        <button class="page-btn">&laquo;</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">&raquo;</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Reviews Section -->
+<section class="reviews-section" style="background:#F7EFE3">
+  <div class="container">
+    <div class="text-center" style="margin-bottom:2.5rem">
+      <span class="section-tag">Customer Love</span>
+      <h2 class="section-title">Reviews &amp; Ratings</h2>
+    </div>
+    <div class="reviews-grid" id="shop-reviews"></div>
+    <!-- Write Review Form -->
+    <div class="write-review-form">
+      <h3 style="font-family:'Playfair Display',serif;margin-bottom:.5rem">Write a Review</h3>
+      <p style="margin-bottom:1.5rem">Share your experience with Dazzle by Dua</p>
+      <div class="form-row" style="margin-bottom:1rem">
+        <div class="form-group"><label class="form-label">Your Name</label><input class="form-input" type="text" placeholder="e.g. Ayesha K."></div>
+        <div class="form-group"><label class="form-label">Product</label><select class="form-select"><option>Flower Pendant Necklace</option><option>Pearl Drop Earrings</option><option>Delicate Chain Bracelet</option><option>Minimal Diamond Ring</option></select></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Rating</label>
+        <div style="display:flex;gap:.5rem;font-size:1.5rem;color:#D4AF7C;margin-bottom:.5rem" id="star-select">
+          <span onclick="setRating(1)" style="cursor:pointer">&#9733;</span>
+          <span onclick="setRating(2)" style="cursor:pointer">&#9733;</span>
+          <span onclick="setRating(3)" style="cursor:pointer">&#9733;</span>
+          <span onclick="setRating(4)" style="cursor:pointer">&#9733;</span>
+          <span onclick="setRating(5)" style="cursor:pointer">&#9733;</span>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Your Review</label><textarea class="form-textarea" placeholder="Tell us about your experience..."></textarea></div>
+      <button class="btn btn-gold" onclick="submitReview()">Submit Review &rarr;</button>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand-name">Dazzle by Dua</div>
+        <span class="footer-brand-tag">Fine Jewellery</span>
+        <p class="footer-tagline">Timeless pieces, crafted with love.<br>For your most beautiful moments.</p>
+        <div class="footer-social">
+          <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-pinterest"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-heading">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html" class="footer-link">Home</a></li>
+          <li><a href="shop.html" class="footer-link">Shop</a></li>
+          <li><a href="offers.html" class="footer-link">Offers &amp; Combos</a></li>
+          <li><a href="contact.html" class="footer-link">Contact Us</a></li>
+          <li><a href="orders.html" class="footer-link">My Orders</a></li>
+          <li><a href="wishlist.html" class="footer-link">Wishlist</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Customer Care</div>
+        <ul class="footer-links">
+          <li><a href="#" class="footer-link">Shipping Info</a></li>
+          <li><a href="#" class="footer-link">Returns &amp; Refunds</a></li>
+          <li><a href="#" class="footer-link">Privacy Policy</a></li>
+          <li><a href="#" class="footer-link">Terms &amp; Conditions</a></li>
+          <li><a href="contact.html" class="footer-link">FAQs</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Connect With Us</div>
+        <ul class="footer-links">
+          <li><a href="#" class="footer-link"><i class="fab fa-instagram"></i>&nbsp; Instagram</a></li>
+          <li><a href="#" class="footer-link"><i class="fab fa-whatsapp"></i>&nbsp; WhatsApp</a></li>
+          <li><a href="#" class="footer-link"><i class="fa fa-envelope"></i>&nbsp; Email Us</a></li>
+        </ul>
+        <div style="margin-top:1.5rem">
+          <div class="footer-heading" style="font-size:.85rem">Newsletter</div>
+          <div style="display:flex;gap:.5rem;margin-top:.75rem">
+            <input type="email" placeholder="Your email" style="flex:1;padding:.6rem .9rem;border:1px solid rgba(255,255,255,.15);border-radius:40px;background:rgba(255,255,255,.05);color:#fff;font-size:.8rem;font-family:inherit">
+            <button class="btn btn-gold btn-sm" style="padding:.6rem 1rem">&#10003;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2025 Dazzle by Dua. All rights reserved.</span>
+      <div class="footer-payments">
+        <span class="payment-badge">VISA</span>
+        <span class="payment-badge">MC</span>
+        <span class="payment-badge">UPI</span>
+        <span class="payment-badge">COD</span>
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="script.js"></script>
+<script>
+let currentRating = 5;
+function setRating(r) {
+  currentRating = r;
+  const stars = document.querySelectorAll('#star-select span');
+  stars.forEach((s,i) => s.style.color = i < r ? '#D4AF7C' : '#DDD');
+}
+function submitReview() {
+  showToast('&#10022; Thank you for your review!');
+}
+function applyFilters() { renderShop(); }
+function clearFilters() {
+  document.querySelectorAll('.shop-sidebar input[type="checkbox"]').forEach(c => c.checked = true);
+  renderShop();
+}
+function setView(v, btn) {
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const grid = document.getElementById('shop-grid');
+  if (v === 'list') { grid.style.gridTemplateColumns = '1fr'; }
+  else { grid.style.gridTemplateColumns = ''; }
+}
+function renderShop() {
+  const grid = document.getElementById('shop-grid');
+  const countEl = document.getElementById('product-count');
+  if (!grid) return;
+  const sortVal = document.getElementById('sort-select').value;
+  let prods = [...PRODUCTS];
+  if (sortVal === 'price-asc') prods.sort((a,b) => a.price - b.price);
+  else if (sortVal === 'price-desc') prods.sort((a,b) => b.price - a.price);
+  else if (sortVal === 'rating') prods.sort((a,b) => b.rating - a.rating);
+  grid.innerHTML = prods.map(productCardHTML).join('');
+  if (countEl) countEl.textContent = prods.length;
+}
+document.addEventListener('DOMContentLoaded', () => {
+  renderShop();
+  const rv = document.getElementById('shop-reviews');
+  if (rv) rv.innerHTML = REVIEWS.map(reviewCardHTML).join('');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offers & Combos — Dazzle by Dua</title>
+<meta name="description" content="Exclusive offers, combo deals and coupon codes from Dazzle by Dua fine jewellery.">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+<!-- Announcement -->
+<div class="announcement-bar">
+  Free shipping on orders above &#8377;2500 &nbsp;|&nbsp; Use code <strong>DAZZLE10</strong> for 10% off
+  <a href="offers.html">View Offers &rarr;</a>
+</div>
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-name">Dazzle by Dua</span>
+      <span class="nav-logo-tagline">Fine Jewellery</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="shop.html" class="nav-link">Shop</a></li>
+      <li><a href="offers.html" class="nav-link">Offers</a></li>
+      <li><a href="orders.html" class="nav-link">My Orders</a></li>
+      <li><a href="wishlist.html" class="nav-link">Wishlist</a></li>
+      <li><a href="contact.html" class="nav-link">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="wishlist.html" class="nav-icon" title="Wishlist">
+        <i class="fa fa-heart"></i>
+        <span class="nav-badge wish-badge">0</span>
+      </a>
+      <a href="orders.html" class="nav-icon" title="My Orders">
+        <i class="fa fa-shopping-bag"></i>
+        <span class="nav-badge cart-badge">0</span>
+      </a>
+      <button class="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<!-- Mobile Menu -->
+<div class="mobile-menu">
+  <div class="mobile-menu-header">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-name">Dazzle by Dua</span>
+      <span class="nav-logo-tagline">Fine Jewellery</span>
+    </a>
+    <button class="mobile-menu-close">&times;</button>
+  </div>
+  <ul class="mobile-nav-links">
+    <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+    <li><a href="shop.html" class="mobile-nav-link">Shop</a></li>
+    <li><a href="offers.html" class="mobile-nav-link">Offers &amp; Combos</a></li>
+    <li><a href="orders.html" class="mobile-nav-link">My Orders</a></li>
+    <li><a href="wishlist.html" class="mobile-nav-link">Wishlist</a></li>
+    <li><a href="contact.html" class="mobile-nav-link">Contact</a></li>
+  </ul>
+</div>
+<!-- Offers Hero -->
+<section class="offers-hero">
+  <div class="offers-hero-content">
+    <div class="offers-hero-tag">&#10022; Limited Time Deals</div>
+    <h1 class="offers-hero-title">Exclusive <em>Offers</em><br>&amp; Combos</h1>
+    <p class="offers-hero-sub">Treat yourself or someone special &mdash; our best deals, only for a limited time.</p>
+    <!-- Countdown -->
+    <div class="countdown-timer">
+      <div class="countdown-unit"><div class="countdown-num" id="cd-days">02</div><div class="countdown-unit-label">Days</div></div>
+      <span class="countdown-sep">:</span>
+      <div class="countdown-unit"><div class="countdown-num" id="cd-hours">18</div><div class="countdown-unit-label">Hours</div></div>
+      <span class="countdown-sep">:</span>
+      <div class="countdown-unit"><div class="countdown-num" id="cd-mins">45</div><div class="countdown-unit-label">Mins</div></div>
+      <span class="countdown-sep">:</span>
+      <div class="countdown-unit"><div class="countdown-num" id="cd-secs">30</div><div class="countdown-unit-label">Secs</div></div>
+    </div>
+    <a href="#combos" class="btn btn-gold">See Combos &darr;</a>
+  </div>
+</section>
+
+<!-- Coupon Codes -->
+<section class="section" style="background:#FFFDF8">
+  <div class="container">
+    <div class="text-center" style="margin-bottom:3rem">
+      <span class="section-tag">Exclusive Codes</span>
+      <h2 class="section-title">Coupon Codes</h2>
+      <p class="section-subtitle" style="margin:0 auto">Click any code to copy it</p>
+    </div>
+    <div class="grid-3">
+      <div class="coupon-section">
+        <p style="font-size:.82rem;color:#77736D">First Order Discount</p>
+        <div class="coupon-code" onclick="copyCoupon('DAZZLE10')">DAZZLE10</div>
+        <p style="font-size:.78rem;color:#77736D">10% off on your first order &bull; Min. &#8377;1,500</p>
+      </div>
+      <div class="coupon-section">
+        <p style="font-size:.82rem;color:#77736D">Combo Saver</p>
+        <div class="coupon-code" onclick="copyCoupon('COMBO20')">COMBO20</div>
+        <p style="font-size:.78rem;color:#77736D">20% off on combo purchases &bull; Min. &#8377;5,000</p>
+      </div>
+      <div class="coupon-section">
+        <p style="font-size:.82rem;color:#77736D">Free Shipping</p>
+        <div class="coupon-code" onclick="copyCoupon('FREESHIP')">FREESHIP</div>
+        <p style="font-size:.78rem;color:#77736D">Free shipping on any order &bull; No minimum</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Flat Offers -->
+<section class="section" style="background:#F7EFE3" id="offers-grid">
+  <div class="container">
+    <div class="text-center" style="margin-bottom:3rem">
+      <span class="section-tag">Special Deals</span>
+      <h2 class="section-title">Today&rsquo;s Offers</h2>
+    </div>
+    <div class="grid-3">
+      <div class="offer-card">
+        <div class="offer-banner"><div class="offer-pct">15%</div><div class="offer-off">OFF</div></div>
+        <div class="offer-body">
+          <h4 class="offer-title">Earrings Collection</h4>
+          <p class="offer-desc">Get 15% off on all earrings in our collection. Use code at checkout.</p>
+          <div class="offer-code-small" onclick="copyCoupon('EARRING15')">EARRING15</div>
+          <p class="offer-valid" style="margin-bottom:1rem">Valid till: 30 Sep 2025</p>
+          <a href="shop.html" class="btn btn-dark btn-sm" style="width:100%;justify-content:center">Shop Earrings</a>
+        </div>
+      </div>
+      <div class="offer-card">
+        <div class="offer-banner"><div class="offer-pct">25%</div><div class="offer-off">OFF</div></div>
+        <div class="offer-body">
+          <h4 class="offer-title">Buy 2 Get 25% Off</h4>
+          <p class="offer-desc">Purchase any 2 items and automatically save 25% at checkout.</p>
+          <div class="offer-code-small" onclick="copyCoupon('BUY2SAVE')">BUY2SAVE</div>
+          <p class="offer-valid" style="margin-bottom:1rem">Valid till: 15 Oct 2025</p>
+          <a href="shop.html" class="btn btn-dark btn-sm" style="width:100%;justify-content:center">Shop Now</a>
+        </div>
+      </div>
+      <div class="offer-card">
+        <div class="offer-banner"><div class="offer-pct">&#8377;500</div><div class="offer-off">OFF</div></div>
+        <div class="offer-body">
+          <h4 class="offer-title">Festival Special</h4>
+          <p class="offer-desc">Flat &#8377;500 off on orders above &#8377;3,000. Perfect for gifting this season.</p>
+          <div class="offer-code-small" onclick="copyCoupon('FESTIVAL500')">FESTIVAL500</div>
+          <p class="offer-valid" style="margin-bottom:1rem">Valid till: 31 Oct 2025</p>
+          <a href="shop.html" class="btn btn-dark btn-sm" style="width:100%;justify-content:center">Shop Now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Combos -->
+<section class="section" style="background:#FFFDF8" id="combos">
+  <div class="container">
+    <div class="text-center" style="margin-bottom:3rem">
+      <span class="section-tag">Curated Sets</span>
+      <h2 class="section-title">Jewellery Combos</h2>
+      <p class="section-subtitle" style="margin:0 auto">Handpicked sets that look stunning together &mdash; at a special price.</p>
+    </div>
+    <div class="grid-3">
+      <!-- Combo 1 -->
+      <div class="combo-card">
+        <div class="combo-header">
+          <div class="combo-name">The Bridal Set</div>
+          <span class="combo-discount">30% OFF</span>
+        </div>
+        <div class="combo-products">
+          <div class="combo-product-img"><img src="product_flower_necklace.jpg" alt="Necklace"></div>
+          <span class="combo-plus">+</span>
+          <div class="combo-product-img"><img src="product_pearl_earrings.jpg" alt="Earrings"></div>
+          <span class="combo-plus">+</span>
+          <div class="combo-product-img"><img src="product_bracelet.jpg" alt="Bracelet"></div>
+        </div>
+        <div class="combo-body">
+          <ul class="combo-includes">
+            <li>Flower Pendant Necklace</li>
+            <li>Pearl Drop Earrings</li>
+            <li>Delicate Chain Bracelet</li>
+          </ul>
+          <div class="combo-price-wrap">
+            <div>
+              <div class="combo-price-new">&#8377;10,990</div>
+              <div class="combo-price-old">&#8377;14,970</div>
+            </div>
+            <button class="btn btn-gold btn-sm" onclick="showToast('&#10022; The Bridal Set added to cart!')">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Combo 2 -->
+      <div class="combo-card">
+        <div class="combo-header">
+          <div class="combo-name">The Everyday Duo</div>
+          <span class="combo-discount">20% OFF</span>
+        </div>
+        <div class="combo-products">
+          <div class="combo-product-img"><img src="product_ring.jpg" alt="Ring"></div>
+          <span class="combo-plus">+</span>
+          <div class="combo-product-img"><img src="product_bracelet.jpg" alt="Bracelet"></div>
+        </div>
+        <div class="combo-body">
+          <ul class="combo-includes">
+            <li>Minimal Diamond Ring</li>
+            <li>Delicate Chain Bracelet</li>
+          </ul>
+          <div class="combo-price-wrap">
+            <div>
+              <div class="combo-price-new">&#8377;8,540</div>
+              <div class="combo-price-old">&#8377;10,680</div>
+            </div>
+            <button class="btn btn-gold btn-sm" onclick="showToast('&#10022; The Everyday Duo added to cart!')">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Combo 3 -->
+      <div class="combo-card">
+        <div class="combo-header">
+          <div class="combo-name">The Gift Set</div>
+          <span class="combo-discount">25% OFF</span>
+        </div>
+        <div class="combo-products">
+          <div class="combo-product-img"><img src="product_pearl_earrings.jpg" alt="Earrings"></div>
+          <span class="combo-plus">+</span>
+          <div class="combo-product-img"><img src="product_ring.jpg" alt="Ring"></div>
+        </div>
+        <div class="combo-body">
+          <ul class="combo-includes">
+            <li>Pearl Drop Earrings</li>
+            <li>Minimal Diamond Ring</li>
+            <li>Premium Gift Box &amp; Card</li>
+          </ul>
+          <div class="combo-price-wrap">
+            <div>
+              <div class="combo-price-new">&#8377;6,740</div>
+              <div class="combo-price-old">&#8377;8,980</div>
+            </div>
+            <button class="btn btn-gold btn-sm" onclick="showToast('&#10022; The Gift Set added to cart!')">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter Banner -->
+<section style="background:#1A1A1A;padding:4rem 0;text-align:center">
+  <div class="container">
+    <span class="section-tag">Never Miss a Deal</span>
+    <h2 style="color:#fff;font-family:'Playfair Display',serif;margin-bottom:.75rem">Get Exclusive Offers in Your Inbox</h2>
+    <p style="color:rgba(255,255,255,.5);margin-bottom:2rem">Subscribe for early access to sales, new arrivals and member-only codes.</p>
+    <div style="display:flex;gap:.75rem;max-width:480px;margin:0 auto">
+      <input type="email" placeholder="Your email address" style="flex:1;padding:.85rem 1.25rem;border:1.5px solid rgba(255,255,255,.15);border-radius:40px;background:rgba(255,255,255,.05);color:#fff;font-family:inherit;font-size:.9rem">
+      <button class="btn btn-gold" onclick="showToast('&#10022; Subscribed! Watch your inbox.')">Subscribe</button>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand-name">Dazzle by Dua</div>
+        <span class="footer-brand-tag">Fine Jewellery</span>
+        <p class="footer-tagline">Timeless pieces, crafted with love.<br>For your most beautiful moments.</p>
+        <div class="footer-social">
+          <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-pinterest"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-heading">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html" class="footer-link">Home</a></li>
+          <li><a href="shop.html" class="footer-link">Shop</a></li>
+          <li><a href="offers.html" class="footer-link">Offers &amp; Combos</a></li>
+          <li><a href="contact.html" class="footer-link">Contact Us</a></li>
+          <li><a href="orders.html" class="footer-link">My Orders</a></li>
+          <li><a href="wishlist.html" class="footer-link">Wishlist</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Customer Care</div>
+        <ul class="footer-links">
+          <li><a href="#" class="footer-link">Shipping Info</a></li>
+          <li><a href="#" class="footer-link">Returns &amp; Refunds</a></li>
+          <li><a href="#" class="footer-link">Privacy Policy</a></li>
+          <li><a href="#" class="footer-link">Terms &amp; Conditions</a></li>
+          <li><a href="contact.html" class="footer-link">FAQs</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Connect With Us</div>
+        <ul class="footer-links">
+          <li><a href="#" class="footer-link"><i class="fab fa-instagram"></i>&nbsp; Instagram</a></li>
+          <li><a href="#" class="footer-link"><i class="fab fa-whatsapp"></i>&nbsp; WhatsApp</a></li>
+          <li><a href="#" class="footer-link"><i class="fa fa-envelope"></i>&nbsp; Email Us</a></li>
+        </ul>
+        <div style="margin-top:1.5rem">
+          <div class="footer-heading" style="font-size:.85rem">Newsletter</div>
+          <div style="display:flex;gap:.5rem;margin-top:.75rem">
+            <input type="email" placeholder="Your email" style="flex:1;padding:.6rem .9rem;border:1px solid rgba(255,255,255,.15);border-radius:40px;background:rgba(255,255,255,.05);color:#fff;font-size:.8rem;font-family:inherit">
+            <button class="btn btn-gold btn-sm" style="padding:.6rem 1rem">&#10003;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2025 Dazzle by Dua. All rights reserved.</span>
+      <div class="footer-payments">
+        <span class="payment-badge">VISA</span>
+        <span class="payment-badge">MC</span>
+        <span class="payment-badge">UPI</span>
+        <span class="payment-badge">COD</span>
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="script.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Set countdown end time to 2 days 18 hours from now
+  const end = Date.now() + (2*86400 + 18*3600 + 45*60 + 30)*1000;
+  initCountdown(end);
+});
+</script>
+</body>
+</html>
