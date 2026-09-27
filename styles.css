@@ -272,18 +272,22 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
 .combo-price-wrap{display:flex;align-items:center;justify-content:space-between;margin-top:1rem;}
 .combo-price-new{font-family:"Playfair Display",serif;font-size:1.4rem;font-weight:700;color:var(--text-dark);}
 .combo-price-old{font-size:.88rem;color:var(--text-light);text-decoration:line-through;}
-.coupon-section{background:var(--beige);border:1.5px dashed var(--gold);border-radius:var(--radius-md);padding:2rem;text-align:center;margin-bottom:2.5rem;}
-.coupon-code{font-family:"Playfair Display",serif;font-size:2rem;font-weight:700;color:var(--gold);background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:.75rem 2rem;display:inline-block;margin:1rem 0;cursor:pointer;transition:all var(--transition);}
-.coupon-code:hover{background:var(--gold);color:#fff;border-color:var(--gold);}
-.offer-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;transition:all var(--transition);}
-.offer-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px);}
-.offer-banner{padding:2rem;background:linear-gradient(135deg,var(--black),#2a2018);color:#fff;text-align:center;}
-.offer-pct{font-family:"Playfair Display",serif;font-size:3rem;font-weight:700;color:var(--gold);line-height:1;}
-.offer-off{font-size:.85rem;color:rgba(255,255,255,.6);margin-top:.25rem;}
-.offer-body{padding:1.5rem;}
-.offer-title{font-family:"Playfair Display",serif;font-size:1.05rem;margin-bottom:.35rem;}
-.offer-desc{font-size:.82rem;color:var(--text-muted);margin-bottom:1rem;}
-.offer-code-small{background:var(--beige);border:1px dashed var(--border);border-radius:var(--radius-sm);padding:.5rem 1rem;font-size:.78rem;font-weight:700;letter-spacing:.1em;color:var(--gold);display:inline-block;margin-bottom:1rem;cursor:pointer;}
+/* Current Offers Section */
+.current-offer-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;display:flex;flex-direction:column;transition:all var(--transition);box-shadow:var(--shadow-sm);}
+.current-offer-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:var(--gold);}
+.current-offer-card.featured-offer{border:1.5px solid var(--gold);position:relative;}
+.current-offer-top{background:linear-gradient(135deg,var(--black) 0%,#241b14 100%);color:#fff;padding:2rem 1.75rem 1.75rem;text-align:center;position:relative;}
+.current-offer-badge{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:rgba(212,175,124,.18);color:var(--gold-light);padding:.3rem .85rem;border-radius:30px;margin-bottom:.75rem;}
+.current-offer-val{font-family:"Playfair Display",serif;font-size:2.8rem;font-weight:700;color:var(--gold);line-height:1;}
+.current-offer-val span{font-family:"Montserrat",sans-serif;font-size:.9rem;font-weight:600;letter-spacing:.1em;color:rgba(255,255,255,.8);vertical-align:middle;margin-left:.25rem;}
+.current-offer-body{padding:2rem 1.75rem;display:flex;flex-direction:column;flex:1;}
+.current-offer-title{font-family:"Playfair Display",serif;font-size:1.25rem;color:var(--text-dark);margin-bottom:.5rem;}
+.current-offer-desc{font-size:.86rem;color:var(--text-muted);line-height:1.6;margin-bottom:1.25rem;}
+.current-offer-meta{font-size:.76rem;color:var(--gold-hover);font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:.35rem;}
+.current-offer-code-row{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding-top:1.25rem;border-top:1px solid var(--border);flex-wrap:wrap;}
+.offer-code-box{font-family:"Montserrat",sans-serif;font-weight:700;font-size:.88rem;letter-spacing:.12em;color:var(--text-dark);background:var(--beige);border:1px dashed var(--gold);padding:.55rem 1rem;border-radius:var(--radius-sm);cursor:pointer;transition:all var(--transition);}
+.offer-code-box:hover{background:var(--gold);color:#fff;}
+.offer-auto-badge{font-size:.78rem;font-weight:600;color:#2E7D32;background:#E8F5E9;padding:.5rem .85rem;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:.25rem;}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
 .animate-fadeup{animation:fadeInUp .7s ease both;}
 .animate-delay-1{animation-delay:.1s;}.animate-delay-2{animation-delay:.2s;}.animate-delay-3{animation-delay:.3s;}

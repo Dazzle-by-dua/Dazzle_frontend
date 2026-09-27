@@ -65,87 +65,73 @@
 <!-- Offers Hero -->
 <section class="offers-hero">
   <div class="offers-hero-content">
-    <div class="offers-hero-tag">&#10022; Limited Time Deals</div>
+    <div class="offers-hero-tag">&#10022; Exclusive Perks</div>
     <h1 class="offers-hero-title">Exclusive <em>Offers</em><br>&amp; Combos</h1>
-    <p class="offers-hero-sub">Treat yourself or someone special &mdash; our best deals, only for a limited time.</p>
-    <!-- Countdown -->
-    <div class="countdown-timer">
-      <div class="countdown-unit"><div class="countdown-num" id="cd-days">02</div><div class="countdown-unit-label">Days</div></div>
-      <span class="countdown-sep">:</span>
-      <div class="countdown-unit"><div class="countdown-num" id="cd-hours">18</div><div class="countdown-unit-label">Hours</div></div>
-      <span class="countdown-sep">:</span>
-      <div class="countdown-unit"><div class="countdown-num" id="cd-mins">45</div><div class="countdown-unit-label">Mins</div></div>
-      <span class="countdown-sep">:</span>
-      <div class="countdown-unit"><div class="countdown-num" id="cd-secs">30</div><div class="countdown-unit-label">Secs</div></div>
-    </div>
-    <a href="#combos" class="btn btn-gold">See Combos &darr;</a>
-  </div>
-</section>
-
-<!-- Coupon Codes -->
-<section class="section" style="background:#FFFDF8">
-  <div class="container">
-    <div class="text-center" style="margin-bottom:3rem">
-      <span class="section-tag">Exclusive Codes</span>
-      <h2 class="section-title">Coupon Codes</h2>
-      <p class="section-subtitle" style="margin:0 auto">Click any code to copy it</p>
-    </div>
-    <div class="grid-3">
-      <div class="coupon-section">
-        <p style="font-size:.82rem;color:#77736D">First Order Discount</p>
-        <div class="coupon-code" onclick="copyCoupon('DAZZLE10')">DAZZLE10</div>
-        <p style="font-size:.78rem;color:#77736D">10% off on your first order &bull; Min. &#8377;1,500</p>
-      </div>
-      <div class="coupon-section">
-        <p style="font-size:.82rem;color:#77736D">Combo Saver</p>
-        <div class="coupon-code" onclick="copyCoupon('COMBO20')">COMBO20</div>
-        <p style="font-size:.78rem;color:#77736D">20% off on combo purchases &bull; Min. &#8377;5,000</p>
-      </div>
-      <div class="coupon-section">
-        <p style="font-size:.82rem;color:#77736D">Free Shipping</p>
-        <div class="coupon-code" onclick="copyCoupon('FREESHIP')">FREESHIP</div>
-        <p style="font-size:.78rem;color:#77736D">Free shipping on any order &bull; No minimum</p>
-      </div>
+    <p class="offers-hero-sub">Treat yourself or someone special &mdash; explore our handpicked discounts and curated jewellery sets.</p>
+    <div class="hero-btns" style="justify-content:center;display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="#current-offers" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.4)">View Offers</a>
+      <a href="#combos" class="btn btn-gold">See Combos &rarr;</a>
     </div>
   </div>
 </section>
 
-<!-- Flat Offers -->
-<section class="section" style="background:#F7EFE3" id="offers-grid">
+<!-- Current Offers -->
+<section class="section" style="background:#F7EFE3" id="current-offers">
   <div class="container">
     <div class="text-center" style="margin-bottom:3rem">
-      <span class="section-tag">Special Deals</span>
-      <h2 class="section-title">Today&rsquo;s Offers</h2>
+      <span class="section-tag">Special Privileges</span>
+      <h2 class="section-title">Current Offers</h2>
+      <p class="section-subtitle" style="margin:0 auto">Enjoy active savings applied directly or with coupon codes at checkout.</p>
     </div>
     <div class="grid-3">
-      <div class="offer-card">
-        <div class="offer-banner"><div class="offer-pct">15%</div><div class="offer-off">OFF</div></div>
-        <div class="offer-body">
-          <h4 class="offer-title">Earrings Collection</h4>
-          <p class="offer-desc">Get 15% off on all earrings in our collection. Use code at checkout.</p>
-          <div class="offer-code-small" onclick="copyCoupon('EARRING15')">EARRING15</div>
-          <p class="offer-valid" style="margin-bottom:1rem">Valid till: 30 Sep 2025</p>
-          <a href="shop.html" class="btn btn-dark btn-sm" style="width:100%;justify-content:center">Shop Earrings</a>
+      <!-- Offer 1 -->
+      <div class="current-offer-card">
+        <div class="current-offer-top">
+          <div class="current-offer-badge">First Order</div>
+          <div class="current-offer-val">10% <span>OFF</span></div>
+        </div>
+        <div class="current-offer-body">
+          <h3 class="current-offer-title">Welcome Privilege</h3>
+          <p class="current-offer-desc">Receive 10% off your entire first purchase across all collections.</p>
+          <div class="current-offer-meta">&#10022; Min. order value &#8377;1,500</div>
+          <div class="current-offer-code-row">
+            <span class="offer-code-box" onclick="copyCoupon('DAZZLE10')" title="Click to copy code">DAZZLE10</span>
+            <button type="button" class="btn btn-gold btn-sm" onclick="copyCoupon('DAZZLE10')">Copy Code</button>
+          </div>
         </div>
       </div>
-      <div class="offer-card">
-        <div class="offer-banner"><div class="offer-pct">25%</div><div class="offer-off">OFF</div></div>
-        <div class="offer-body">
-          <h4 class="offer-title">Buy 2 Get 25% Off</h4>
-          <p class="offer-desc">Purchase any 2 items and automatically save 25% at checkout.</p>
-          <div class="offer-code-small" onclick="copyCoupon('BUY2SAVE')">BUY2SAVE</div>
-          <p class="offer-valid" style="margin-bottom:1rem">Valid till: 15 Oct 2025</p>
-          <a href="shop.html" class="btn btn-dark btn-sm" style="width:100%;justify-content:center">Shop Now</a>
+
+      <!-- Offer 2 -->
+      <div class="current-offer-card featured-offer">
+        <div class="current-offer-top">
+          <div class="current-offer-badge" style="background:var(--gold);color:#fff">Combo Deal</div>
+          <div class="current-offer-val">20% <span>OFF</span></div>
+        </div>
+        <div class="current-offer-body">
+          <h3 class="current-offer-title">Selected Combos</h3>
+          <p class="current-offer-desc">Save 20% when you buy paired jewellery sets and matching duo sets.</p>
+          <div class="current-offer-meta">&#10022; Min. order value &#8377;5,000</div>
+          <div class="current-offer-code-row">
+            <span class="offer-code-box" onclick="copyCoupon('COMBO20')" title="Click to copy code">COMBO20</span>
+            <button type="button" class="btn btn-gold btn-sm" onclick="copyCoupon('COMBO20')">Copy Code</button>
+          </div>
         </div>
       </div>
-      <div class="offer-card">
-        <div class="offer-banner"><div class="offer-pct">&#8377;500</div><div class="offer-off">OFF</div></div>
-        <div class="offer-body">
-          <h4 class="offer-title">Festival Special</h4>
-          <p class="offer-desc">Flat &#8377;500 off on orders above &#8377;3,000. Perfect for gifting this season.</p>
-          <div class="offer-code-small" onclick="copyCoupon('FESTIVAL500')">FESTIVAL500</div>
-          <p class="offer-valid" style="margin-bottom:1rem">Valid till: 31 Oct 2025</p>
-          <a href="shop.html" class="btn btn-dark btn-sm" style="width:100%;justify-content:center">Shop Now</a>
+
+      <!-- Offer 3 -->
+      <div class="current-offer-card">
+        <div class="current-offer-top">
+          <div class="current-offer-badge">Complimentary</div>
+          <div class="current-offer-val" style="font-size:2rem">FREE <span>SHIPPING</span></div>
+        </div>
+        <div class="current-offer-body">
+          <h3 class="current-offer-title">Orders Above &#8377;2,500</h3>
+          <p class="current-offer-desc">Complimentary express shipping across India with signature luxury box.</p>
+          <div class="current-offer-meta">&#10022; Valid on all orders over &#8377;2,500</div>
+          <div class="current-offer-code-row">
+            <span class="offer-auto-badge">&#10003; Auto-Applied</span>
+            <a href="shop.html" class="btn btn-outline btn-sm">Shop Now</a>
+          </div>
         </div>
       </div>
     </div>
@@ -321,12 +307,5 @@
   </div>
 </footer>
 <script src="script.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Set countdown end time to 2 days 18 hours from now
-  const end = Date.now() + (2*86400 + 18*3600 + 45*60 + 30)*1000;
-  initCountdown(end);
-});
-</script>
 </body>
 </html>
