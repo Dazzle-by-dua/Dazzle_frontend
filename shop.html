@@ -124,12 +124,12 @@
     </div>
 
     <!-- Pagination -->
-    <div class="pagination">
-      <button class="page-btn">&laquo;</button>
-      <button class="page-btn active">1</button>
-      <button class="page-btn">2</button>
-      <button class="page-btn">3</button>
-      <button class="page-btn">&raquo;</button>
+    <div class="pagination" id="pagination-bar">
+      <button class="page-btn" id="prev-page" onclick="changePage(-1)">&laquo;</button>
+      <button class="page-btn active" onclick="goToPage(1)">1</button>
+      <button class="page-btn" onclick="goToPage(2)">2</button>
+      <button class="page-btn" onclick="goToPage(3)">3</button>
+      <button class="page-btn" id="next-page" onclick="changePage(1)">&raquo;</button>
     </div>
   </div>
 </section>
@@ -239,6 +239,7 @@ function submitReview() {
   showToast('&#10022; Thank you for your review!');
 }
 function applyFilters() {
+  currentPage = 1;
   renderShop();
 }
 function resetCategoryFilter() {
@@ -256,6 +257,40 @@ function setView(v, btn) {
     grid.style.gridTemplateColumns = '';
   }
 }
+const PAGE_SIZE = 8;
+let currentPage = 1;
+let totalPages = 1;
+
+function goToPage(page) {
+  currentPage = page;
+  renderShop();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function changePage(delta) {
+  const next = currentPage + delta;
+  if (next < 1 || next > totalPages) return;
+  goToPage(next);
+}
+
+function updatePagination(total) {
+  totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const bar = document.getElementById('pagination-bar');
+  if (!bar) return;
+
+  // Rebuild page number buttons dynamically
+  const prevBtn = `<button class="page-btn${currentPage === 1 ? ' disabled' : ''}" id="prev-page" onclick="changePage(-1)">&laquo;</button>`;
+  const nextBtn = `<button class="page-btn${currentPage === totalPages ? ' disabled' : ''}" id="next-page" onclick="changePage(1)">&raquo;</button>`;
+
+  let numBtns = '';
+  for (let i = 1; i <= totalPages; i++) {
+    numBtns += `<button class="page-btn${i === currentPage ? ' active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+  }
+
+  bar.innerHTML = prevBtn + numBtns + nextBtn;
+  bar.style.display = totalPages <= 1 ? 'none' : 'flex';
+}
+
 function renderShop() {
   const grid = document.getElementById('shop-grid');
   const countEl = document.getElementById('product-count');
@@ -287,16 +322,24 @@ function renderShop() {
     });
   }
 
-  // 3. Render
+  // 3. Update count & pagination
   if (countEl) countEl.textContent = prods.length;
+  updatePagination(prods.length);
+
+  // 4. Slice for current page
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const paginated = prods.slice(start, start + PAGE_SIZE);
+
+  // 5. Render
   if (prods.length === 0) {
     grid.innerHTML = '';
     if (emptyEl) emptyEl.style.display = 'block';
   } else {
     if (emptyEl) emptyEl.style.display = 'none';
-    grid.innerHTML = prods.map(productCardHTML).join('');
+    grid.innerHTML = paginated.map(productCardHTML).join('');
   }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const catParam = params.get('category');
@@ -304,6 +347,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (catParam && catSelect) {
     catSelect.value = catParam.toLowerCase();
   }
+  // Reset to page 1 on filter/sort change
+  document.getElementById('category-select')?.addEventListener('change', () => { currentPage = 1; renderShop(); });
+  document.getElementById('sort-select')?.addEventListener('change', () => { currentPage = 1; renderShop(); });
   renderShop();
   const rv = document.getElementById('shop-reviews');
   if (rv) rv.innerHTML = REVIEWS.map(reviewCardHTML).join('');

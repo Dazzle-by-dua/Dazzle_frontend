@@ -183,6 +183,7 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
 .pagination{display:flex;align-items:center;justify-content:center;gap:.5rem;margin-top:3rem;}
 .page-btn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);font-size:.85rem;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:all var(--transition);}
 .page-btn:hover,.page-btn.active{background:var(--gold);border-color:var(--gold);color:#fff;}
+.page-btn.disabled{opacity:.35;cursor:not-allowed;pointer-events:none;}
 .contact-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:4rem;align-items:start;}
 .contact-info-card{background:var(--black);border-radius:var(--radius-lg);padding:3rem;color:#fff;}
 .contact-info-title{font-family:"Playfair Display",serif;font-size:1.8rem;color:#fff;margin-bottom:.75rem;}
