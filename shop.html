@@ -71,70 +71,68 @@
   </div>
 </div>
 
-<!-- Shop Layout -->
-<div class="container">
-  <div class="shop-layout">
-    <!-- Sidebar -->
-    <aside class="shop-sidebar">
-      <div class="sidebar-section">
-        <div class="sidebar-heading">Category</div>
-        <label class="filter-option"><input type="checkbox" checked onchange="applyFilters()"> Necklaces <span class="filter-count">12</span></label>
-        <label class="filter-option"><input type="checkbox" checked onchange="applyFilters()"> Earrings <span class="filter-count">18</span></label>
-        <label class="filter-option"><input type="checkbox" checked onchange="applyFilters()"> Bracelets <span class="filter-count">8</span></label>
-        <label class="filter-option"><input type="checkbox" checked onchange="applyFilters()"> Rings <span class="filter-count">6</span></label>
+<!-- Shop Section -->
+<section class="section" style="padding-top:2.5rem">
+  <div class="container">
+    <!-- Top Controls Bar -->
+    <div class="shop-controls-bar">
+      <div class="shop-results-info">
+        Showing <strong id="product-count">8</strong> products
       </div>
-      <div class="sidebar-section">
-        <div class="sidebar-heading">Price Range</div>
-        <div class="price-range-inputs">
-          <input class="price-input" type="number" placeholder="&#8377;0" id="price-min" value="0">
-          <input class="price-input" type="number" placeholder="&#8377;10000" id="price-max" value="10000">
-        </div>
-        <input type="range" class="range-slider" min="0" max="10000" value="10000" oninput="document.getElementById('price-max').value=this.value;applyFilters()">
-      </div>
-      <div class="sidebar-section">
-        <div class="sidebar-heading">Availability</div>
-        <label class="filter-option"><input type="checkbox" checked onchange="applyFilters()"> In Stock <span class="filter-count">32</span></label>
-        <label class="filter-option"><input type="checkbox" onchange="applyFilters()"> Out of Stock <span class="filter-count">4</span></label>
-      </div>
-      <div class="sidebar-section">
-        <div class="sidebar-heading">Sort By</div>
-        <label class="filter-option"><input type="radio" name="sort" value="newest" checked onchange="applyFilters()"> Newest</label>
-        <label class="filter-option"><input type="radio" name="sort" value="price-asc" onchange="applyFilters()"> Price: Low to High</label>
-        <label class="filter-option"><input type="radio" name="sort" value="price-desc" onchange="applyFilters()"> Price: High to Low</label>
-        <label class="filter-option"><input type="radio" name="sort" value="rating" onchange="applyFilters()"> Top Rated</label>
-      </div>
-      <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center;margin-top:.5rem" onclick="clearFilters()">Clear Filters</button>
-    </aside>
 
-    <!-- Products -->
-    <main>
-      <div class="shop-toolbar">
-        <div class="toolbar-result">Showing <strong id="product-count">8</strong> products</div>
-        <div class="toolbar-right">
-          <select class="sort-select" onchange="applyFilters()" id="sort-select">
+      <div class="shop-filter-group">
+        <!-- Categories Dropdown -->
+        <div class="filter-select-wrapper">
+          <label for="category-select" class="filter-select-label">Categories &#9662;</label>
+          <select id="category-select" class="shop-select" onchange="applyFilters()">
+            <option value="all">All Categories</option>
+            <option value="necklaces">Necklaces</option>
+            <option value="earrings">Earrings</option>
+            <option value="bracelets">Bracelets</option>
+            <option value="rings">Rings</option>
+          </select>
+        </div>
+
+        <!-- Sort By Dropdown -->
+        <div class="filter-select-wrapper">
+          <label for="sort-select" class="filter-select-label">Sort By &#9662;</label>
+          <select id="sort-select" class="shop-select" onchange="applyFilters()">
             <option value="newest">Newest</option>
             <option value="price-asc">Price: Low to High</option>
             <option value="price-desc">Price: High to Low</option>
             <option value="rating">Top Rated</option>
           </select>
-          <div class="view-toggle">
-            <button class="view-btn active" title="Grid" onclick="setView('grid',this)"><i class="fa fa-th-large"></i></button>
-            <button class="view-btn" title="List" onclick="setView('list',this)"><i class="fa fa-list"></i></button>
-          </div>
+        </div>
+
+        <!-- View Toggle -->
+        <div class="view-toggle">
+          <button type="button" class="view-btn active" title="Grid View" onclick="setView('grid',this)"><i class="fa fa-th-large"></i></button>
+          <button type="button" class="view-btn" title="List View" onclick="setView('list',this)"><i class="fa fa-list"></i></button>
         </div>
       </div>
-      <div class="active-filters" id="active-filters"></div>
-      <div class="grid-4" id="shop-grid"></div>
-      <div class="pagination">
-        <button class="page-btn">&laquo;</button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
-        <button class="page-btn">&raquo;</button>
-      </div>
-    </main>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="grid-4" id="shop-grid"></div>
+
+    <!-- Empty State -->
+    <div id="shop-empty" style="display:none;text-align:center;padding:5rem 2rem">
+      <div style="font-size:3rem;color:var(--gold);margin-bottom:1rem">&#10022;</div>
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:.5rem">No Products Found</h3>
+      <p style="color:var(--text-muted);margin-bottom:1.5rem">No pieces currently match the selected category.</p>
+      <button type="button" class="btn btn-gold btn-sm" onclick="resetCategoryFilter()">View All Categories</button>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <button class="page-btn">&laquo;</button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn">&raquo;</button>
+    </div>
   </div>
-</div>
+</section>
 
 <!-- Reviews Section -->
 <section class="reviews-section" style="background:#F7EFE3">
@@ -240,31 +238,72 @@ function setRating(r) {
 function submitReview() {
   showToast('&#10022; Thank you for your review!');
 }
-function applyFilters() { renderShop(); }
-function clearFilters() {
-  document.querySelectorAll('.shop-sidebar input[type="checkbox"]').forEach(c => c.checked = true);
+function applyFilters() {
+  renderShop();
+}
+function resetCategoryFilter() {
+  const catSelect = document.getElementById('category-select');
+  if (catSelect) catSelect.value = 'all';
   renderShop();
 }
 function setView(v, btn) {
   document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const grid = document.getElementById('shop-grid');
-  if (v === 'list') { grid.style.gridTemplateColumns = '1fr'; }
-  else { grid.style.gridTemplateColumns = ''; }
+  if (v === 'list') {
+    grid.style.gridTemplateColumns = '1fr';
+  } else {
+    grid.style.gridTemplateColumns = '';
+  }
 }
 function renderShop() {
   const grid = document.getElementById('shop-grid');
   const countEl = document.getElementById('product-count');
+  const emptyEl = document.getElementById('shop-empty');
   if (!grid) return;
-  const sortVal = document.getElementById('sort-select').value;
+
+  const catVal = (document.getElementById('category-select')?.value || 'all').toLowerCase();
+  const sortVal = document.getElementById('sort-select')?.value || 'newest';
+
   let prods = [...PRODUCTS];
-  if (sortVal === 'price-asc') prods.sort((a,b) => a.price - b.price);
-  else if (sortVal === 'price-desc') prods.sort((a,b) => b.price - a.price);
-  else if (sortVal === 'rating') prods.sort((a,b) => b.rating - a.rating);
-  grid.innerHTML = prods.map(productCardHTML).join('');
+
+  // 1. Filter by category
+  if (catVal !== 'all') {
+    prods = prods.filter(p => p.category && p.category.toLowerCase() === catVal);
+  }
+
+  // 2. Sort products
+  if (sortVal === 'price-asc') {
+    prods.sort((a,b) => a.price - b.price);
+  } else if (sortVal === 'price-desc') {
+    prods.sort((a,b) => b.price - a.price);
+  } else if (sortVal === 'rating') {
+    prods.sort((a,b) => b.rating - a.rating);
+  } else if (sortVal === 'newest') {
+    prods.sort((a,b) => {
+      const aNew = (a.badges || []).includes('new') ? 1 : 0;
+      const bNew = (b.badges || []).includes('new') ? 1 : 0;
+      return bNew - aNew || b.id - a.id;
+    });
+  }
+
+  // 3. Render
   if (countEl) countEl.textContent = prods.length;
+  if (prods.length === 0) {
+    grid.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = 'block';
+  } else {
+    if (emptyEl) emptyEl.style.display = 'none';
+    grid.innerHTML = prods.map(productCardHTML).join('');
+  }
 }
 document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const catParam = params.get('category');
+  const catSelect = document.getElementById('category-select');
+  if (catParam && catSelect) {
+    catSelect.value = catParam.toLowerCase();
+  }
   renderShop();
   const rv = document.getElementById('shop-reviews');
   if (rv) rv.innerHTML = REVIEWS.map(reviewCardHTML).join('');
