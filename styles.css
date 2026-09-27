@@ -1,4 +1,4 @@
-﻿@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap");
 :root{--ivory:#FFFDF8;--beige:#F7EFE3;--gold:#D4AF7C;--gold-hover:#B99461;--gold-light:#EDD9B3;--text-dark:#1A1A1A;--text-muted:#77736D;--text-light:#A09990;--black:#111111;--white:#FFFFFF;--border:#E8DDD0;--shadow-sm:0 2px 12px rgba(180,150,100,0.08);--shadow-md:0 8px 32px rgba(180,150,100,0.14);--shadow-lg:0 20px 60px rgba(180,150,100,0.18);--radius-sm:8px;--radius-md:16px;--radius-lg:24px;--radius-xl:40px;--transition:0.3s cubic-bezier(0.4,0,0.2,1);--nav-height:80px;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
@@ -98,19 +98,22 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
 .footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:2rem;display:flex;align-items:center;justify-content:space-between;font-size:.78rem;color:rgba(255,255,255,.3);}
 .footer-payments{display:flex;gap:.5rem;align-items:center;}
 .payment-badge{background:rgba(255,255,255,.08);border-radius:4px;padding:.25rem .6rem;font-size:.7rem;font-weight:700;color:rgba(255,255,255,.5);}
-.hero{position:relative;height:calc(100vh - var(--nav-height));min-height:600px;display:flex;align-items:center;overflow:hidden;}
+.hero{position:relative;min-height:calc(100vh - var(--nav-height));min-height:680px;display:flex;align-items:center;padding:4rem 0 6rem;overflow:hidden;}
 .hero-bg{position:absolute;inset:0;}
 .hero-bg img{width:100%;height:100%;object-fit:cover;object-position:center;}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(105deg,rgba(26,26,26,.72) 0%,rgba(26,26,26,.4) 50%,rgba(26,26,26,.1) 100%);}
-.hero-content{position:relative;z-index:2;color:#fff;max-width:600px;}
+.hero-content{position:relative;z-index:2;color:#fff;max-width:600px;margin-bottom:1rem;}
 .hero-tag{display:inline-flex;align-items:center;gap:.5rem;background:rgba(212,175,124,.2);border:1px solid rgba(212,175,124,.4);border-radius:40px;padding:.4rem 1rem;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-light);margin-bottom:1.5rem;}
 .hero-title{font-family:"Playfair Display",serif;font-size:clamp(2.8rem,6vw,4.5rem);font-weight:700;line-height:1.1;margin-bottom:1.25rem;color:#fff;}
 .hero-title em{color:var(--gold-light);font-style:italic;}
-.hero-sub{font-size:1rem;color:rgba(255,255,255,.75);margin-bottom:2.5rem;max-width:400px;}
+.hero-sub{font-size:1rem;color:rgba(255,255,255,.75);margin-bottom:2rem;max-width:400px;}
 .hero-btns{display:flex;gap:1rem;flex-wrap:wrap;}
-.hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;color:rgba(255,255,255,.6);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;z-index:2;}
-.scroll-dot{width:1.5px;height:50px;background:linear-gradient(to bottom,rgba(212,175,124,.8),transparent);animation:scrollPulse 1.8s ease-in-out infinite;}
-@keyframes scrollPulse{0%,100%{opacity:.4;transform:scaleY(.8);}50%{opacity:1;transform:scaleY(1);}}
+.hero-scroll{position:absolute;bottom:1.25rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.35rem;color:rgba(255,255,255,.6);font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;z-index:2;text-decoration:none;transition:color var(--transition);}
+.hero-scroll:hover{color:var(--gold-light);}
+.scroll-dot{width:1.5px;height:26px;background:linear-gradient(to bottom,var(--gold),transparent);animation:scrollPulse 1.8s ease-in-out infinite;}
+@keyframes scrollPulse{0%,100%{opacity:.4;transform:scaleY(.7);}50%{opacity:1;transform:scaleY(1);}}
+@media(max-height:700px){.hero-scroll{display:none;}}
+@media(max-width:768px){.hero-scroll{display:none;}}
 .categories-strip{padding:4rem 0;background:var(--beige);}
 .cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;}
 .cat-card{background:var(--white);border-radius:var(--radius-md);overflow:hidden;text-align:center;cursor:pointer;transition:all var(--transition);border:1px solid transparent;text-decoration:none;color:inherit;display:block;}
