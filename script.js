@@ -116,13 +116,38 @@ function addToCart(productId, qty = 1) {
 
 function buyNow(productId, qty = 1) {
   addToCart(productId, qty);
-  window.location.href = "orders.html";
+  window.location.href = "checkout.html";
+}
+
+function updateCartQty(productId, delta) {
+  const item = state.cart.find(x => x.id === productId);
+  if (!item) return;
+  const newQty = (item.qty || 1) + delta;
+  if (newQty <= 0) {
+    removeFromCart(productId);
+  } else {
+    item.qty = Math.min(99, newQty);
+    saveState();
+    updateNavBadges();
+  }
+}
+
+function getCartSubtotal() {
+  return state.cart.reduce((sum, item) => sum + (item.price * (item.qty || 1)), 0);
+}
+
+function clearCart() {
+  state.cart = [];
+  saveState();
+  updateNavBadges();
 }
 
 function removeFromCart(productId) {
+  const p = state.cart.find(x => x.id === productId);
   state.cart = state.cart.filter(x => x.id !== productId);
   saveState();
   updateNavBadges();
+  if (p) showToast("Removed " + p.name + " from cart");
 }
 
 // ---- Wishlist ----

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wishlist — Dazzle by Dua</title>
-<meta name="description" content="Your saved jewellery pieces — Dazzle by Dua wishlist.">
+<title>Shopping Cart — Dazzle by Dua</title>
+<meta name="description" content="Review your jewellery selections and proceed to checkout — Dazzle by Dua.">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -62,51 +62,91 @@
     <li><a href="contact.html" class="mobile-nav-link">Contact</a></li>
   </ul>
 </div>
+
 <div class="page-hero">
   <div class="container">
-    <nav class="breadcrumb"><a href="index.html">Home</a><span>/</span><span>Wishlist</span></nav>
-    <h1 style="font-size:2rem">My Wishlist</h1>
-    <p>Pieces you&rsquo;ve fallen in love with.</p>
+    <nav class="breadcrumb"><a href="index.html">Home</a><span>/</span><span>Cart</span></nav>
+    <h1 style="font-size:2rem">Shopping Cart</h1>
+    <p>Review your selections before checkout.</p>
   </div>
 </div>
 
 <section class="section">
   <div class="container">
-    <div class="wishlist-header">
-      <div>
-        <h2 style="font-size:1.4rem;margin-bottom:.25rem">Saved Items</h2>
-        <span class="wishlist-count-pill" id="wish-count-pill">0 items</span>
-      </div>
-      <div style="display:flex;gap:.75rem">
-        <button class="btn btn-outline btn-sm" onclick="clearWishlist()">Clear All</button>
-        <button class="btn btn-gold btn-sm" onclick="addAllToCart()">Add All to Cart</button>
-      </div>
-    </div>
 
-    <!-- Wishlist empty state -->
-    <div id="wishlist-empty" style="display:none" class="empty-state">
-      <div class="empty-icon">&#9825;</div>
-      <h3 class="empty-title">Your Wishlist is Empty</h3>
-      <p class="empty-sub">Browse our collection and save pieces you love.</p>
+    <!-- Empty State -->
+    <div id="cart-empty" style="display:none" class="empty-state">
+      <div class="empty-icon">🛒</div>
+      <h3 class="empty-title">Your Cart is Empty</h3>
+      <p class="empty-sub">Looks like you haven&rsquo;t added any jewellery yet.</p>
       <a href="shop.html" class="btn btn-gold">Explore Collection</a>
     </div>
 
-    <!-- Wishlist grid -->
-    <div class="grid-4" id="wishlist-grid"></div>
+    <!-- Cart Content -->
+    <div id="cart-content" style="display:none">
+      <div class="cart-layout">
+        <!-- Cart Table -->
+        <div>
+          <div class="cart-table-card">
+            <div class="cart-header-row">
+              <div>Product</div>
+              <div>Price</div>
+              <div>Quantity</div>
+              <div>Total</div>
+              <div></div>
+            </div>
+            <div class="cart-items-list" id="cart-items-list">
+              <!-- JS rendered -->
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;gap:1rem;flex-wrap:wrap">
+            <a href="shop.html" class="btn btn-outline btn-sm"><i class="fa fa-arrow-left" style="font-size:.7rem"></i> Continue Shopping</a>
+            <button class="btn btn-outline btn-sm" onclick="handleClearCart()" id="clear-cart-btn"><i class="fa fa-trash-alt" style="font-size:.7rem"></i> Clear Cart</button>
+          </div>
+        </div>
 
-    <!-- Recommendations -->
-    <div style="margin-top:4rem">
+        <!-- Summary Sidebar -->
+        <div class="cart-summary-box">
+          <div class="summary-title">Order Summary</div>
+          <div class="summary-line">
+            <span class="summary-label">Subtotal</span>
+            <span class="summary-val" id="summary-subtotal">₹0</span>
+          </div>
+          <div class="summary-line">
+            <span class="summary-label">Delivery</span>
+            <span class="summary-val-accent">Calculated at checkout</span>
+          </div>
+          <div class="summary-total-line">
+            <span class="summary-total-label">Estimated Total</span>
+            <span class="summary-total-val" id="summary-total">₹0</span>
+          </div>
+          <a href="checkout.html" class="btn btn-gold" id="proceed-checkout-btn" style="width:100%;justify-content:center;font-size:.85rem">
+            Proceed to Checkout <i class="fa fa-arrow-right" style="font-size:.7rem;margin-left:.4rem"></i>
+          </a>
+          <div class="cart-trust-badges">
+            <div class="cart-trust-item"><i class="fa fa-lock"></i> Secure Checkout</div>
+            <div class="cart-trust-item"><i class="fa fa-shield-alt"></i> Anti-Tarnish Jewellery</div>
+            <div class="cart-trust-item"><i class="fa fa-box-open"></i> Carefully Packed &amp; Delivered</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- You May Also Like -->
+    <div style="margin-top:4rem" id="cart-recs-section">
       <div class="section-header-row">
         <div>
-          <span class="section-tag">You Might Also Love</span>
-          <h2 class="section-title" style="margin-bottom:0">Recommended For You</h2>
+          <span class="section-tag">You May Also Like</span>
+          <h2 class="section-title" style="margin-bottom:0">Complete Your Look</h2>
         </div>
         <a href="shop.html" class="btn btn-outline btn-sm">View All</a>
       </div>
-      <div class="grid-4" id="rec-grid"></div>
+      <div class="grid-4" id="cart-recs-grid"></div>
     </div>
+
   </div>
 </section>
+
 <footer>
   <div class="container">
     <div class="footer-inner">
@@ -171,36 +211,80 @@
 </footer>
 <script src="script.js"></script>
 <script>
-function renderWishlist() {
-  const grid = document.getElementById('wishlist-grid');
-  const empty = document.getElementById('wishlist-empty');
-  const pill = document.getElementById('wish-count-pill');
-  if (!grid) return;
-  const wl = state.wishlist;
-  if (pill) pill.textContent = wl.length + ' item' + (wl.length !== 1 ? 's' : '');
-  if (wl.length === 0) {
-    grid.innerHTML = '';
-    if (empty) empty.style.display = '';
-  } else {
-    if (empty) empty.style.display = 'none';
-    grid.innerHTML = wl.map(productCardHTML).join('');
+function renderCart() {
+  const emptyEl = document.getElementById('cart-empty');
+  const contentEl = document.getElementById('cart-content');
+  const listEl = document.getElementById('cart-items-list');
+  const subtotalEl = document.getElementById('summary-subtotal');
+  const totalEl = document.getElementById('summary-total');
+
+  if (state.cart.length === 0) {
+    emptyEl.style.display = '';
+    contentEl.style.display = 'none';
+    return;
   }
+
+  emptyEl.style.display = 'none';
+  contentEl.style.display = '';
+
+  listEl.innerHTML = state.cart.map(item => {
+    const itemTotal = item.price * (item.qty || 1);
+    return `
+    <div class="cart-item-row" data-id="${item.id}">
+      <div class="cart-item-info">
+        <a href="product-details.html?id=${item.id}" class="cart-item-img">
+          <img src="${item.img}" alt="${item.name}">
+        </a>
+        <div>
+          <a href="product-details.html?id=${item.id}" class="cart-item-title">${item.name}</a>
+        </div>
+      </div>
+      <div class="cart-item-price">₹${item.price.toLocaleString()}</div>
+      <div>
+        <div class="cart-qty-ctrl">
+          <button class="cart-qty-btn" onclick="changeQty(${item.id}, -1)" aria-label="Decrease">−</button>
+          <span class="cart-qty-val">${item.qty || 1}</span>
+          <button class="cart-qty-btn" onclick="changeQty(${item.id}, 1)" aria-label="Increase">+</button>
+        </div>
+      </div>
+      <div class="cart-item-total">₹${itemTotal.toLocaleString()}</div>
+      <button class="cart-item-del" onclick="deleteItem(${item.id})" title="Remove" aria-label="Remove">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>`;
+  }).join('');
+
+  const subtotal = getCartSubtotal();
+  subtotalEl.textContent = '₹' + subtotal.toLocaleString();
+  totalEl.textContent = '₹' + subtotal.toLocaleString();
 }
-function clearWishlist() {
-  state.wishlist = [];
-  saveState();
-  updateNavBadges();
-  renderWishlist();
-  showToast('Wishlist cleared.');
+
+function changeQty(id, delta) {
+  updateCartQty(id, delta);
+  renderCart();
 }
-function addAllToCart() {
-  state.wishlist.forEach(p => addToCart(p.id));
-  showToast('&#10022; All wishlist items added to cart!');
+
+function deleteItem(id) {
+  removeFromCart(id);
+  renderCart();
 }
+
+function handleClearCart() {
+  if (state.cart.length === 0) return;
+  clearCart();
+  renderCart();
+  showToast('Cart cleared.');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  renderWishlist();
-  const rec = document.getElementById('rec-grid');
-  if (rec) rec.innerHTML = PRODUCTS.slice(0,4).map(productCardHTML).join('');
+  renderCart();
+  // Recommendations
+  const recGrid = document.getElementById('cart-recs-grid');
+  if (recGrid) {
+    const cartIds = state.cart.map(c => c.id);
+    const recs = PRODUCTS.filter(p => !cartIds.includes(p.id)).slice(0, 4);
+    recGrid.innerHTML = (recs.length ? recs : PRODUCTS.slice(0, 4)).map(productCardHTML).join('');
+  }
 });
 </script>
 </body>
