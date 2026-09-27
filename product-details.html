@@ -199,7 +199,6 @@
 <script>
 let currentProduct = null;
 let currentQuantity = 1;
-let selectedVariant = "";
 
 function getProductIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -214,14 +213,6 @@ function updateQuantity(delta) {
   val = Math.max(1, Math.min(10, val + delta));
   input.value = val;
   currentQuantity = val;
-}
-
-function selectVariant(pill, name) {
-  document.querySelectorAll(".detail-variant-pill").forEach(p => p.classList.remove("active"));
-  pill.classList.add("active");
-  selectedVariant = name;
-  const label = document.getElementById("selected-variant-name");
-  if (label) label.textContent = name;
 }
 
 function switchGalleryImage(thumb, src) {
@@ -265,8 +256,6 @@ function renderProductDetails() {
     images: [currentProduct.img, "featured_collection.jpg", "hero_necklace.jpg"]
   };
 
-  selectedVariant = info.variants[0] || "";
-
   // Update Breadcrumbs & Title
   document.title = currentProduct.name + " — Dazzle by Dua";
   const crumbCat = document.getElementById("crumb-category");
@@ -287,11 +276,6 @@ function renderProductDetails() {
     <div class="gallery-thumb ${i === 0 ? 'active' : ''}" onclick="switchGalleryImage(this, '${img}')">
       <img src="${img}" alt="${currentProduct.name} preview ${i+1}">
     </div>
-  `).join("");
-
-  // Variants HTML
-  const variantsHTML = info.variants.map((v, i) => `
-    <button type="button" class="detail-variant-pill ${i === 0 ? 'active' : ''}" onclick="selectVariant(this, '${v}')">${v}</button>
   `).join("");
 
   // Mount HTML
@@ -331,17 +315,6 @@ function renderProductDetails() {
         </div>
 
         <p class="detail-desc">${info.description}</p>
-
-        <!-- Variants -->
-        <div class="detail-variant-section">
-          <div class="detail-variant-label">
-            <span>Select Finish / Option:</span>
-            <span id="selected-variant-name">${selectedVariant}</span>
-          </div>
-          <div class="detail-variant-options">
-            ${variantsHTML}
-          </div>
-        </div>
 
         <!-- Quantity -->
         <div class="detail-qty-group">
