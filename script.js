@@ -23,6 +23,73 @@ const REVIEWS = [
   { name:"Maha B.", rating:4, text:"Very happy with my purchase. The earrings are lightweight and comfortable for all-day wear.", date:"2 Jun 2025", verified:true },
 ];
 
+const PRODUCT_DETAILS = {
+  1: {
+    description: "An ode to blooming elegance, this Flower Pendant Necklace features delicately sculpted petals set with shimmering pavé accents, culminating in a radiant freshwater pearl at the center. Hand-crafted and finished in our signature 18K champagne gold vermeil.",
+    material: "18K Champagne Gold Vermeil & Natural Freshwater Pearl",
+    dimensions: "Pendant 18mm x 18mm | Chain length: 42cm + 5cm extension",
+    sku: "DBD-NC-001",
+    variants: ["18K Champagne Gold", "Rose Gold Vermeil", "Sterling Silver"],
+    images: ["product_flower_necklace.jpg", "hero_necklace.jpg", "featured_collection.jpg"]
+  },
+  2: {
+    description: "Graceful and captivating, the Pearl Drop Earrings frame your features with luminous freshwater pearls suspended from delicate diamond-accented hoop huggies. Designed to move subtly with your every step.",
+    material: "18K Gold Plated Brass & Grade-AAA Freshwater Pearls",
+    dimensions: "Drop length: 32mm | Pearl diameter: 9mm",
+    sku: "DBD-ER-002",
+    variants: ["18K Champagne Gold", "Classic White Gold"],
+    images: ["product_pearl_earrings.jpg", "featured_collection.jpg", "hero_necklace.jpg"]
+  },
+  3: {
+    description: "Subtle luxury for every day. Our Delicate Chain Bracelet features fine interlocking links interwoven with dainty droplet charms that catch the light from every angle. Perfect for wearing solo or layering.",
+    material: "18K Champagne Gold Vermeil over Sterling Silver",
+    dimensions: "Length: 16cm + 3.5cm extender",
+    sku: "DBD-BR-003",
+    variants: ["18K Champagne Gold", "Sterling Silver"],
+    images: ["product_bracelet.jpg", "featured_collection.jpg", "product_ring.jpg"]
+  },
+  4: {
+    description: "The epitome of refined modern minimalism. This ring showcases a solitary brilliant-cut solitaire set upon an ultra-slim champagne gold band. Designed for seamless stacking or understated everyday luxury.",
+    material: "18K Champagne Gold Vermeil & Solitaire Cubic Zirconia",
+    dimensions: "Band width: 1.4mm | Solitaire: 4mm",
+    sku: "DBD-RG-004",
+    variants: ["Size 6 (16.5mm)", "Size 7 (17.3mm)", "Size 8 (18.1mm)"],
+    images: ["product_ring.jpg", "featured_collection.jpg", "product_bracelet.jpg"]
+  },
+  5: {
+    description: "Timeless classic hoops reimagined with a modern sculpted silhouette. Lightweight enough for effortless day-to-night styling with a secure hinge clasp.",
+    material: "18K Champagne Gold Vermeil",
+    dimensions: "Diameter: 22mm | Thickness: 3mm",
+    sku: "DBD-ER-005",
+    variants: ["Small (18mm)", "Medium (22mm)", "Large (28mm)"],
+    images: ["product_pearl_earrings.jpg", "hero_necklace.jpg", "featured_collection.jpg"]
+  },
+  6: {
+    description: "Dainty celestial motif adorned with fine micropavé stones on a slender cable chain. Adds a celestial glow to your collarbone.",
+    material: "18K Champagne Gold Vermeil",
+    dimensions: "Chain: 40cm + 5cm extension | Pendant: 12mm",
+    sku: "DBD-NC-006",
+    variants: ["18K Champagne Gold", "Sterling Silver"],
+    images: ["product_flower_necklace.jpg", "hero_necklace.jpg", "featured_collection.jpg"]
+  },
+  7: {
+    description: "Effortless everyday classic. Handpicked button-shape freshwater pearls mounted on hypo-allergenic titanium posts with secure butterfly backs.",
+    material: "Grade-AAA Freshwater Pearls & 18K Gold Posts",
+    dimensions: "Diameter: 7mm",
+    sku: "DBD-ER-007",
+    variants: ["White Pearl", "Blush Pink Pearl"],
+    images: ["product_pearl_earrings.jpg", "featured_collection.jpg", "product_flower_necklace.jpg"]
+  },
+  8: {
+    description: "A harmonized stack of finely textured bangles, each offering a different facet of hand-carved polish and champagne luster.",
+    material: "18K Champagne Gold Vermeil",
+    dimensions: "Inner diameter: 62mm (Medium)",
+    sku: "DBD-BR-008",
+    variants: ["18K Champagne Gold", "Tricolor Gold Stack"],
+    images: ["product_bracelet.jpg", "featured_collection.jpg", "product_ring.jpg"]
+  }
+};
+
 // ---- State ----
 const state = {
   cart: JSON.parse(localStorage.getItem("dazzle_cart") || "[]"),
@@ -35,15 +102,21 @@ function saveState() {
 }
 
 // ---- Cart ----
-function addToCart(productId) {
+function addToCart(productId, qty = 1) {
   const p = PRODUCTS.find(x => x.id === productId);
   if (!p) return;
+  const num = parseInt(qty, 10) || 1;
   const existing = state.cart.find(x => x.id === productId);
-  if (existing) { existing.qty = (existing.qty || 1) + 1; }
-  else { state.cart.push({ ...p, qty: 1 }); }
+  if (existing) { existing.qty = (existing.qty || 1) + num; }
+  else { state.cart.push({ ...p, qty: num }); }
   saveState();
   updateNavBadges();
-  showToast("✦ Added to cart — " + p.name);
+  showToast("✦ Added to cart — " + p.name + (num > 1 ? ` (x${num})` : ""));
+}
+
+function buyNow(productId, qty = 1) {
+  addToCart(productId, qty);
+  window.location.href = "orders.html";
 }
 
 function removeFromCart(productId) {
@@ -117,18 +190,19 @@ function productCardHTML(p) {
   const inWish = isInWishlist(p.id);
   const badgesHTML = (p.badges || []).map(b => `<span class="badge badge-${b}">${b}</span>`).join("");
   const outOfStock = !p.inStock ? '<span class="badge badge-oos">Out of Stock</span>' : "";
+  const detailUrl = `product-details.html?id=${p.id}`;
   return `
-  <div class="product-card" data-id="${p.id}">
+  <div class="product-card" data-id="${p.id}" onclick="handleCardClick(event, ${p.id})" style="cursor:pointer">
     <div class="product-img-wrap">
       <img src="${p.img}" alt="${p.name}" loading="lazy">
       <div class="product-badges">${badgesHTML}${outOfStock}</div>
       <div class="product-img-actions">
-        <button class="btn-icon wish-toggle${inWish ? " active" : ""}" onclick="handleWishToggle(this, ${p.id})" title="Wishlist">♥</button>
-        <a href="shop.html" class="btn-icon" title="Quick View">👁</a>
+        <button type="button" class="btn-icon wish-toggle${inWish ? " active" : ""}" onclick="event.stopPropagation();handleWishToggle(this, ${p.id})" title="Wishlist">♥</button>
+        <a href="${detailUrl}" class="btn-icon" onclick="event.stopPropagation()" title="View Details">👁</a>
       </div>
     </div>
     <div class="product-body">
-      <h4 class="product-name">${p.name}</h4>
+      <h4 class="product-name"><a href="${detailUrl}" onclick="event.stopPropagation()">${p.name}</a></h4>
       <div class="product-rating">
         <span class="stars">${renderStars(p.rating)}</span>
         <span class="rating-count">(${p.reviews})</span>
@@ -137,9 +211,16 @@ function productCardHTML(p) {
         <span class="product-price">₹${p.price.toLocaleString()}</span>
         <span class="product-price-old">₹${p.oldPrice.toLocaleString()}</span>
       </div>
-      <button class="btn btn-dark btn-sm" onclick="addToCart(${p.id})" ${!p.inStock ? "disabled style='opacity:.5;cursor:not-allowed'" : ""}>${!p.inStock ? "Out of Stock" : "Add to Cart"}</button>
+      <button type="button" class="btn btn-dark btn-sm" onclick="event.stopPropagation();addToCart(${p.id})" ${!p.inStock ? "disabled style='opacity:.5;cursor:not-allowed'" : ""}>${!p.inStock ? "Out of Stock" : "Add to Cart"}</button>
     </div>
   </div>`;
+}
+
+function handleCardClick(event, id) {
+  if (event.target.closest('button') || event.target.closest('.wish-toggle') || event.target.closest('.btn') || event.target.closest('.btn-icon')) {
+    return;
+  }
+  window.location.href = `product-details.html?id=${id}`;
 }
 
 // ---- Review Card HTML ----

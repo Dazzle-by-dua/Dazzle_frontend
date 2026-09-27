@@ -7,6 +7,7 @@ A luxury, minimal, multi-page front-end jewellery e-commerce website crafted wit
 - **Multi-Page Architecture**:
   - **Home** (`index.html`): Hero section with call-to-actions, category spotlights, new arrivals, brand story, customer testimonials, and Instagram gallery.
   - **Shop** (`shop.html`): Comprehensive product catalog with category checkboxes, price range slider, availability filters, sort by options (newest, price, rating), grid/list view toggles, pagination, and a customer reviews & ratings section with a 5-star submission form.
+  - **Product Details** (`product-details.html`): Dedicated dynamic single product view featuring full-size photography gallery, thumbnail switcher, SKU, material specs, finish variants selector, quantity adjuster, Add to Cart, Buy Now, Wishlist toggle, care guides, and customer reviews.
   - **Offers & Combos** (`offers.html`): Live real-time countdown timer, one-click copyable coupon codes (`DAZZLE10`), bundle deals with discount badges, and newsletter subscription.
   - **My Orders** (`orders.html`): Interactive status tabs (*All*, *Processing*, *Shipped*, *Delivered*, *Cancelled*), multi-step delivery tracking progression bar, order breakdown, and order action buttons.
   - **Wishlist** (`wishlist.html`): Saved favourites with dynamic badge counter, remove items, clear all, add all to cart, empty state handling, and curated recommendations.

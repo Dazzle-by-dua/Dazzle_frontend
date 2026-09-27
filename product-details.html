@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Details — Dazzle by Dua</title>
+<meta name="description" content="Explore fine handcrafted jewellery by Dazzle by Dua. Timeless elegance crafted with 18K champagne gold.">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<!-- Announcement -->
+<div class="announcement-bar">
+  Free shipping on orders above &#8377;2500 &nbsp;|&nbsp; Use code <strong>DAZZLE10</strong> for 10% off
+  <a href="offers.html">View Offers &rarr;</a>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-name">Dazzle by Dua</span>
+      <span class="nav-logo-tagline">Fine Jewellery</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="shop.html" class="nav-link active">Shop</a></li>
+      <li><a href="offers.html" class="nav-link">Offers</a></li>
+      <li><a href="orders.html" class="nav-link">My Orders</a></li>
+      <li><a href="wishlist.html" class="nav-link">Wishlist</a></li>
+      <li><a href="contact.html" class="nav-link">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="wishlist.html" class="nav-icon" title="Wishlist">
+        <i class="fa fa-heart"></i>
+        <span class="nav-badge wish-badge">0</span>
+      </a>
+      <a href="orders.html" class="nav-icon" title="My Orders">
+        <i class="fa fa-shopping-bag"></i>
+        <span class="nav-badge cart-badge">0</span>
+      </a>
+      <button class="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu">
+  <div class="mobile-menu-header">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-name">Dazzle by Dua</span>
+      <span class="nav-logo-tagline">Fine Jewellery</span>
+    </a>
+    <button class="mobile-menu-close">&times;</button>
+  </div>
+  <ul class="mobile-nav-links">
+    <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+    <li><a href="shop.html" class="mobile-nav-link">Shop</a></li>
+    <li><a href="offers.html" class="mobile-nav-link">Offers &amp; Combos</a></li>
+    <li><a href="orders.html" class="mobile-nav-link">My Orders</a></li>
+    <li><a href="wishlist.html" class="mobile-nav-link">Wishlist</a></li>
+    <li><a href="contact.html" class="mobile-nav-link">Contact</a></li>
+  </ul>
+</div>
+
+<!-- Page Body -->
+<main class="section" style="padding-top:2.5rem">
+  <div class="container">
+    <!-- Breadcrumb & Back -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem">
+      <nav class="breadcrumb" style="margin-bottom:0">
+        <a href="index.html">Home</a>
+        <span>/</span>
+        <a href="shop.html">Shop</a>
+        <span>/</span>
+        <span id="crumb-category" style="text-transform:capitalize">Category</span>
+        <span>/</span>
+        <span id="crumb-product" style="color:var(--text-dark);font-weight:600">Product</span>
+      </nav>
+      <a href="shop.html" class="detail-back-link" style="margin-bottom:0">&larr; Back to Shop</a>
+    </div>
+
+    <!-- Product Layout Container (dynamically injected) -->
+    <div id="product-detail-mount"></div>
+
+    <!-- Details Tabs / Accordion -->
+    <div style="max-width:850px;margin:4rem auto 0">
+      <div class="faq-item open">
+        <div class="faq-q">Product Specifications &amp; Dimensions <span class="faq-arrow">&#9660;</span></div>
+        <div class="faq-a" id="specs-accordion-content">
+          <p>Hand-crafted with meticulous attention to detail in 18K champagne gold finish.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Jewellery Care &amp; Longevity <span class="faq-arrow">&#9660;</span></div>
+        <div class="faq-a">
+          <p>To preserve your jewellery's brilliance, keep away from direct contact with perfumes, sanitizers, chlorine, and harsh chemicals. Store individually in your complimentary Dazzle by Dua soft velvet pouch when not in use. Gently buff with a clean microfiber cloth after wear.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Complimentary Packaging &amp; Shipping <span class="faq-arrow">&#9660;</span></div>
+        <div class="faq-a">
+          <p>Every order arrives in our signature champagne gold and ivory keepsake box, tied with satin ribbon and accompanied by an authenticity certificate card. Orders above &#8377;2500 qualify for free express courier delivery with tracking.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Reviews -->
+    <div style="margin-top:5rem">
+      <div class="text-center" style="margin-bottom:2.5rem">
+        <span class="section-tag">Real Experiences</span>
+        <h2 class="section-title">Customer Reviews &amp; Ratings</h2>
+      </div>
+      <div class="reviews-grid" id="product-reviews-grid"></div>
+    </div>
+
+    <!-- Related Products -->
+    <div style="margin-top:5rem">
+      <div class="section-header-row">
+        <div>
+          <span class="section-tag">Complete The Look</span>
+          <h2 class="section-title" style="margin-bottom:0">You May Also Adore</h2>
+        </div>
+        <a href="shop.html" class="btn btn-outline btn-sm">View All &rarr;</a>
+      </div>
+      <div class="grid-4" id="related-products-grid"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand-name">Dazzle by Dua</div>
+        <span class="footer-brand-tag">Fine Jewellery</span>
+        <p class="footer-tagline">Timeless pieces, crafted with love.<br>For your most beautiful moments.</p>
+        <div class="footer-social">
+          <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-pinterest"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-heading">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html" class="footer-link">Home</a></li>
+          <li><a href="shop.html" class="footer-link">Shop</a></li>
+          <li><a href="offers.html" class="footer-link">Offers &amp; Combos</a></li>
+          <li><a href="contact.html" class="footer-link">Contact Us</a></li>
+          <li><a href="orders.html" class="footer-link">My Orders</a></li>
+          <li><a href="wishlist.html" class="footer-link">Wishlist</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Customer Care</div>
+        <ul class="footer-links">
+          <li><a href="#" class="footer-link">Shipping Info</a></li>
+          <li><a href="#" class="footer-link">Returns &amp; Refunds</a></li>
+          <li><a href="#" class="footer-link">Privacy Policy</a></li>
+          <li><a href="#" class="footer-link">Terms &amp; Conditions</a></li>
+          <li><a href="contact.html" class="footer-link">FAQs</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Connect With Us</div>
+        <ul class="footer-links">
+          <li><a href="#" class="footer-link"><i class="fab fa-instagram"></i>&nbsp; Instagram</a></li>
+          <li><a href="#" class="footer-link"><i class="fab fa-whatsapp"></i>&nbsp; WhatsApp</a></li>
+          <li><a href="#" class="footer-link"><i class="fa fa-envelope"></i>&nbsp; Email Us</a></li>
+        </ul>
+        <div style="margin-top:1.5rem">
+          <div class="footer-heading" style="font-size:.85rem">Newsletter</div>
+          <div style="display:flex;gap:.5rem;margin-top:.75rem">
+            <input type="email" placeholder="Your email" style="flex:1;padding:.6rem .9rem;border:1px solid rgba(255,255,255,.15);border-radius:40px;background:rgba(255,255,255,.05);color:#fff;font-size:.8rem;font-family:inherit">
+            <button class="btn btn-gold btn-sm" style="padding:.6rem 1rem">&#10003;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2025 Dazzle by Dua. All rights reserved.</span>
+      <div class="footer-payments">
+        <span class="payment-badge">VISA</span>
+        <span class="payment-badge">MC</span>
+        <span class="payment-badge">UPI</span>
+        <span class="payment-badge">COD</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+let currentProduct = null;
+let currentQuantity = 1;
+let selectedVariant = "";
+
+function getProductIdFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const id = parseInt(params.get("id"), 10);
+  return id || 1;
+}
+
+function updateQuantity(delta) {
+  const input = document.getElementById("detail-qty-input");
+  if (!input) return;
+  let val = parseInt(input.value, 10) || 1;
+  val = Math.max(1, Math.min(10, val + delta));
+  input.value = val;
+  currentQuantity = val;
+}
+
+function selectVariant(pill, name) {
+  document.querySelectorAll(".detail-variant-pill").forEach(p => p.classList.remove("active"));
+  pill.classList.add("active");
+  selectedVariant = name;
+  const label = document.getElementById("selected-variant-name");
+  if (label) label.textContent = name;
+}
+
+function switchGalleryImage(thumb, src) {
+  document.querySelectorAll(".gallery-thumb").forEach(t => t.classList.remove("active"));
+  thumb.classList.add("active");
+  const main = document.getElementById("gallery-main-img");
+  if (main) {
+    main.style.opacity = "0.4";
+    setTimeout(() => {
+      main.src = src;
+      main.style.opacity = "1";
+    }, 120);
+  }
+}
+
+function handleDetailAddToCart() {
+  if (!currentProduct) return;
+  addToCart(currentProduct.id, currentQuantity);
+}
+
+function handleDetailBuyNow() {
+  if (!currentProduct) return;
+  buyNow(currentProduct.id, currentQuantity);
+}
+
+function handleDetailWishlist(btn) {
+  if (!currentProduct) return;
+  const added = toggleWishlist(currentProduct.id);
+  btn.classList.toggle("active", added);
+}
+
+function renderProductDetails() {
+  const id = getProductIdFromUrl();
+  currentProduct = PRODUCTS.find(p => p.id === id) || PRODUCTS[0];
+  const info = PRODUCT_DETAILS[currentProduct.id] || {
+    description: "An iconic piece from Dazzle by Dua crafted with timeless grace.",
+    material: "18K Champagne Gold Vermeil",
+    dimensions: "Standard Fine Jewellery Sizing",
+    sku: "DBD-00" + currentProduct.id,
+    variants: ["18K Champagne Gold", "Rose Gold Vermeil", "Sterling Silver"],
+    images: [currentProduct.img, "featured_collection.jpg", "hero_necklace.jpg"]
+  };
+
+  selectedVariant = info.variants[0] || "";
+
+  // Update Breadcrumbs & Title
+  document.title = currentProduct.name + " — Dazzle by Dua";
+  const crumbCat = document.getElementById("crumb-category");
+  const crumbProd = document.getElementById("crumb-product");
+  if (crumbCat) crumbCat.textContent = currentProduct.category;
+  if (crumbProd) crumbProd.textContent = currentProduct.name;
+
+  // Badges & Discount
+  const discountPct = Math.round(((currentProduct.oldPrice - currentProduct.price) / currentProduct.oldPrice) * 100);
+  const inWish = isInWishlist(currentProduct.id);
+  const badgesHTML = (currentProduct.badges || []).map(b => `<span class="badge badge-${b}">${b}</span>`).join("");
+  const stockBadge = currentProduct.inStock
+    ? `<span class="badge" style="background:#E8F5E9;color:#2E7D32;border:1px solid #C8E6C9">&#10003; In Stock</span>`
+    : `<span class="badge badge-oos">Out of Stock</span>`;
+
+  // Gallery Thumbnails
+  const thumbsHTML = info.images.map((img, i) => `
+    <div class="gallery-thumb ${i === 0 ? 'active' : ''}" onclick="switchGalleryImage(this, '${img}')">
+      <img src="${img}" alt="${currentProduct.name} preview ${i+1}">
+    </div>
+  `).join("");
+
+  // Variants HTML
+  const variantsHTML = info.variants.map((v, i) => `
+    <button type="button" class="detail-variant-pill ${i === 0 ? 'active' : ''}" onclick="selectVariant(this, '${v}')">${v}</button>
+  `).join("");
+
+  // Mount HTML
+  const mount = document.getElementById("product-detail-mount");
+  mount.innerHTML = `
+    <div class="product-detail-layout">
+      <!-- Gallery Column -->
+      <div class="product-gallery">
+        <div class="gallery-main">
+          <img id="gallery-main-img" src="${info.images[0] || currentProduct.img}" alt="${currentProduct.name}">
+          <div class="gallery-badges">
+            ${badgesHTML}
+            ${stockBadge}
+          </div>
+        </div>
+        <div class="gallery-thumbs">
+          ${thumbsHTML}
+        </div>
+      </div>
+
+      <!-- Info Column -->
+      <div class="product-info-panel">
+        <span class="detail-tag">${currentProduct.category} &bull; ${info.sku}</span>
+        <h1 class="detail-title">${currentProduct.name}</h1>
+        
+        <div class="detail-rating-row">
+          <span class="stars">${renderStars(currentProduct.rating)}</span>
+          <span style="font-weight:600">${currentProduct.rating}</span>
+          <span style="color:var(--text-muted)">(${currentProduct.reviews} customer reviews)</span>
+          <span class="detail-verified-badge">&#10003; Verified Piece</span>
+        </div>
+
+        <div class="detail-price-wrap">
+          <span class="detail-price">&#8377;${currentProduct.price.toLocaleString()}</span>
+          <span class="detail-price-old">&#8377;${currentProduct.oldPrice.toLocaleString()}</span>
+          <span class="detail-discount">${discountPct}% OFF</span>
+        </div>
+
+        <p class="detail-desc">${info.description}</p>
+
+        <!-- Variants -->
+        <div class="detail-variant-section">
+          <div class="detail-variant-label">
+            <span>Select Finish / Option:</span>
+            <span id="selected-variant-name">${selectedVariant}</span>
+          </div>
+          <div class="detail-variant-options">
+            ${variantsHTML}
+          </div>
+        </div>
+
+        <!-- Quantity -->
+        <div class="detail-qty-group">
+          <div class="detail-qty-label">Quantity</div>
+          <div class="detail-qty-selector">
+            <button type="button" class="detail-qty-btn" onclick="updateQuantity(-1)">&minus;</button>
+            <input type="text" class="detail-qty-input" id="detail-qty-input" value="1" readonly>
+            <button type="button" class="detail-qty-btn" onclick="updateQuantity(1)">&plus;</button>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="detail-actions-row">
+          <button type="button" class="btn btn-gold" onclick="handleDetailAddToCart()" ${!currentProduct.inStock ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''}>
+            <i class="fa fa-shopping-bag"></i>&nbsp; ${currentProduct.inStock ? 'Add to Cart' : 'Out of Stock'}
+          </button>
+          <button type="button" class="btn btn-dark" onclick="handleDetailBuyNow()" ${!currentProduct.inStock ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''}>
+            Buy Now &rarr;
+          </button>
+          <button type="button" class="detail-wish-btn ${inWish ? 'active' : ''}" onclick="handleDetailWishlist(this)" title="Save to Wishlist">
+            &hearts;
+          </button>
+        </div>
+
+        <!-- Perks -->
+        <div class="detail-perks">
+          <div class="detail-perk">
+            <div class="detail-perk-icon">&#10022;</div>
+            <div class="detail-perk-text">18K Pure Finish</div>
+          </div>
+          <div class="detail-perk">
+            <div class="detail-perk-icon"><i class="fa fa-truck-fast"></i></div>
+            <div class="detail-perk-text">Insured Shipping</div>
+          </div>
+          <div class="detail-perk">
+            <div class="detail-perk-icon"><i class="fa fa-shield-alt"></i></div>
+            <div class="detail-perk-text">7-Day Return</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Update Accordion Specs
+  const specsContent = document.getElementById("specs-accordion-content");
+  if (specsContent) {
+    specsContent.innerHTML = `
+      <table class="detail-specs-table">
+        <tr><td>Material</td><td>${info.material}</td></tr>
+        <tr><td>Dimensions</td><td>${info.dimensions}</td></tr>
+        <tr><td>Product Code (SKU)</td><td>${info.sku}</td></tr>
+        <tr><td>Hypoallergenic</td><td>Yes &bull; Lead &amp; Nickel Compliant</td></tr>
+        <tr><td>Packaging</td><td>Luxury Gift Box Included</td></tr>
+      </table>
+    `;
+  }
+
+  // Render Reviews
+  const reviewsEl = document.getElementById("product-reviews-grid");
+  if (reviewsEl) {
+    reviewsEl.innerHTML = REVIEWS.slice(0, 3).map(reviewCardHTML).join("");
+  }
+
+  // Render Related
+  const relatedEl = document.getElementById("related-products-grid");
+  if (relatedEl) {
+    const related = PRODUCTS.filter(p => p.id !== currentProduct.id).slice(0, 4);
+    relatedEl.innerHTML = related.map(productCardHTML).join("");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderProductDetails();
+});
+</script>
+</body>
+</html>
