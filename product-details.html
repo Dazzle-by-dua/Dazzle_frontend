@@ -87,23 +87,17 @@
     <div id="product-detail-mount"></div>
 
     <!-- Details Tabs / Accordion -->
-    <div style="max-width:850px;margin:4rem auto 0">
+    <div style="max-width:850px;margin:3.5rem auto 0">
       <div class="faq-item open">
-        <div class="faq-q">Product Specifications &amp; Dimensions <span class="faq-arrow">&#9660;</span></div>
-        <div class="faq-a" id="specs-accordion-content">
-          <p>Hand-crafted with meticulous attention to detail in 18K champagne gold finish.</p>
-        </div>
-      </div>
-      <div class="faq-item">
         <div class="faq-q">Jewellery Care &amp; Longevity <span class="faq-arrow">&#9660;</span></div>
         <div class="faq-a">
-          <p>To preserve your jewellery's brilliance, keep away from direct contact with perfumes, sanitizers, chlorine, and harsh chemicals. Store individually in your complimentary Dazzle by Dua soft velvet pouch when not in use. Gently buff with a clean microfiber cloth after wear.</p>
+          <p>To preserve your jewellery's brilliance, keep away from direct contact with perfumes, sanitizers, chlorine, and harsh chemicals. Gently buff with a clean microfiber cloth after wear.</p>
         </div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Complimentary Packaging &amp; Shipping <span class="faq-arrow">&#9660;</span></div>
+        <div class="faq-q">Packaging &amp; Shipping <span class="faq-arrow">&#9660;</span></div>
         <div class="faq-a">
-          <p>Every order arrives in our signature champagne gold and ivory keepsake box, tied with satin ribbon and accompanied by an authenticity certificate card. Orders above &#8377;2500 qualify for free express courier delivery with tracking.</p>
+          <p>Your jewellery is carefully packed in secure packaging to help ensure it reaches you safely. Orders are dispatched with care and delivered through our available shipping service. Shipping charges and delivery timelines are shown at checkout.</p>
         </div>
       </div>
     </div>
@@ -351,26 +345,12 @@ function renderProductDetails() {
           </div>
           <div class="detail-perk">
             <div class="detail-perk-icon"><i class="fa fa-shield-alt"></i></div>
-            <div class="detail-perk-text">7-Day Return</div>
+            <div class="detail-perk-text">Anti-Tarnish</div>
           </div>
         </div>
       </div>
     </div>
   `;
-
-  // Update Accordion Specs
-  const specsContent = document.getElementById("specs-accordion-content");
-  if (specsContent) {
-    specsContent.innerHTML = `
-      <table class="detail-specs-table">
-        <tr><td>Material</td><td>${info.material}</td></tr>
-        <tr><td>Dimensions</td><td>${info.dimensions}</td></tr>
-        <tr><td>Product Code (SKU)</td><td>${info.sku}</td></tr>
-        <tr><td>Hypoallergenic</td><td>Yes &bull; Lead &amp; Nickel Compliant</td></tr>
-        <tr><td>Packaging</td><td>Luxury Gift Box Included</td></tr>
-      </table>
-    `;
-  }
 
   // Render Reviews
   const reviewsEl = document.getElementById("product-reviews-grid");
