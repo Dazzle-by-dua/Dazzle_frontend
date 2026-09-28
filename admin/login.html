@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — Dazzle by Dua</title>
+<meta name="description" content="Secure administrative login portal for Dazzle by Dua Fine Jewellery.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="admin.css">
+<style>
+  body {
+    background: radial-gradient(circle at 50% 30%, #2A241C 0%, #171513 60%, #0F0E0C 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    font-family: 'Montserrat', sans-serif;
+    color: #FFF;
+    margin: 0;
+  }
+
+  .login-card {
+    background: rgba(26, 26, 26, 0.88);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(212, 175, 124, 0.35);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(212, 175, 124, 0.08);
+    width: 100%;
+    max-width: 440px;
+    padding: 2.75rem 2.25rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .login-brand-icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(212, 175, 124, 0.25) 0%, rgba(212, 175, 124, 0.08) 100%);
+    border: 1px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-size: 1.35rem;
+  }
+
+  .login-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #FFF;
+    margin-bottom: 0.35rem;
+    letter-spacing: 0.02em;
+  }
+
+  .login-sub {
+    font-size: 0.78rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+  }
+
+  .login-alert {
+    display: none;
+    background: rgba(229, 57, 53, 0.15);
+    border: 1px solid rgba(229, 57, 53, 0.4);
+    color: #FF8A80;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+    gap: 0.65rem;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .login-alert.show {
+    display: flex;
+  }
+
+  .input-wrapper {
+    position: relative;
+  }
+
+  .input-wrapper input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #FFF;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    border-radius: var(--radius-sm);
+    width: 100%;
+    outline: none;
+    font-size: 0.85rem;
+    transition: var(--transition);
+  }
+
+  .input-wrapper input:focus {
+    border-color: var(--gold);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(212, 175, 124, 0.2);
+  }
+
+  .input-icon-left {
+    position: absolute;
+    left: 0.95rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.85rem;
+  }
+
+  .input-toggle-pass {
+    position: absolute;
+    right: 0.95rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0;
+    transition: var(--transition);
+  }
+
+  .input-toggle-pass:hover {
+    color: var(--gold);
+  }
+
+  .login-options-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 1.25rem 0 1.75rem;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .remember-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .btn-submit-login {
+    width: 100%;
+    padding: 0.85rem;
+    background: var(--gold);
+    border: 1px solid var(--gold);
+    color: #FFF;
+    font-weight: 600;
+    font-size: 0.88rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    letter-spacing: 0.04em;
+    transition: var(--transition);
+  }
+
+  .btn-submit-login:hover {
+    background: var(--gold-hover);
+    border-color: var(--gold-hover);
+  }
+
+  .btn-submit-login:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+
+  /* Spinner */
+  .spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #FFF;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .btn-submit-login.loading .spinner {
+    display: inline-block;
+  }
+  .btn-submit-login.loading .btn-text {
+    opacity: 0.8;
+  }
+
+  .demo-credentials-box {
+    margin-top: 2rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    background: rgba(212, 175, 124, 0.08);
+    border: 1px dashed rgba(212, 175, 124, 0.3);
+    font-size: 0.74rem;
+    color: rgba(255, 255, 255, 0.75);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .demo-creds-title {
+    font-weight: 600;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .demo-autofill-btn {
+    background: none;
+    border: none;
+    color: var(--gold);
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.72rem;
+  }
+
+  .back-to-store {
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+
+  .back-to-store a {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.76rem;
+    transition: var(--transition);
+  }
+
+  .back-to-store a:hover {
+    color: var(--gold);
+  }
+</style>
+</head>
+<body>
+
+<div class="login-card">
+  <div class="login-header">
+    <div class="login-brand-icon">
+      <i class="fa fa-gem"></i>
+    </div>
+    <h1 class="login-title">Dazzle by Dua</h1>
+    <div class="login-sub">Fine Jewellery &bull; Admin Portal</div>
+  </div>
+
+  <!-- Error Alert -->
+  <div class="login-alert" id="login-error">
+    <i class="fa fa-exclamation-circle"></i>
+    <span id="login-error-text">Invalid username or password.</span>
+  </div>
+
+  <form id="admin-login-form" onsubmit="handleLoginSubmit(event)">
+    <div class="form-group" style="margin-bottom:1.25rem">
+      <label class="form-label" style="color:rgba(255,255,255,0.85);font-size:0.78rem" for="login-username">Admin Email or Username</label>
+      <div class="input-wrapper">
+        <i class="fa fa-user input-icon-left"></i>
+        <input type="text" id="login-username" placeholder="admin@dazzlebydua.com" required autocomplete="username">
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:0.75rem">
+      <label class="form-label" style="color:rgba(255,255,255,0.85);font-size:0.78rem" for="login-password">Admin Password</label>
+      <div class="input-wrapper">
+        <i class="fa fa-lock input-icon-left"></i>
+        <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+        <button type="button" class="input-toggle-pass" id="btn-toggle-pass" title="Show or hide password" aria-label="Toggle password visibility">
+          <i class="fa fa-eye" id="toggle-icon"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="login-options-row">
+      <label class="remember-box">
+        <input type="checkbox" id="login-remember">
+        <span>Remember me</span>
+      </label>
+      <span style="font-size:0.72rem;color:rgba(255,255,255,0.4)">Prototype Auth</span>
+    </div>
+
+    <button type="submit" class="btn-submit-login" id="btn-login-submit">
+      <span class="spinner"></span>
+      <span class="btn-text">Sign In to Admin Panel &rarr;</span>
+    </button>
+  </form>
+
+  <!-- Demo credentials hint for testing -->
+  <div class="demo-credentials-box">
+    <div class="demo-creds-title">
+      <span>Demo Administrator Access</span>
+      <button type="button" class="demo-autofill-btn" onclick="autofillDemo()">Autofill</button>
+    </div>
+    <div>Username: <strong style="color:#FFF">admin@dazzlebydua.com</strong> (or <strong style="color:#FFF">admin</strong>)</div>
+    <div>Password: <strong style="color:#FFF">admin123</strong></div>
+  </div>
+
+  <div class="back-to-store">
+    <a href="../index.html">&larr; Return to Customer Storefront</a>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+// If user already has an active authenticated session, redirect straight to index.html
+if (AdminAuth.isAuthenticated()) {
+  const params = new URLSearchParams(window.location.search);
+  const redirect = params.get("redirect") || "index.html";
+  window.location.replace(redirect);
+}
+
+// Toggle password visibility
+const passInput = document.getElementById("login-password");
+const toggleBtn = document.getElementById("btn-toggle-pass");
+const toggleIcon = document.getElementById("toggle-icon");
+
+toggleBtn.addEventListener("click", () => {
+  const isPass = passInput.type === "password";
+  passInput.type = isPass ? "text" : "password";
+  toggleIcon.className = isPass ? "fa fa-eye-slash" : "fa fa-eye";
+});
+
+// Autofill helper
+function autofillDemo() {
+  document.getElementById("login-username").value = "admin@dazzlebydua.com";
+  document.getElementById("login-password").value = "admin123";
+  document.getElementById("login-remember").checked = true;
+  document.getElementById("login-error").classList.remove("show");
+}
+
+// Form submission handler
+async function handleLoginSubmit(e) {
+  e.preventDefault();
+  const username = document.getElementById("login-username").value.trim();
+  const password = document.getElementById("login-password").value.trim();
+  const remember = document.getElementById("login-remember").checked;
+  const submitBtn = document.getElementById("btn-login-submit");
+  const errorBox = document.getElementById("login-error");
+  const errorText = document.getElementById("login-error-text");
+
+  errorBox.classList.remove("show");
+  submitBtn.classList.add("loading");
+  submitBtn.disabled = true;
+
+  try {
+    const result = await AdminAuth.login(username, password, remember);
+
+    if (!result.success) {
+      errorText.textContent = result.message || "Invalid username or password.";
+      errorBox.classList.add("show");
+      submitBtn.classList.remove("loading");
+      submitBtn.disabled = false;
+      return;
+    }
+
+    // Success! Redirect to target or dashboard
+    const params = new URLSearchParams(window.location.search);
+    const redirectUrl = params.get("redirect") || "index.html";
+    window.location.replace(redirectUrl);
+  } catch (err) {
+    console.error("Login error:", err);
+    errorText.textContent = "An unexpected error occurred. Please try again.";
+    errorBox.classList.add("show");
+    submitBtn.classList.remove("loading");
+    submitBtn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
