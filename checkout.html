@@ -177,7 +177,8 @@
     <div class="success-icon-wrap">✓</div>
     <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:.75rem">Order Placed!</h2>
     <p style="font-size:.95rem;color:var(--text-muted);margin-bottom:.5rem">Thank you for shopping with <strong>Dazzle by Dua</strong>.</p>
-    <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:2rem">Your order has been received and is being processed. You&rsquo;ll receive a confirmation shortly.</p>
+    <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:1.5rem">Your order has been received and is being processed. You&rsquo;ll receive a confirmation shortly.</p>
+    <div style="background:var(--warm-cream);padding:.75rem 1rem;border-radius:8px;border:1px solid rgba(212,175,124,.3);margin-bottom:1.5rem"><strong style="color:var(--charcoal)">Order ID: </strong><span id="placed-order-id" style="font-weight:700;color:var(--gold)">#DBD-2025-001</span></div>
     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
       <a href="orders.html" class="btn btn-gold">View Orders</a>
       <a href="shop.html" class="btn btn-outline">Continue Shopping</a>
@@ -285,6 +286,31 @@ function renderCheckout() {
 
 function handlePlaceOrder(e) {
   e.preventDefault();
+  const orderId = `DBD-2025-${Math.floor(100 + Math.random() * 900)}`;
+  const name = document.getElementById('ch-name')?.value || 'Valued Customer';
+  const mobile = document.getElementById('ch-mobile')?.value || '+91 98765 43210';
+  const email = document.getElementById('ch-email')?.value || 'customer@example.com';
+  const house = document.getElementById('ch-house')?.value || '';
+  const street = document.getElementById('ch-street')?.value || '';
+  const city = document.getElementById('ch-city')?.value || '';
+  const stateVal = document.getElementById('ch-state')?.value || '';
+  const fullAddress = `${house}, ${street}, ${city}, ${stateVal}`.replace(/^[,\s]+|[,\s]+$/g, '');
+
+  const newOrder = DazzleStore.addOrder({
+    id: orderId,
+    customer: name,
+    email: email,
+    phone: mobile,
+    address: fullAddress || 'Mumbai, Maharashtra',
+    paymentMethod: 'Cash on Delivery',
+    total: getCartSubtotal(),
+    status: 'Processing',
+    items: [...state.cart]
+  });
+
+  const refEl = document.getElementById('placed-order-id');
+  if (refEl) refEl.textContent = '#' + orderId;
+
   // Show success modal
   const modal = document.getElementById('order-success-modal');
   modal.classList.add('open');

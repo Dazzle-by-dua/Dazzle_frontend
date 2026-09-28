@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin CMS & Control Center — Dazzle by Dua</title>
+<meta name="description" content="Luxury CMS & Administration Control Center for Dazzle by Dua Fine Jewellery.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="admin-sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-name">
+        Dazzle by Dua <span class="brand-dot">&#10022;</span>
+      </div>
+      <div class="sidebar-brand-tag">CMS & Control Center</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-menu">
+    <div class="menu-section-label">Overview</div>
+    <div class="sidebar-item active" data-view="dashboard">
+      <div class="item-main">
+        <i class="fa fa-chart-pie item-icon"></i>
+        <span>Dashboard</span>
+      </div>
+    </div>
+
+    <div class="menu-section-label">Catalog & Sales</div>
+    <div class="sidebar-item" data-view="products">
+      <div class="item-main">
+        <i class="fa fa-gem item-icon"></i>
+        <span>Products</span>
+      </div>
+      <span class="sidebar-badge" id="badge-products-count">8</span>
+    </div>
+
+    <div class="sidebar-item" data-view="categories">
+      <div class="item-main">
+        <i class="fa fa-tags item-icon"></i>
+        <span>Categories</span>
+      </div>
+      <span class="sidebar-badge" id="badge-categories-count">4</span>
+    </div>
+
+    <div class="sidebar-item" data-view="orders">
+      <div class="item-main">
+        <i class="fa fa-shopping-bag item-icon"></i>
+        <span>Orders</span>
+      </div>
+      <span class="sidebar-badge" id="badge-orders-count">3</span>
+    </div>
+
+    <div class="sidebar-item" data-view="reviews">
+      <div class="item-main">
+        <i class="fa fa-star item-icon"></i>
+        <span>Reviews</span>
+      </div>
+      <span class="sidebar-badge" id="badge-reviews-count">6</span>
+    </div>
+
+    <div class="sidebar-item" data-view="offers">
+      <div class="item-main">
+        <i class="fa fa-gift item-icon"></i>
+        <span>Offers & Combos</span>
+      </div>
+      <span class="sidebar-badge" id="badge-offers-count">3</span>
+    </div>
+
+    <div class="menu-section-label">Website & Content</div>
+    <div class="sidebar-item" data-view="homepage">
+      <div class="item-main">
+        <i class="fa fa-home item-icon"></i>
+        <span>Homepage Manager</span>
+      </div>
+    </div>
+
+    <div class="sidebar-item" data-view="pages">
+      <div class="item-main">
+        <i class="fa fa-file-alt item-icon"></i>
+        <span>Pages & Content</span>
+      </div>
+    </div>
+
+    <div class="sidebar-item" data-view="navigation">
+      <div class="item-main">
+        <i class="fa fa-bars item-icon"></i>
+        <span>Navigation</span>
+      </div>
+    </div>
+
+    <div class="sidebar-item" data-view="media">
+      <div class="item-main">
+        <i class="fa fa-images item-icon"></i>
+        <span>Media Gallery</span>
+      </div>
+    </div>
+
+    <div class="menu-section-label">Administration</div>
+    <div class="sidebar-item" data-view="settings">
+      <div class="item-main">
+        <i class="fa fa-cog item-icon"></i>
+        <span>Settings & Data</span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar">D</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Dua &bull; Admin</div>
+        <div class="sidebar-user-role">Master Administrator</div>
+      </div>
+    </div>
+    <a href="../index.html" target="_blank" title="Open Storefront" style="color:var(--gold);font-size:0.9rem">
+      <i class="fa fa-external-link-alt"></i>
+    </a>
+  </div>
+</aside>
+
+<!-- MAIN WRAPPER -->
+<div class="admin-main">
+  <!-- TOPBAR -->
+  <header class="admin-topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle-btn" id="sidebar-toggle" aria-label="Toggle Menu">
+        <i class="fa fa-bars"></i>
+      </button>
+      <div class="topbar-title-wrap">
+        <h1 class="topbar-title" id="topbar-page-title">Dashboard Overview</h1>
+        <div class="topbar-breadcrumbs" id="topbar-breadcrumb">Dazzle CMS / Dashboard</div>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <a href="../index.html" target="_blank" class="btn-store-link">
+        <i class="fa fa-store"></i>
+        <span>View Live Website &rarr;</span>
+      </a>
+      <button class="btn btn-primary btn-sm" onclick="AdminApp.openAddProductModal()">
+        <i class="fa fa-plus"></i> New Product
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="admin-content">
+
+    <!-- 1. DASHBOARD VIEW -->
+    <div class="admin-view active" id="view-dashboard">
+      <div class="view-header">
+        <div>
+          <h2 class="view-heading">Welcome back, Dua</h2>
+          <p class="view-subheading">Here is the real-time operational status of Dazzle by Dua Fine Jewellery.</p>
+        </div>
+        <div class="view-actions">
+          <button class="btn btn-outline btn-sm" onclick="AdminApp.exportStoreData()"><i class="fa fa-download"></i> Backup Store</button>
+          <button class="btn btn-gold btn-sm" onclick="AdminApp.openAddProductModal()"><i class="fa fa-plus"></i> Add Product</button>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-widget">
+          <div class="stat-info">
+            <span class="stat-label">Total Revenue</span>
+            <span class="stat-value" id="dash-revenue">₹19,660</span>
+            <span class="stat-trend positive"><i class="fa fa-arrow-up"></i> Live orders sum</span>
+          </div>
+          <div class="stat-icon"><i class="fa fa-coins"></i></div>
+        </div>
+
+        <div class="stat-widget">
+          <div class="stat-info">
+            <span class="stat-label">Total Orders</span>
+            <span class="stat-value" id="dash-orders">3 Orders</span>
+            <span class="stat-trend positive"><i class="fa fa-shopping-bag"></i> Active fulfillment</span>
+          </div>
+          <div class="stat-icon"><i class="fa fa-box"></i></div>
+        </div>
+
+        <div class="stat-widget">
+          <div class="stat-info">
+            <span class="stat-label">Total Products</span>
+            <span class="stat-value" id="dash-products">8 Items</span>
+            <span class="stat-trend neutral"><i class="fa fa-gem"></i> In catalog</span>
+          </div>
+          <div class="stat-icon"><i class="fa fa-ring"></i></div>
+        </div>
+
+        <div class="stat-widget">
+          <div class="stat-info">
+            <span class="stat-label">Customer Reviews</span>
+            <span class="stat-value" id="dash-rating">4.8 ★</span>
+            <span class="stat-trend positive"><i class="fa fa-star"></i> 6 verified reviews</span>
+          </div>
+          <div class="stat-icon"><i class="fa fa-heart"></i></div>
+        </div>
+      </div>
+
+      <!-- 2-Column Dashboard Cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(400px, 1fr));gap:1.5rem">
+        <!-- Recent Orders -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa fa-clock" style="color:var(--gold)"></i> Recent Orders</h3>
+            <button class="btn btn-outline btn-sm" onclick="window.location.hash='orders'">View All &rarr;</button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Customer</th>
+                  <th>Date</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="dash-recent-orders">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Inventory Status & Alerts -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa fa-exclamation-triangle" style="color:#F57F17"></i> Stock Alerts</h3>
+            <button class="btn btn-outline btn-sm" onclick="window.location.hash='products'">Manage Inventory &rarr;</button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="dash-low-stock">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Customer Reviews -->
+      <div class="card" style="margin-top:1.5rem">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa fa-comments" style="color:var(--gold)"></i> Recent Customer Feedback</h3>
+          <button class="btn btn-outline btn-sm" onclick="window.location.hash='reviews'">Manage All &rarr;</button>
+        </div>
+        <div id="dash-recent-reviews">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. PRODUCTS VIEW -->
+    <div class="admin-view" id="view-products">
+      <div class="view-header">
+        <div>
+          <h2 class="view-heading">Products Catalog</h2>
+          <p class="view-subheading">Manage your jewellery pieces, prices, badges, stock availability, and specs.</p>
+        </div>
+        <div class="view-actions">
+          <button class="btn btn-gold" onclick="AdminApp.openAddProductModal()">
+            <i class="fa fa-plus"></i> Add New Product
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="search-box">
+          <i class="fa fa-search"></i>
+          <input type="text" placeholder="Search by name, category or SKU..." oninput="AdminApp.handleProductSearch(this.value)">
+        </div>
+
+        <div class="filter-pills" id="product-filter-pills">
+          <button class="filter-pill active" onclick="AdminApp.setProductFilter('all', this)">All</button>
+          <button class="filter-pill" onclick="AdminApp.setProductFilter('instock', this)">In Stock</button>
+          <button class="filter-pill" onclick="AdminApp.setProductFilter('outofstock', this)">Out of Stock</button>
+          <button class="filter-pill" onclick="AdminApp.setProductFilter('necklaces', this)">Necklaces</button>
+          <button class="filter-pill" onclick="AdminApp.setProductFilter('earrings', this)">Earrings</button>
+          <button class="filter-pill" onclick="AdminApp.setProductFilter('bracelets', this)">Bracelets</button>
+          <button class="filter-pill" onclick="AdminApp.setProductFilter('rings', this)">Rings</button>
+        </div>
+
+        <div style="font-size:0.78rem;color:var(--text-muted);font-weight:600" id="products-count-label">
+          Showing 8 products
+        </div>
+      </div>
+
+      <!-- Products Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Badges</th>
+                <th>Rating</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="products-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. CATEGORIES VIEW -->
+    <div class="admin-view" id="view-categories">
+      <div class="view-header">
+        <div>
+          <h2 class="view-heading">Category Manager</h2>
+          <p class="view-subheading">Organize your jewellery catalog into collections and categories.</p>
+        </div>
+        <div class="view-actions">
+          <button class="btn btn-gold" onclick="AdminApp.openAddCategoryModal()">
+            <i class="fa fa-plus"></i> Add Category
+          </button>
+        </div>
+      </div>
+
+      <div class="stats-grid" id="categories-grid">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+
+    <!-- 4. ORDERS VIEW -->
+    <div class="admin-view" id="view-orders">
+      <div class="view-header">
+        <div>
+          <h2 class="view-heading">Customer Orders & Fulfillment</h2>
+          <p class="view-subheading">Track customer purchases, update order statuses, and view delivery details.</p>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="search-box">
+          <i class="fa fa-search"></i>
+          <input type="text" placeholder="Search by Order ID, name, email..." oninput="AdminApp.handleOrderSearch(this.value)">
+        </div>
+
+        <div class="filter-pills" id="order-filter-pills">
+          <button class="filter-pill active" onclick="AdminApp.setOrderFilter('all', this)">All</button>
+          <button class="filter-pill" onclick="AdminApp.setOrderFilter('processing', this)">Processing</button>
+          <button class="filter-pill" onclick="AdminApp.setOrderFilter('packed', this)">Packed</button>
+          <button class="filter-pill" onclick="AdminApp.setOrderFilter('shipped', this)">Shipped</button>
+          <button class="filter-pill" onclick="AdminApp.setOrderFilter('delivered', this)">Delivered</button>
+          <button class="filter-pill" onclick="AdminApp.setOrderFilter('cancelled', this)">Cancelled</button>
+        </div>
+
+        <div style="font-size:0.78rem;color:var(--text-muted);font-weight:600" id="orders-count-label">
+          Showing 3 orders
+        </div>
+      </div>
+
+      <!-- Orders Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. REVIEWS VIEW -->
+    <div class="admin-view" id="view-reviews">
+      <div class="view-header">
+        <div>
+          <h2 class="view-heading">Customer Reviews & Testimonials</h2>
+          <p class="view-subheading">Approve, edit, or moderate reviews shown on the store home and product pages.</p>
+        </div>
+        <div class="view-actions">
+          <button class="btn btn-gold" onclick="AdminApp.openAddReviewModal()">
+            <i class="fa fa-plus"></i> Add Review
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="filter-pills" id="review-filter-pills">
+          <button class="filter-pill active" onclick="AdminApp.setReviewFilter('all', this)">All Reviews</button>
+          <button class="filter-pill" onclick="AdminApp.setReviewFilter('approved', this)">Approved / Live</button>
+          <button class="filter-pill" onclick="AdminApp.setReviewFilter('pending', this)">Pending / Hidden</button>
+        </div>
+      </div>
+
+      <!-- Reviews Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Rating</th>
+                <th>Review Text</th>
+                <th>Verified</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reviews-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. OFFERS & COMBOS VIEW -->
+    <div class="admin-view" id="view-offers">
+      <div class="view-header">
+        <div>
+          <h2 class="view-heading">Offers, Coupons &amp; Combos</h2>
+          <p class="view-subheading">Manage promotional discounts, coupon codes, and curated jewellery combo sets.</p>
+        </div>
+        <div class="view-actions">
+          <button class="btn btn-outline" onclick="AdminApp.openAddComboModal()">
+            <i class="fa fa-plus"></i> Add Combo Set
+          </button>
+          <button class="btn btn-gold" onclick="AdminApp.openAddCouponModal()">
+            <i class="fa fa-plus"></i> Add Coupon
+          </button>
+        </div>
+      </div>
+
+      <!-- Coupons Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa fa-ticket-alt" style="color:var(--gold)"></i> Active Coupon Codes</h3>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Title</th>
+                <th>Discount</th>
+                <th>Min. Order</th>
+                <th>Expiry</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="coupons-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Combos Card -->
+      <div class="card" style="margin-top:2rem">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa fa-layer-group" style="color:var(--gold)"></i> Curated Jewellery Combos</h3>
+        </div>
+        <div class="stats-grid" id="combos-admin-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. HOMEPAGE MANAGER VIEW -->
+    <div class="admin-view" id="view-homepage">
+      <div class="view-header">
+        <div>
+          <h2 class="view-heading">Homepage Layout &amp; Content Manager</h2>
+          <p class="view-subheading">Customize banners, hero text, section visibility, and branding on the store home page.</p>
+        </div>
+        <div class="view-actions">
+          <a href="../index.html" target="_blank" class="btn btn-outline btn-sm"><i class="fa fa-eye"></i> Preview Home</a>
+          <button class="btn btn-gold" onclick="AdminApp.saveHomepageManager(event)">
+            <i class="fa fa-save"></i> Save Homepage Changes
+          </button>
+        </div>
+      </div>
+
+      <!-- 1. Announcement Bar -->
+      <div class="hp-section-card">
+        <div class="hp-section-header">
+          <div class="hp-section-title"><i class="fa fa-bullhorn" style="color:var(--gold)"></i> Top Announcement Bar</div>
+          <label class="form-switch">
+            <input type="checkbox" id="hp-ann-enabled" style="display:none">
+            <div class="switch-toggle"></div>
+            <span style="font-size:0.75rem;font-weight:600">Enabled</span>
+          </label>
+        </div>
+        <div class="hp-section-body">
+          <div class="form-group">
+            <label class="form-label">Announcement Text</label>
+            <input type="text" class="form-control" id="hp-ann-text" placeholder="Free shipping on orders above ₹2500 | Use code DAZZLE10">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Link Text</label>
+              <input type="text" class="form-control" id="hp-ann-link-text" placeholder="View Offers &rarr;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Link URL</label>
+              <input type="text" class="form-control" id="hp-ann-link-url" placeholder="offers.html">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Hero Section -->
+      <div class="hp-section-card">
+        <div class="hp-section-header">
+          <div class="hp-section-title"><i class="fa fa-image" style="color:var(--gold)"></i> Hero Banner Section</div>
+          <label class="form-switch">
+            <input type="checkbox" id="hp-hero-enabled" style="display:none">
+            <div class="switch-toggle"></div>
+            <span style="font-size:0.75rem;font-weight:600">Enabled</span>
+          </label>
+        </div>
+        <div class="hp-section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Hero Badge / Tag</label>
+              <input type="text" class="form-control" id="hp-hero-tag" placeholder="✦ New Collection 2025">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hero Background Image</label>
+              <input type="text" class="form-control" id="hp-hero-bg" placeholder="hero_necklace.jpg">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Main Heading (HTML &lt;em&gt; allowed for italic gold)</label>
+            <input type="text" class="form-control" id="hp-hero-title" placeholder="Jewellery That <em>Tells</em><br>Your Story">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hero Subtitle</label>
+            <textarea class="form-textarea" id="hp-hero-desc" rows="2" placeholder="Discover pieces made to be remembered..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Primary Button Text</label>
+              <input type="text" class="form-control" id="hp-hero-btn1-text" placeholder="Shop Collection &rarr;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Primary Button URL</label>
+              <input type="text" class="form-control" id="hp-hero-btn1-url" placeholder="shop.html">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Secondary Button Text</label>
+              <input type="text" class="form-control" id="hp-hero-btn2-text" placeholder="View Offers">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Secondary Button URL</label>
+              <input type="text" class="form-control" id="hp-hero-btn2-url" placeholder="offers.html">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Categories Strip -->
+      <div class="hp-section-card">
+        <div class="hp-section-header">
+          <div class="hp-section-title"><i class="fa fa-th" style="color:var(--gold)"></i> Categories Strip</div>
+          <label class="form-switch">
+            <input type="checkbox" id="hp-cat-enabled" style="display:none">
+            <div class="switch-toggle"></div>
+            <span style="font-size:0.75rem;font-weight:600">Enabled</span>
+          </label>
+        </div>
+        <div class="hp-section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Section Tag</label>
+              <input type="text" class="form-control" id="hp-cat-tag" placeholder="Shop by Category">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Section Title</label>
+              <input type="text" class="form-control" id="hp-cat-title" placeholder="Find Your Perfect Piece">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. New Arrivals -->
+      <div class="hp-section-card">
+        <div class="hp-section-header">
+          <div class="hp-section-title"><i class="fa fa-sparkles" style="color:var(--gold)"></i> New Arrivals Grid</div>
+          <label class="form-switch">
+            <input type="checkbox" id="hp-new-enabled" style="display:none">
+            <div class="switch-toggle"></div>
+            <span style="font-size:0.75rem;font-weight:600">Enabled</span>
+          </label>
+        </div>
+        <div class="hp-section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Section Tag</label>
+              <input type="text" class="form-control" id="hp-new-tag" placeholder="Just Arrived">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Section Title</label>
+              <input type="text" class="form-control" id="hp-new-title" placeholder="New Arrivals">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Items to Display</label>
+              <input type="number" class="form-control" id="hp-new-count" min="1" max="12" value="4">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Featured Collection Banner -->
+      <div class="hp-section-card">
+        <div class="hp-section-header">
+          <div class="hp-section-title"><i class="fa fa-crown" style="color:var(--gold)"></i> Featured Collection Banner</div>
+          <label class="form-switch">
+            <input type="checkbox" id="hp-feat-enabled" style="display:none">
+            <div class="switch-toggle"></div>
+            <span style="font-size:0.75rem;font-weight:600">Enabled</span>
+          </label>
+        </div>
+        <div class="hp-section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Section Tag</label>
+              <input type="text" class="form-control" id="hp-feat-tag" placeholder="Our Featured Collection">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Banner Image</label>
+              <input type="text" class="form-control" id="hp-feat-img" placeholder="featured_collection.jpg">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Banner Title</label>
+            <input type="text" class="form-control" id="hp-feat-title" placeholder="Grace in <em>Every</em> Detail">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Banner Description</label>
+            <textarea class="form-textarea" id="hp-feat-desc" rows="2"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Button Text</label>
+              <input type="text" class="form-control" id="hp-feat-btn-text" placeholder="Explore Collection &rarr;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Button Link</label>
+              <input type="text" class="form-control" id="hp-feat-btn-url" placeholder="shop.html">
+            </div>
+          </div>
+          <div class="form-row" style="margin-top:0.5rem">
+            <div class="form-group">
+              <label class="form-label">Stat 1 (Num &bull; Label)</label>
+              <div style="display:flex;gap:0.4rem">
+                <input type="text" class="form-control" id="hp-feat-stat1-num" placeholder="500+">
+                <input type="text" class="form-control" id="hp-feat-stat1-lbl" placeholder="Happy Customers">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stat 2 (Num &bull; Label)</label>
+              <div style="display:flex;gap:0.4rem">
+                <input type="text" class="form-control" id="hp-feat-stat2-num" placeholder="50+">
+                <input type="text" class="form-control" id="hp-feat-stat2-lbl" placeholder="Unique Designs">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stat 3 (Num &bull; Label)</label>
+              <div style="display:flex;gap:0.4rem">
+                <input type="text" class="form-control" id="hp-feat-stat3-num" placeholder="4.8★">
+                <input type="text" class="form-control" id="hp-feat-stat3-lbl" placeholder="Avg. Rating">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Why Choose Us -->
+      <div class="hp-section-card">
+        <div class="hp-section-header">
+          <div class="hp-section-title"><i class="fa fa-award" style="color:var(--gold)"></i> Why Choose Us Section</div>
+          <label class="form-switch">
+            <input type="checkbox" id="hp-why-enabled" style="display:none">
+            <div class="switch-toggle"></div>
+            <span style="font-size:0.75rem;font-weight:600">Enabled</span>
+          </label>
+        </div>
+        <div class="hp-section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Section Tag</label>
+              <input type="text" class="form-control" id="hp-why-tag" placeholder="Why Choose Us">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Section Title</label>
+              <input type="text" class="form-control" id="hp-why-title" placeholder="The Dazzle Difference">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subtitle</label>
+            <input type="text" class="form-control" id="hp-why-sub" placeholder="Thoughtfully chosen, beautifully packed...">
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Reviews Section -->
+      <div class="hp-section-card">
+        <div class="hp-section-header">
+          <div class="hp-section-title"><i class="fa fa-quote-left" style="color:var(--gold)"></i> Customer Reviews Section</div>
+          <label class="form-switch">
+            <input type="checkbox" id="hp-rev-enabled" style="display:none">
+            <div class="switch-toggle"></div>
+            <span style="font-size:0.75rem;font-weight:600">Enabled</span>
+          </label>
+        </div>
+        <div class="hp-section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Section Tag</label>
+              <input type="text" class="form-control" id="hp-rev-tag" placeholder="Customer Love">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Section Title</label>
+              <input type="text" class="form-control" id="hp-rev-title" placeholder="What Our Customers Say">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. Instagram Section -->
+      <div class="hp-section-card">
+        <div class="hp-section-header">
+          <div class="hp-section-title"><i class="fab fa-instagram" style="color:var(--gold)"></i> Instagram Feed Section</div>
+          <label class="form-switch">
+            <input type="checkbox" id="hp-insta-enabled" style="display:none">
+            <div class="switch-toggle"></div>
+            <span style="font-size:0.75rem;font-weight:600">Enabled</span>
+          </label>
+        </div>
+        <div class="hp-section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Section Tag</label>
+              <input type="text" class="form-control" id="hp-insta-tag" placeholder="Follow Our Journey">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Instagram Handle</label>
+              <input type="text" class="form-control" id="hp-insta-handle" placeholder="@dazzlebydua">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subtitle</label>
+            <input type="text" class="form-control" id="hp-insta-sub" placeholder="Share your Dazzle moments with us">
+          </div>
+        </div>
+      </div>
+
+      <!-- 9. Footer Info -->
+      <div class="hp-section-card">
+        <div class="hp-section-header">
+          <div class="hp-section-title"><i class="fa fa-shoe-prints" style="color:var(--gold)"></i> Footer Content</div>
+        </div>
+        <div class="hp-section-body">
+          <div class="form-group">
+            <label class="form-label">Footer Tagline</label>
+            <input type="text" class="form-control" id="hp-foot-tagline" placeholder="Timeless pieces, crafted with love.">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Copyright Notice</label>
+            <input type="text" class="form-control" id="hp-foot-copy" placeholder="© 2025 Dazzle by Dua. All rights reserved.">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-top:1.5rem">
+        <button class="btn btn-gold" style="padding:0.75rem 2rem;font-size:0.9rem" onclick="AdminApp.saveHomepageManager(event)">
+          <i class="fa fa-save"></i> Save All Homepage Changes
+        </button>
+      </div>
+    </div>
+
+    <!-- 8. PAGES & CONTENT VIEW -->
+    <div class="admin-view" id="view-pages">
+      <div class="view-header">
+        <div>
+          <h2 class="view-heading">Pages &amp; Static Content</h2>
+          <p class="view-subheading">Manage content for static information pages and customer support.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa fa-info-circle" style="color:var(--gold)"></i> Customer Support &amp; Policies</h3>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jewellery Care & Longevity Guide</label>
+          <textarea class="form-textarea" rows="3">To preserve your jewellery's brilliance, keep away from direct contact with perfumes, sanitizers, chlorine, and harsh chemicals. Store individually when not in use. Gently buff with a clean microfiber cloth after wear.</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Packaging & Shipping Terms</label>
+          <textarea class="form-textarea" rows="3">Your jewellery is carefully packed in secure packaging to help ensure it reaches you safely. Orders are dispatched with care and delivered through our available shipping service.</textarea>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="AdminApp.showToast('✦ Policy texts saved.')">Save Content</button>
+      </div>
+    </div>
+
+    <!-- 9. NAVIGATION VIEW -->
+    <div class="admin-view" id="view-navigation">
+      <div class="view-header">
+        <div>
+          <h2 class="view-heading">Navigation Menu Manager</h2>
+          <p class="view-subheading">Configure header menu links and navigation destinations.</p>
+        </div>
+        <div class="view-actions">
+          <button class="btn btn-gold btn-sm" onclick="AdminApp.addNavItem()">
+            <i class="fa fa-plus"></i> Add Nav Link
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa fa-compass" style="color:var(--gold)"></i> Primary Header Menu</h3>
+        </div>
+        <div id="nav-header-list">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. MEDIA GALLERY VIEW -->
+    <div class="admin-view" id="view-media">
+      <div class="view-header">
+        <div>
+          <h2 class="view-heading">Media Asset Gallery</h2>
+          <p class="view-subheading">Browse store photography, copy relative asset filenames, or preview images.</p>
+        </div>
+        <div class="view-actions">
+          <button class="btn btn-gold btn-sm" onclick="AdminApp.showToast('✦ To add a new photo, place the JPG in the project folder and use its filename.')">
+            <i class="fa fa-info-circle"></i> Asset Helper
+          </button>
+        </div>
+      </div>
+
+      <div class="media-grid" id="media-gallery-grid">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+
+    <!-- 11. SETTINGS VIEW -->
+    <div class="admin-view" id="view-settings">
+      <div class="view-header">
+        <div>
+          <h2 class="view-heading">Store Settings &amp; Data Control</h2>
+          <p class="view-subheading">Manage store identity, contact info, shipping rules, and complete data backup.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(360px, 1fr));gap:1.5rem">
+        <!-- Brand & Store Details -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa fa-store" style="color:var(--gold)"></i> Store Identity</h3>
+          </div>
+          <form onsubmit="AdminApp.saveSettingsForm(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Store Brand Name</label>
+                <input type="text" class="form-control" id="set-name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tagline</label>
+                <input type="text" class="form-control" id="set-tagline">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Support Email</label>
+                <input type="email" class="form-control" id="set-email">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Support Phone</label>
+                <input type="text" class="form-control" id="set-phone">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Store Address / Headquarters</label>
+              <textarea class="form-textarea" id="set-address" rows="2"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Currency Symbol</label>
+                <input type="text" class="form-control" id="set-currency" value="₹">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Free Shipping Threshold (₹)</label>
+                <input type="number" class="form-control" id="set-freeship" value="2500">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Instagram Link</label>
+                <input type="text" class="form-control" id="set-instagram">
+              </div>
+              <div class="form-group">
+                <label class="form-label">WhatsApp Link</label>
+                <input type="text" class="form-control" id="set-whatsapp">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-gold btn-sm" style="margin-top:0.5rem">
+              <i class="fa fa-save"></i> Save Settings
+            </button>
+          </form>
+        </div>
+
+        <!-- Data Backup & Factory Reset -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa fa-database" style="color:var(--gold)"></i> Data Management</h3>
+          </div>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:1.5rem">
+            Because this prototype uses browser localStorage as its central database, you can export all products, orders, reviews, and settings to a JSON file, or restore from a backup anytime.
+          </p>
+
+          <div style="display:flex;flex-direction:column;gap:1rem">
+            <div style="background:#FAF7F2;padding:1rem;border-radius:var(--radius-sm);border:1px solid var(--border-color)">
+              <h4 style="font-size:0.88rem;font-weight:600;margin-bottom:0.25rem">Export Database</h4>
+              <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem">Download all store products, orders, and configurations as JSON.</p>
+              <button class="btn btn-outline btn-sm" onclick="AdminApp.exportStoreData()"><i class="fa fa-download"></i> Export Data (JSON)</button>
+            </div>
+
+            <div style="background:#FAF7F2;padding:1rem;border-radius:var(--radius-sm);border:1px solid var(--border-color)">
+              <h4 style="font-size:0.88rem;font-weight:600;margin-bottom:0.25rem">Import Database</h4>
+              <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem">Restore or transfer store data from a previously exported JSON backup.</p>
+              <button class="btn btn-outline btn-sm" onclick="AdminApp.openImportModal()"><i class="fa fa-upload"></i> Import Backup</button>
+            </div>
+
+            <div style="background:#FFF5F5;padding:1rem;border-radius:var(--radius-sm);border:1px solid #FFCDD2">
+              <h4 style="font-size:0.88rem;font-weight:600;color:#C62828;margin-bottom:0.25rem">Factory Reset</h4>
+              <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem">Reset the entire store to its original clean demo state with 8 products.</p>
+              <button class="btn btn-danger btn-sm" onclick="AdminApp.resetStoreDataPrompt()"><i class="fa fa-redo"></i> Reset Store Data</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ========================================================
+     MODALS & DRAWERS
+     ======================================================== -->
+
+<!-- 1. Product Modal -->
+<div class="modal-backdrop" id="modal-product">
+  <div class="modal-box modal-lg">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-product-title">Add New Product</h3>
+      <button class="modal-close-btn" onclick="AdminApp.closeModal('modal-product')">&times;</button>
+    </div>
+    <form id="prod-form" onsubmit="AdminApp.saveProductForm(event)">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label class="form-label">Product Name <span class="req">*</span></label>
+            <input type="text" class="form-control" id="prod-name" placeholder="e.g. Diamond Droplet Pendant" required>
+          </div>
+          <div class="form-group" style="flex:1">
+            <label class="form-label">Category <span class="req">*</span></label>
+            <select class="form-select" id="prod-category" required>
+              <option value="necklaces">Necklaces</option>
+              <option value="earrings">Earrings</option>
+              <option value="bracelets">Bracelets</option>
+              <option value="rings">Rings</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Sale Price (₹) <span class="req">*</span></label>
+            <input type="number" class="form-control" id="prod-price" placeholder="4990" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Original / Old Price (₹)</label>
+            <input type="number" class="form-control" id="prod-old-price" placeholder="6990">
+          </div>
+          <div class="form-group">
+            <label class="form-label">SKU Code</label>
+            <input type="text" class="form-control" id="prod-sku" placeholder="DBD-NC-009">
+          </div>
+        </div>
+
+        <div class="form-row" style="align-items:center;background:#FAF7F2;padding:0.75rem 1rem;border-radius:var(--radius-sm);margin-bottom:1.2rem">
+          <div style="flex:1">
+            <label class="form-switch">
+              <input type="checkbox" id="prod-stock-check" style="display:none" checked>
+              <div class="switch-toggle"></div>
+              <span style="font-weight:600;font-size:0.82rem">In Stock &amp; Available for Purchase</span>
+            </label>
+          </div>
+          <div style="flex:2;display:flex;gap:1rem;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.78rem;cursor:pointer">
+              <input type="checkbox" id="badge-bestseller"> Bestseller
+            </label>
+            <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.78rem;cursor:pointer">
+              <input type="checkbox" id="badge-new"> New
+            </label>
+            <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.78rem;cursor:pointer">
+              <input type="checkbox" id="badge-sale"> Sale
+            </label>
+            <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.78rem;cursor:pointer">
+              <input type="checkbox" id="badge-offer"> Offer
+            </label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label class="form-label">Primary Image URL or Filename</label>
+            <input type="text" class="form-control" id="prod-img" placeholder="product_flower_necklace.jpg">
+            <div class="form-help">Choose: product_flower_necklace.jpg, product_pearl_earrings.jpg, product_bracelet.jpg, product_ring.jpg</div>
+          </div>
+          <div class="form-group" style="flex:1">
+            <label class="form-label">Image Preview</label>
+            <div style="width:70px;height:70px;border-radius:4px;overflow:hidden;border:1px solid var(--border-color);background:#F0EAE1">
+              <img id="prod-img-preview" src="../product_flower_necklace.jpg" style="width:100%;height:100%;object-fit:cover" alt="preview">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Material &amp; Finish</label>
+            <input type="text" class="form-control" id="prod-material" placeholder="18K Champagne Gold Vermeil & Pearl">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dimensions / Sizing</label>
+            <input type="text" class="form-control" id="prod-dimensions" placeholder="Length: 42cm + 5cm extension">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Available Variants (Comma-separated)</label>
+          <input type="text" class="form-control" id="prod-variants" placeholder="18K Champagne Gold, Rose Gold, Sterling Silver">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" id="prod-desc" rows="3" placeholder="Craftsmanship details, inspiration, and styling notes..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="AdminApp.closeModal('modal-product')">Cancel</button>
+        <button type="submit" class="btn btn-gold">Save Product &rarr;</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 2. Category Modal -->
+<div class="modal-backdrop" id="modal-category">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-cat-title">Add Category</h3>
+      <button class="modal-close-btn" onclick="AdminApp.closeModal('modal-category')">&times;</button>
+    </div>
+    <form id="cat-form" onsubmit="AdminApp.saveCategoryForm(event)">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Category Name <span class="req">*</span></label>
+            <input type="text" class="form-control" id="cat-name" placeholder="Necklaces" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Slug / ID <span class="req">*</span></label>
+            <input type="text" class="form-control" id="cat-id" placeholder="necklaces" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Item Count</label>
+            <input type="number" class="form-control" id="cat-count" value="10">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Thumbnail Image</label>
+            <input type="text" class="form-control" id="cat-img" placeholder="product_flower_necklace.jpg">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" id="cat-desc" rows="2" placeholder="Curated pendants and necklaces..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="AdminApp.closeModal('modal-category')">Cancel</button>
+        <button type="submit" class="btn btn-gold">Save Category</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 3. Review Modal -->
+<div class="modal-backdrop" id="modal-review">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-review-title">Add Review</h3>
+      <button class="modal-close-btn" onclick="AdminApp.closeModal('modal-review')">&times;</button>
+    </div>
+    <form id="review-form" onsubmit="AdminApp.saveReviewForm(event)">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Customer Name <span class="req">*</span></label>
+            <input type="text" class="form-control" id="rev-name" placeholder="Ayesha K." required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Rating</label>
+            <select class="form-select" id="rev-rating">
+              <option value="5">★★★★★ (5 Stars)</option>
+              <option value="4">★★★★☆ (4 Stars)</option>
+              <option value="3">★★★☆☆ (3 Stars)</option>
+              <option value="2">★★☆☆☆ (2 Stars)</option>
+              <option value="1">★☆☆☆☆ (1 Star)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Associated Product</label>
+          <select class="form-select" id="rev-product"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Review Text <span class="req">*</span></label>
+          <textarea class="form-textarea" id="rev-text" rows="3" placeholder="Tell us about the customer's experience..." required></textarea>
+        </div>
+        <div class="form-row" style="gap:2rem">
+          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer">
+            <input type="checkbox" id="rev-verified" checked> Verified Purchase Badge
+          </label>
+          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer">
+            <input type="checkbox" id="rev-approved" checked> Approved (Live on Website)
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="AdminApp.closeModal('modal-review')">Cancel</button>
+        <button type="submit" class="btn btn-gold">Save Review</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 4. Coupon Modal -->
+<div class="modal-backdrop" id="modal-coupon">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-coupon-title">Add Coupon Code</h3>
+      <button class="modal-close-btn" onclick="AdminApp.closeModal('modal-coupon')">&times;</button>
+    </div>
+    <form id="coupon-form" onsubmit="AdminApp.saveCouponForm(event)">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Coupon Code <span class="req">*</span></label>
+            <input type="text" class="form-control" id="cp-code" placeholder="DAZZLE25" required style="text-transform:uppercase;font-weight:700">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Offer Title</label>
+            <input type="text" class="form-control" id="cp-title" placeholder="Special Discount">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Discount Type</label>
+            <select class="form-select" id="cp-type">
+              <option value="percent">Percentage (%)</option>
+              <option value="free_shipping">Free Shipping</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Discount Value (%)</label>
+            <input type="number" class="form-control" id="cp-discount" placeholder="10">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Min. Order Value (₹)</label>
+            <input type="number" class="form-control" id="cp-minorder" placeholder="1500">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Expiry Date</label>
+            <input type="text" class="form-control" id="cp-expiry" placeholder="2026-12-31">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Badge Label</label>
+          <input type="text" class="form-control" id="cp-badge" placeholder="First Order / Limited Time">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Offer Description</label>
+          <textarea class="form-textarea" id="cp-desc" rows="2" placeholder="Describe the offer privileges..."></textarea>
+        </div>
+        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer">
+          <input type="checkbox" id="cp-active" checked> Active &amp; Redeemable at Checkout
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="AdminApp.closeModal('modal-coupon')">Cancel</button>
+        <button type="submit" class="btn btn-gold">Save Coupon</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 5. Combo Modal -->
+<div class="modal-backdrop" id="modal-combo">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-combo-title">Add Jewellery Combo</h3>
+      <button class="modal-close-btn" onclick="AdminApp.closeModal('modal-combo')">&times;</button>
+    </div>
+    <form id="combo-form" onsubmit="AdminApp.saveComboForm(event)">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Combo Name <span class="req">*</span></label>
+            <input type="text" class="form-control" id="combo-name" placeholder="The Royal Set" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Discount Badge</label>
+            <input type="text" class="form-control" id="combo-discount" placeholder="25% OFF">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Special Combo Price (₹) <span class="req">*</span></label>
+            <input type="number" class="form-control" id="combo-price" placeholder="9990" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Original Price (₹)</label>
+            <input type="number" class="form-control" id="combo-oldprice" placeholder="13990">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Included Items (Comma-separated)</label>
+          <input type="text" class="form-control" id="combo-items" placeholder="Flower Pendant Necklace, Pearl Drop Earrings">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Image Filenames (Comma-separated)</label>
+          <input type="text" class="form-control" id="combo-images" placeholder="product_flower_necklace.jpg, product_pearl_earrings.jpg">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="AdminApp.closeModal('modal-combo')">Cancel</button>
+        <button type="submit" class="btn btn-gold">Save Combo</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 6. Import Data Modal -->
+<div class="modal-backdrop" id="modal-import">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">Restore / Import Store Data</h3>
+      <button class="modal-close-btn" onclick="AdminApp.closeModal('modal-import')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.75rem">
+        Paste your previously exported JSON store configuration below to restore products, orders, and content.
+      </p>
+      <textarea class="form-textarea" id="import-json-area" rows="10" placeholder="{ &quot;products&quot;: [...] }" style="font-family:monospace;font-size:0.75rem"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" onclick="AdminApp.closeModal('modal-import')">Cancel</button>
+      <button type="button" class="btn btn-gold" onclick="AdminApp.confirmImportData()">Restore Data Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- 7. Order Details Drawer -->
+<div class="drawer-backdrop" id="drawer-order">
+  <div class="drawer-panel">
+    <div class="drawer-header">
+      <div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700" id="drawer-order-id">#DBD-2025-001</h3>
+        <div style="font-size:0.72rem;color:var(--text-muted)" id="drawer-order-date">Placed on Recent</div>
+      </div>
+      <button class="modal-close-btn" onclick="AdminApp.closeOrderDrawer()">&times;</button>
+    </div>
+    <div class="drawer-body">
+      <!-- Progression Timeline -->
+      <div class="order-timeline" id="drawer-timeline">
+        <!-- Dynamically populated -->
+      </div>
+
+      <!-- Customer Details -->
+      <div style="background:#FAF7F2;padding:1rem;border-radius:var(--radius-sm);margin-bottom:1.25rem;border:1px solid var(--border-color)">
+        <h4 style="font-size:0.82rem;font-weight:700;margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.04em">Customer &amp; Shipping</h4>
+        <div style="font-weight:600;font-size:0.9rem" id="drawer-customer-name">Ayesha Khan</div>
+        <div style="font-size:0.78rem;color:var(--text-muted);margin:2px 0" id="drawer-customer-contact">ayesha.k@example.com | +91 98765 43210</div>
+        <div style="font-size:0.78rem;color:#333;margin-top:6px" id="drawer-shipping-address">Flat 402, Sea Green Apts, Bandra West, Mumbai</div>
+        <div style="font-size:0.74rem;color:var(--gold);font-weight:600;margin-top:6px">Payment: <span id="drawer-payment-method">UPI / Online</span></div>
+      </div>
+
+      <!-- Items List -->
+      <h4 style="font-size:0.82rem;font-weight:700;margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.04em">Order Items</h4>
+      <div id="drawer-items-list" style="margin-bottom:1.25rem">
+        <!-- Dynamically populated -->
+      </div>
+
+      <!-- Financial Totals -->
+      <div style="border-top:1px solid var(--border-color);padding-top:0.75rem;display:flex;flex-direction:column;gap:0.35rem">
+        <div style="display:flex;justify-content:space-between;font-size:0.82rem">
+          <span style="color:var(--text-muted)">Subtotal</span>
+          <span id="drawer-subtotal">₹0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.82rem">
+          <span style="color:var(--text-muted)">Delivery</span>
+          <span style="color:#2E7D32">Complimentary (Free)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:1.05rem;font-weight:700;margin-top:0.35rem;border-top:1px dashed var(--border-color);padding-top:0.5rem">
+          <span>Total</span>
+          <span id="drawer-total" style="color:var(--gold)">₹0</span>
+        </div>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <div style="font-size:0.75rem;font-weight:600;color:var(--text-muted)">Update Status:</div>
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap" id="drawer-status-actions">
+        <!-- Dynamically populated status progression buttons -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="../script.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

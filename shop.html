@@ -236,7 +236,40 @@ function setRating(r) {
   stars.forEach((s,i) => s.style.color = i < r ? '#D4AF7C' : '#DDD');
 }
 function submitReview() {
-  showToast('&#10022; Thank you for your review!');
+  const form = document.querySelector('.write-review-form');
+  if (!form) return;
+  const nameInput = form.querySelector('input[type="text"]');
+  const prodSelect = form.querySelector('select');
+  const textInput = form.querySelector('textarea');
+  const name = nameInput && nameInput.value.trim() ? nameInput.value.trim() : 'Anonymous';
+  const product = prodSelect ? prodSelect.value : 'General';
+  const text = textInput && textInput.value.trim() ? textInput.value.trim() : '';
+
+  if (!text) {
+    showToast('Please enter your review text.');
+    return;
+  }
+
+  DazzleStore.addReview({
+    name: name,
+    product: product,
+    rating: currentRating,
+    text: text,
+    verified: true,
+    approved: true
+  });
+
+  if (nameInput) nameInput.value = '';
+  if (textInput) textInput.value = '';
+  setRating(5);
+
+  const rv = document.getElementById('shop-reviews');
+  if (rv) {
+    const approved = DazzleStore.getReviews().filter(r => r.approved !== false);
+    rv.innerHTML = approved.map(reviewCardHTML).join('');
+  }
+
+  showToast('✦ Thank you for your review!');
 }
 function applyFilters() {
   currentPage = 1;
@@ -341,9 +374,23 @@ function renderShop() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Populate category filter from DazzleStore
+  const catSelect = document.getElementById('category-select');
+  if (catSelect) {
+    const cats = DazzleStore.getCategories();
+    catSelect.innerHTML = `<option value="all">All Categories</option>` +
+      cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  }
+
+  // Populate review form product select
+  const reviewProdSelect = document.querySelector('.write-review-form select');
+  if (reviewProdSelect) {
+    const prods = DazzleStore.getProducts();
+    reviewProdSelect.innerHTML = prods.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+  }
+
   const params = new URLSearchParams(window.location.search);
   const catParam = params.get('category');
-  const catSelect = document.getElementById('category-select');
   if (catParam && catSelect) {
     catSelect.value = catParam.toLowerCase();
   }
@@ -352,7 +399,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('sort-select')?.addEventListener('change', () => { currentPage = 1; renderShop(); });
   renderShop();
   const rv = document.getElementById('shop-reviews');
-  if (rv) rv.innerHTML = REVIEWS.map(reviewCardHTML).join('');
+  if (rv) {
+    const approved = DazzleStore.getReviews().filter(r => r.approved !== false);
+    rv.innerHTML = approved.map(reviewCardHTML).join('');
+  }
 });
 </script>
 </body>

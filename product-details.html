@@ -244,14 +244,14 @@ function handleDetailWishlist(btn) {
 
 function renderProductDetails() {
   const id = getProductIdFromUrl();
-  currentProduct = PRODUCTS.find(p => p.id === id) || PRODUCTS[0];
-  const info = PRODUCT_DETAILS[currentProduct.id] || {
-    description: "An iconic piece from Dazzle by Dua crafted with timeless grace.",
-    material: "18K Champagne Gold Vermeil",
-    dimensions: "Standard Fine Jewellery Sizing",
-    sku: "DBD-00" + currentProduct.id,
-    variants: ["18K Champagne Gold", "Rose Gold Vermeil", "Sterling Silver"],
-    images: [currentProduct.img, "featured_collection.jpg", "hero_necklace.jpg"]
+  currentProduct = (window.DazzleStore ? DazzleStore.getProductById(id) : null) || PRODUCTS.find(p => p.id === id) || PRODUCTS[0];
+  const info = {
+    description: currentProduct.description || (PRODUCT_DETAILS[currentProduct.id] ? PRODUCT_DETAILS[currentProduct.id].description : "An iconic piece from Dazzle by Dua crafted with timeless grace."),
+    material: currentProduct.material || (PRODUCT_DETAILS[currentProduct.id] ? PRODUCT_DETAILS[currentProduct.id].material : "18K Champagne Gold Vermeil"),
+    dimensions: currentProduct.dimensions || (PRODUCT_DETAILS[currentProduct.id] ? PRODUCT_DETAILS[currentProduct.id].dimensions : "Standard Fine Jewellery Sizing"),
+    sku: currentProduct.sku || (PRODUCT_DETAILS[currentProduct.id] ? PRODUCT_DETAILS[currentProduct.id].sku : ("DBD-00" + currentProduct.id)),
+    variants: (currentProduct.variants && currentProduct.variants.length) ? currentProduct.variants : (PRODUCT_DETAILS[currentProduct.id] ? PRODUCT_DETAILS[currentProduct.id].variants : ["18K Champagne Gold", "Rose Gold Vermeil", "Sterling Silver"]),
+    images: (currentProduct.images && currentProduct.images.length) ? currentProduct.images : (PRODUCT_DETAILS[currentProduct.id] ? PRODUCT_DETAILS[currentProduct.id].images : [currentProduct.img, "featured_collection.jpg", "hero_necklace.jpg"])
   };
 
   // Update Breadcrumbs & Title
