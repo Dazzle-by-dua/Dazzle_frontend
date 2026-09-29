@@ -65,11 +65,9 @@ const AdminAuth = {
         localStorage.removeItem(this.STORAGE_KEY);
         sessionStorage.removeItem(this.STORAGE_KEY);
 
-        if (rememberMe) {
-          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
-        } else {
-          sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
-        }
+        // Always persist to localStorage and sessionStorage for seamless multi-tab administration
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
+        sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
 
         return {
           success: true,

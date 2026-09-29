@@ -8,6 +8,7 @@ window.API_BASE_URL = API_BASE_URL;
 
 // Global Admin State
 const AdminApp = {
+  // Exposed on window below for inline event handlers
   currentView: "dashboard",
   editingProductId: null,
   editingReviewId: null,
@@ -172,7 +173,7 @@ const AdminApp = {
     if (catBadge) catBadge.textContent = categories.length;
   },
 
-  showToast(msg) {
+  showToast(msg, type = "success") {
     let container = document.querySelector(".admin-toast-container");
     if (!container) {
       container = document.createElement("div");
@@ -181,14 +182,21 @@ const AdminApp = {
     }
     const toast = document.createElement("div");
     toast.className = "admin-toast";
-    toast.innerHTML = `<i class="fa fa-gem" style="color:var(--gold)"></i> <span>${msg}</span>`;
+    const isError = type === "error";
+    if (isError) {
+      toast.style.borderColor = "#E53935";
+      toast.style.background = "#FFF5F5";
+    }
+    const icon = isError ? "fa-exclamation-triangle" : "fa-gem";
+    const iconColor = isError ? "#E53935" : "var(--gold)";
+    toast.innerHTML = `<i class="fa ${icon}" style="color:${iconColor}"></i> <span>${msg}</span>`;
     container.appendChild(toast);
     setTimeout(() => {
       toast.style.opacity = "0";
       toast.style.transform = "translateX(30px)";
       toast.style.transition = "all 0.3s ease";
       setTimeout(() => toast.remove(), 300);
-    }, 3200);
+    }, 3800);
   },
 
   // ========================================================
@@ -392,11 +400,16 @@ const AdminApp = {
     const p = DazzleStore.getProductById(id);
     if (!p) return;
     const newStock = !p.inStock;
-    await DazzleStore.toggleStock(id, newStock);
-    this.showToast(`✦ "${p.name}" marked as ${newStock ? 'In Stock' : 'Out of Stock'} in MongoDB`);
-    this.renderProducts();
-    this.renderDashboard();
-    this.updateSidebarBadges();
+    try {
+      await DazzleStore.toggleStock(id, newStock);
+      this.showToast(`✦ "${p.name}" marked as ${newStock ? 'In Stock' : 'Out of Stock'} in MongoDB`);
+      this.renderProducts();
+      this.renderDashboard();
+      this.updateSidebarBadges();
+    } catch (err) {
+      console.error("Toggle stock error:", err);
+      this.showToast(`Failed to update stock: ${err.message || err}`, "error");
+    }
   },
 
   openAddProductModal() {
@@ -498,31 +511,35 @@ const AdminApp = {
         await DazzleStore.addProduct(productPayload);
         this.showToast(`✦ New product "${name}" added to collection and saved to MongoDB!`);
       }
+      this.closeModal("modal-product");
+      this.renderProducts();
+      this.renderDashboard();
+      this.updateSidebarBadges();
     } catch (err) {
       console.error("Save product error:", err);
-      this.showToast(`Error saving product: ${err.message || err}`);
+      this.showToast(`Error saving product: ${err.message || err}`, "error");
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.textContent = "Save Product";
       }
     }
-
-    this.closeModal("modal-product");
-    this.renderProducts();
-    this.renderDashboard();
-    this.updateSidebarBadges();
   },
 
   async deleteProductPrompt(id) {
     const p = DazzleStore.getProductById(id);
     if (!p) return;
     if (confirm(`Are you sure you want to delete "${p.name}"? This action removes it from MongoDB.`)) {
-      await DazzleStore.deleteProduct(id);
-      this.showToast(`✦ Product "${p.name}" deleted from MongoDB.`);
-      this.renderProducts();
-      this.renderDashboard();
-      this.updateSidebarBadges();
+      try {
+        await DazzleStore.deleteProduct(id);
+        this.showToast(`✦ Product "${p.name}" deleted from MongoDB.`);
+        this.renderProducts();
+        this.renderDashboard();
+        this.updateSidebarBadges();
+      } catch (err) {
+        console.error("Delete product error:", err);
+        this.showToast(`Failed to delete product: ${err.message || err}`, "error");
+      }
     }
   },
 
@@ -587,25 +604,34 @@ const AdminApp = {
     const img = document.getElementById("cat-img").value.trim() || "product_flower_necklace.jpg";
     const desc = document.getElementById("cat-desc").value.trim();
 
-    if (this.editingCategoryId) {
-      await DazzleStore.updateCategory(this.editingCategoryId, { name, count, img, desc });
-      this.showToast(`✦ Category "${name}" updated in MongoDB.`);
-    } else {
-      await DazzleStore.addCategory({ id, name, count, img, desc });
-      this.showToast(`✦ Category "${name}" added to MongoDB.`);
+    try {
+      if (this.editingCategoryId) {
+        await DazzleStore.updateCategory(this.editingCategoryId, { name, count, img, desc });
+        this.showToast(`✦ Category "${name}" updated in MongoDB.`);
+      } else {
+        await DazzleStore.addCategory({ id, name, count, img, desc });
+        this.showToast(`✦ Category "${name}" added to MongoDB.`);
+      }
+      this.closeModal("modal-category");
+      this.renderCategories();
+      this.updateSidebarBadges();
+    } catch (err) {
+      console.error("Save category error:", err);
+      this.showToast(`Failed to save category: ${err.message || err}`, "error");
     }
-
-    this.closeModal("modal-category");
-    this.renderCategories();
-    this.updateSidebarBadges();
   },
 
   async deleteCategoryPrompt(id) {
     if (confirm(`Are you sure you want to delete category "${id}"?`)) {
-      await DazzleStore.deleteCategory(id);
-      this.showToast(`✦ Category "${id}" removed from MongoDB.`);
-      this.renderCategories();
-      this.updateSidebarBadges();
+      try {
+        await DazzleStore.deleteCategory(id);
+        this.showToast(`✦ Category "${id}" removed from MongoDB.`);
+        this.renderCategories();
+        this.updateSidebarBadges();
+      } catch (err) {
+        console.error("Delete category error:", err);
+        this.showToast(`Failed to delete category: ${err.message || err}`, "error");
+      }
     }
   },
 
@@ -685,15 +711,20 @@ const AdminApp = {
   },
 
   async changeOrderStatus(id, newStatus) {
-    const updated = await DazzleStore.updateOrderStatus(id, newStatus);
-    if (updated) {
-      this.showToast(`✦ Order #${id} status updated to ${newStatus} in MongoDB`);
-      this.renderOrders();
-      this.renderDashboard();
-      this.updateSidebarBadges();
-      if (this.viewingOrderId === id) {
-        this.openOrderDrawer(id);
+    try {
+      const updated = await DazzleStore.updateOrderStatus(id, newStatus);
+      if (updated) {
+        this.showToast(`✦ Order #${id} status updated to ${newStatus} in MongoDB`);
+        this.renderOrders();
+        this.renderDashboard();
+        this.updateSidebarBadges();
+        if (this.viewingOrderId === id) {
+          this.openOrderDrawer(id);
+        }
       }
+    } catch (err) {
+      console.error("Update order status error:", err);
+      this.showToast(`Failed to update order status: ${err.message || err}`, "error");
     }
   },
 
@@ -873,7 +904,7 @@ const AdminApp = {
     document.getElementById("modal-review").classList.add("open");
   },
 
-  saveReviewForm(e) {
+  async saveReviewForm(e) {
     e.preventDefault();
     const name = document.getElementById("rev-name").value.trim();
     const product = document.getElementById("rev-product").value;
@@ -882,26 +913,35 @@ const AdminApp = {
     const verified = document.getElementById("rev-verified").checked;
     const approved = document.getElementById("rev-approved").checked;
 
-    if (this.editingReviewId) {
-      DazzleStore.updateReview(this.editingReviewId, { name, product, rating, text, verified, approved });
-      this.showToast(`✦ Review from "${name}" updated.`);
-    } else {
-      DazzleStore.addReview({ name, product, rating, text, verified, approved });
-      this.showToast(`✦ Review from "${name}" added.`);
+    try {
+      if (this.editingReviewId) {
+        await DazzleStore.updateReview(this.editingReviewId, { name, product, rating, text, verified, approved });
+        this.showToast(`✦ Review from "${name}" updated.`);
+      } else {
+        await DazzleStore.addReview({ name, product, rating, text, verified, approved });
+        this.showToast(`✦ Review from "${name}" added.`);
+      }
+      this.closeModal("modal-review");
+      this.renderReviews();
+      this.renderDashboard();
+      this.updateSidebarBadges();
+    } catch (err) {
+      console.error("Save review error:", err);
+      this.showToast(`Failed to save review: ${err.message || err}`, "error");
     }
-
-    this.closeModal("modal-review");
-    this.renderReviews();
-    this.renderDashboard();
-    this.updateSidebarBadges();
   },
 
-  deleteReviewPrompt(id) {
+  async deleteReviewPrompt(id) {
     if (confirm("Are you sure you want to delete this customer review?")) {
-      DazzleStore.deleteReview(id);
-      this.showToast("✦ Review removed.");
-      this.renderReviews();
-      this.updateSidebarBadges();
+      try {
+        await DazzleStore.deleteReview(id);
+        this.showToast("✦ Review removed.");
+        this.renderReviews();
+        this.updateSidebarBadges();
+      } catch (err) {
+        console.error("Delete review error:", err);
+        this.showToast(`Failed to delete review: ${err.message || err}`, "error");
+      }
     }
   },
 
@@ -1006,18 +1046,22 @@ const AdminApp = {
 
     const payload = { code, title, type, discount, minOrder, expiry, desc, badge, active };
 
-    if (this.editingCouponId) {
-      await DazzleStore.updateCoupon(this.editingCouponId, payload);
-      this.showToast(`✦ Coupon "${code}" updated in MongoDB.`);
-    } else {
-      payload.id = `cp-${Date.now().toString().slice(-4)}`;
-      await DazzleStore.addCoupon(payload);
-      this.showToast(`✦ Coupon "${code}" created in MongoDB.`);
+    try {
+      if (this.editingCouponId) {
+        await DazzleStore.updateCoupon(this.editingCouponId, payload);
+        this.showToast(`✦ Coupon "${code}" updated in MongoDB.`);
+      } else {
+        payload.id = `cp-${Date.now().toString().slice(-4)}`;
+        await DazzleStore.addCoupon(payload);
+        this.showToast(`✦ Coupon "${code}" created in MongoDB.`);
+      }
+      this.closeModal("modal-coupon");
+      this.renderOffers();
+      this.updateSidebarBadges();
+    } catch (err) {
+      console.error("Save coupon error:", err);
+      this.showToast(`Failed to save coupon: ${err.message || err}`, "error");
     }
-
-    this.closeModal("modal-coupon");
-    this.renderOffers();
-    this.updateSidebarBadges();
   },
 
   async deleteCouponPrompt(id) {
@@ -1064,17 +1108,21 @@ const AdminApp = {
 
     const payload = { name, discount, price, oldPrice, items, images };
 
-    if (this.editingComboId) {
-      await DazzleStore.updateCombo(this.editingComboId, payload);
-      this.showToast(`✦ Combo "${name}" updated in MongoDB.`);
-    } else {
-      payload.id = `cb-${Date.now().toString().slice(-4)}`;
-      await DazzleStore.addCombo(payload);
-      this.showToast(`✦ Combo "${name}" created in MongoDB.`);
+    try {
+      if (this.editingComboId) {
+        await DazzleStore.updateCombo(this.editingComboId, payload);
+        this.showToast(`✦ Combo "${name}" updated in MongoDB.`);
+      } else {
+        payload.id = `cb-${Date.now().toString().slice(-4)}`;
+        await DazzleStore.addCombo(payload);
+        this.showToast(`✦ Combo "${name}" created in MongoDB.`);
+      }
+      this.closeModal("modal-combo");
+      this.renderOffers();
+    } catch (err) {
+      console.error("Save combo error:", err);
+      this.showToast(`Failed to save combo: ${err.message || err}`, "error");
     }
-
-    this.closeModal("modal-combo");
-    this.renderOffers();
   },
 
   async deleteComboPrompt(id) {
@@ -1458,7 +1506,14 @@ const AdminApp = {
   }
 };
 
-// Initialize on DOM Ready
-document.addEventListener("DOMContentLoaded", () => {
+// Expose globally to window so that all inline onclick and onsubmit handlers can access AdminApp
+window.AdminApp = AdminApp;
+
+// Initialize on DOM Ready or immediately if DOM is already loaded
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
+    AdminApp.init();
+  });
+} else {
   AdminApp.init();
-});
+}

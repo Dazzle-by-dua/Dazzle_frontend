@@ -389,28 +389,39 @@ const DazzleStore = {
   },
 
   async _api(endpoint, method = "GET", body = null) {
-    try {
-      const options = {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          ...this._getAuthHeader()
-        }
-      };
-      if (body) {
-        options.body = JSON.stringify(body);
+    const authHeaders = this._getAuthHeader();
+    const options = {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        ...authHeaders
       }
-      const res = await fetch(`${API_BASE_URL}${endpoint}`, options);
-      if (!res.ok) {
-        const errText = await res.text().catch(() => "");
-        console.warn(`API call ${method} ${endpoint} returned ${res.status}:`, errText);
-        return null;
-      }
-      return await res.json();
-    } catch (e) {
-      console.warn(`API call ${method} ${endpoint} failed:`, e);
-      return null;
+    };
+    if (body) {
+      options.body = JSON.stringify(body);
     }
+    const res = await fetch(`${API_BASE_URL}${endpoint}`, options);
+    if (!res.ok) {
+      let errorMsg = `API request ${method} ${endpoint} failed with status ${res.status}`;
+      try {
+        const errJson = await res.json();
+        if (errJson && (errJson.detail || errJson.message)) {
+          errorMsg = errJson.detail || errJson.message;
+        }
+      } catch (e) {}
+
+      if (res.status === 401) {
+        console.warn("Admin session unauthorized or expired:", errorMsg);
+        if (window.location.pathname.includes("/admin") && !window.location.pathname.includes("login")) {
+          localStorage.removeItem("dazzle_admin_session");
+          sessionStorage.removeItem("dazzle_admin_session");
+          alert("Admin session expired. Please sign in again.");
+          window.location.replace("login.html?expired=1");
+        }
+      }
+      throw new Error(errorMsg);
+    }
+    return await res.json();
   },
 
   async syncFromBackend() {
@@ -508,55 +519,65 @@ const DazzleStore = {
   },
   async addProduct(product) {
     const res = await this._api('/api/products', 'POST', product);
-    let newProd = res;
-    if (!newProd) {
-      const prods = this.getProducts();
-      const maxId = prods.reduce((max, p) => Math.max(max, parseInt(p.id, 10) || 0), 0);
-      newProd = {
-        ...product,
-        id: maxId + 1,
-        rating: product.rating || 5.0,
-        reviews: product.reviews || 0,
-        badges: product.badges || [],
-        variants: product.variants || ["18K Champagne Gold"],
-        images: product.images && product.images.length ? product.images : [product.img || "product_flower_necklace.jpg"]
-      };
-    }
-    const prods = this.getProducts();
-    const filtered = prods.filter(p => String(p.id) !== String(newProd.id));
-    filtered.unshift(newProd);
-    this.saveProducts(filtered);
-    return newProd;
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/products`).then(r => r.ok ? r.json() : null);
+      if (Array.isArray(live)) {
+        this.saveProducts(live);
+        return res;
+      }
+    } catch (e) {}
+    const prods = this.getProducts().filter(p => p.id !== res.id);
+    prods.unshift(res);
+    this.saveProducts(prods);
+    return res;
   },
   async updateProduct(id, updates) {
     const numId = parseInt(id, 10) || id;
     const res = await this._api(`/api/products/${numId}`, 'PUT', updates);
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/products`).then(r => r.ok ? r.json() : null);
+      if (Array.isArray(live)) {
+        this.saveProducts(live);
+        return res;
+      }
+    } catch (e) {}
     const prods = this.getProducts();
     const idx = prods.findIndex(p => p.id === parseInt(id, 10) || String(p.id) === String(id));
-    const merged = res || (idx >= 0 ? { ...prods[idx], ...updates } : null);
-    if (idx >= 0 && merged) {
-      prods[idx] = merged;
+    if (idx >= 0) {
+      prods[idx] = res;
       this.saveProducts(prods);
-      return prods[idx];
     }
-    return merged;
+    return res;
   },
   async toggleStock(id, inStock) {
     const numId = parseInt(id, 10) || id;
     const res = await this._api(`/api/products/${numId}/stock`, 'PATCH', { inStock });
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/products`).then(r => r.ok ? r.json() : null);
+      if (Array.isArray(live)) {
+        this.saveProducts(live);
+        return res;
+      }
+    } catch (e) {}
     const prods = this.getProducts();
     const idx = prods.findIndex(p => p.id === parseInt(id, 10) || String(p.id) === String(id));
     if (idx >= 0) {
       prods[idx].inStock = inStock;
       this.saveProducts(prods);
     }
-    return res || (idx >= 0 ? prods[idx] : null);
+    return res;
   },
   async deleteProduct(id) {
     const numId = parseInt(id, 10) || id;
     await this._api(`/api/products/${numId}`, 'DELETE');
-    let prods = this.getProducts();
-    prods = prods.filter(p => p.id !== parseInt(id, 10) && String(p.id) !== String(id));
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/products`).then(r => r.ok ? r.json() : null);
+      if (Array.isArray(live)) {
+        this.saveProducts(live);
+        return true;
+      }
+    } catch (e) {}
+    let prods = this.getProducts().filter(p => p.id !== parseInt(id, 10) && String(p.id) !== String(id));
     this.saveProducts(prods);
     return true;
   },
@@ -598,27 +619,45 @@ const DazzleStore = {
   },
   async addCategory(cat) {
     const res = await this._api('/api/categories', 'POST', cat);
-    const newCat = res || cat;
-    const list = this.getCategories().filter(c => c.id !== newCat.id);
-    list.push(newCat);
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/categories`).then(r => r.ok ? r.json() : null);
+      if (Array.isArray(live)) {
+        this.saveCategories(live);
+        return res;
+      }
+    } catch (e) {}
+    const list = this.getCategories().filter(c => c.id !== res.id);
+    list.push(res);
     this.saveCategories(list);
-    return newCat;
+    return res;
   },
   async updateCategory(id, updates) {
     const res = await this._api(`/api/categories/${id}`, 'PUT', updates);
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/categories`).then(r => r.ok ? r.json() : null);
+      if (Array.isArray(live)) {
+        this.saveCategories(live);
+        return res;
+      }
+    } catch (e) {}
     const list = this.getCategories();
     const idx = list.findIndex(c => c.id === id);
     if (idx >= 0) {
-      list[idx] = res || { ...list[idx], ...updates };
+      list[idx] = res;
       this.saveCategories(list);
-      return list[idx];
     }
     return res;
   },
   async deleteCategory(id) {
     await this._api(`/api/categories/${id}`, 'DELETE');
-    let list = this.getCategories();
-    list = list.filter(c => c.id !== id);
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/categories`).then(r => r.ok ? r.json() : null);
+      if (Array.isArray(live)) {
+        this.saveCategories(live);
+        return true;
+      }
+    } catch (e) {}
+    let list = this.getCategories().filter(c => c.id !== id);
     this.saveCategories(list);
     return true;
   },
@@ -632,20 +671,14 @@ const DazzleStore = {
   },
   async addReview(r) {
     const res = await this._api('/api/reviews', 'POST', r);
-    const newRev = res || {
-      id: Date.now(),
-      name: r.name || "Anonymous",
-      rating: parseInt(r.rating, 10) || 5,
-      text: r.text || "",
-      date: r.date || new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }),
-      verified: r.verified !== false,
-      approved: r.approved !== false,
-      product: r.product || "General"
-    };
-    const list = this.getReviews().filter(x => String(x.id) !== String(newRev.id));
-    list.unshift(newRev);
-    this.saveReviews(list);
-    return newRev;
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/reviews`).then(r => r.ok ? r.json() : null);
+      if (Array.isArray(live)) {
+        this.saveReviews(live);
+        return res;
+      }
+    } catch (e) {}
+    return res;
   },
   async updateReview(id, updates) {
     const numId = parseInt(id, 10) || id;
@@ -655,20 +688,26 @@ const DazzleStore = {
     } else {
       res = await this._api(`/api/reviews/${numId}`, 'PUT', updates);
     }
-    const list = this.getReviews();
-    const idx = list.findIndex(r => r.id === parseInt(id, 10) || String(r.id) === String(id));
-    if (idx >= 0) {
-      list[idx] = res || { ...list[idx], ...updates };
-      this.saveReviews(list);
-      return list[idx];
-    }
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/reviews`).then(r => r.ok ? r.json() : null);
+      if (Array.isArray(live)) {
+        this.saveReviews(live);
+        return res;
+      }
+    } catch (e) {}
     return res;
   },
   async deleteReview(id) {
     const numId = parseInt(id, 10) || id;
     await this._api(`/api/reviews/${numId}`, 'DELETE');
-    let list = this.getReviews();
-    list = list.filter(r => r.id !== parseInt(id, 10) && String(r.id) !== String(id));
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/reviews`).then(r => r.ok ? r.json() : null);
+      if (Array.isArray(live)) {
+        this.saveReviews(live);
+        return true;
+      }
+    } catch (e) {}
+    let list = this.getReviews().filter(r => r.id !== parseInt(id, 10) && String(r.id) !== String(id));
     this.saveReviews(list);
     return true;
   },
@@ -682,58 +721,50 @@ const DazzleStore = {
   },
   async addCoupon(coupon) {
     const res = await this._api('/api/offers/coupons', 'POST', coupon);
-    const newC = res || coupon;
-    const data = this.getOffers();
-    data.coupons = data.coupons || [];
-    data.coupons = data.coupons.filter(c => c.id !== newC.id && c.code !== newC.code);
-    data.coupons.push(newC);
-    this.saveOffers(data);
-    return newC;
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/offers`).then(r => r.ok ? r.json() : null);
+      if (live) this.saveOffers(live);
+    } catch (e) {}
+    return res;
   },
   async updateCoupon(id, updates) {
     const res = await this._api(`/api/offers/coupons/${id}`, 'PUT', updates);
-    const data = this.getOffers();
-    const idx = (data.coupons || []).findIndex(c => c.id === id);
-    if (idx >= 0) {
-      data.coupons[idx] = res || { ...data.coupons[idx], ...updates };
-      this.saveOffers(data);
-      return data.coupons[idx];
-    }
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/offers`).then(r => r.ok ? r.json() : null);
+      if (live) this.saveOffers(live);
+    } catch (e) {}
     return res;
   },
   async deleteCoupon(id) {
     await this._api(`/api/offers/coupons/${id}`, 'DELETE');
-    const data = this.getOffers();
-    data.coupons = (data.coupons || []).filter(c => c.id !== id);
-    this.saveOffers(data);
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/offers`).then(r => r.ok ? r.json() : null);
+      if (live) this.saveOffers(live);
+    } catch (e) {}
     return true;
   },
   async addCombo(combo) {
     const res = await this._api('/api/offers/combos', 'POST', combo);
-    const newCb = res || combo;
-    const data = this.getOffers();
-    data.combos = data.combos || [];
-    data.combos = data.combos.filter(c => c.id !== newCb.id);
-    data.combos.push(newCb);
-    this.saveOffers(data);
-    return newCb;
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/offers`).then(r => r.ok ? r.json() : null);
+      if (live) this.saveOffers(live);
+    } catch (e) {}
+    return res;
   },
   async updateCombo(id, updates) {
     const res = await this._api(`/api/offers/combos/${id}`, 'PUT', updates);
-    const data = this.getOffers();
-    const idx = (data.combos || []).findIndex(c => c.id === id);
-    if (idx >= 0) {
-      data.combos[idx] = res || { ...data.combos[idx], ...updates };
-      this.saveOffers(data);
-      return data.combos[idx];
-    }
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/offers`).then(r => r.ok ? r.json() : null);
+      if (live) this.saveOffers(live);
+    } catch (e) {}
     return res;
   },
   async deleteCombo(id) {
     await this._api(`/api/offers/combos/${id}`, 'DELETE');
-    const data = this.getOffers();
-    data.combos = (data.combos || []).filter(c => c.id !== id);
-    this.saveOffers(data);
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/offers`).then(r => r.ok ? r.json() : null);
+      if (live) this.saveOffers(live);
+    } catch (e) {}
     return true;
   },
 
@@ -757,38 +788,45 @@ const DazzleStore = {
   },
   async addOrder(order) {
     const res = await this._api('/api/orders', 'POST', order);
-    const newOrder = res || {
-      id: order.id || `DBD-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
-      customer: order.customer || "Valued Customer",
-      email: order.email || "customer@example.com",
-      phone: order.phone || "+91 98765 00000",
-      date: order.date || new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }),
-      total: order.total || 0,
-      status: order.status || "Processing",
-      paymentMethod: order.paymentMethod || "Cash on Delivery",
-      address: order.address || "Mumbai, India",
-      items: order.items || []
-    };
-    const list = this.getOrders().filter(o => o.id !== newOrder.id);
-    list.unshift(newOrder);
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/orders`).then(r => r.ok ? r.json() : null);
+      if (Array.isArray(live)) {
+        this.saveOrders(live);
+        return res;
+      }
+    } catch (e) {}
+    const list = this.getOrders().filter(o => o.id !== res.id);
+    list.unshift(res);
     this.saveOrders(list);
-    return newOrder;
+    return res;
   },
   async updateOrderStatus(id, status) {
     const res = await this._api(`/api/orders/${id}/status`, 'PATCH', { status });
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/orders`).then(r => r.ok ? r.json() : null);
+      if (Array.isArray(live)) {
+        this.saveOrders(live);
+        return res;
+      }
+    } catch (e) {}
     const list = this.getOrders();
     const order = list.find(o => o.id === id);
     if (order) {
       order.status = (res && res.status) ? res.status : status;
       this.saveOrders(list);
-      return order;
     }
     return res;
   },
   async deleteOrder(id) {
     await this._api(`/api/orders/${id}`, 'DELETE');
-    let list = this.getOrders();
-    list = list.filter(o => o.id !== id);
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/orders`).then(r => r.ok ? r.json() : null);
+      if (Array.isArray(live)) {
+        this.saveOrders(live);
+        return true;
+      }
+    } catch (e) {}
+    let list = this.getOrders().filter(o => o.id !== id);
     this.saveOrders(list);
     return true;
   },
