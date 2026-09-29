@@ -1,7 +1,10 @@
 /* ========================================================
-   DAZZLE BY DUA — Admin CMS Application Logic
+   DAZZLE BY DUA - Admin CMS Application Logic
    Centralized Control Center for Store Operations
    ======================================================== */
+
+const API_BASE_URL = window.API_BASE_URL || "https://dazzle-backend-69un.onrender.com";
+window.API_BASE_URL = API_BASE_URL;
 
 // Global Admin State
 const AdminApp = {
@@ -23,6 +26,14 @@ const AdminApp = {
     this.setupEventListeners();
     this.renderCurrentView();
     this.updateSidebarBadges();
+
+    // Live sync with Render MongoDB backend
+    if (window.DazzleStore && typeof window.DazzleStore.syncFromBackend === "function") {
+      window.DazzleStore.syncFromBackend().then(() => {
+        this.renderCurrentView();
+        this.updateSidebarBadges();
+      });
+    }
   },
 
   // ---- Routing & Navigation ----

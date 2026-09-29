@@ -1,7 +1,10 @@
 /* ========================================================
-   DAZZLE BY DUA — Centralized Store & Shared JS
+   DAZZLE BY DUA - Centralized Store & Shared JS
    Centralized Data Layer for Store & Admin Panel
    ======================================================== */
+
+const API_BASE_URL = "https://dazzle-backend-69un.onrender.com";
+window.API_BASE_URL = API_BASE_URL;
 
 // ---- Default Initial Data ----
 const DEFAULT_PRODUCTS = [
@@ -370,6 +373,99 @@ const DEFAULT_NAVIGATION = {
 
 // ---- Centralized Data Store API ----
 const DazzleStore = {
+  API_BASE_URL: API_BASE_URL,
+
+  _getAuthHeader() {
+    try {
+      const sessStr = localStorage.getItem("dazzle_admin_session") || sessionStorage.getItem("dazzle_admin_session");
+      if (sessStr) {
+        const sess = JSON.parse(sessStr);
+        if (sess && sess.token) {
+          return { "Authorization": `Bearer ${sess.token}` };
+        }
+      }
+    } catch (e) {}
+    return {};
+  },
+
+  async _api(endpoint, method = "GET", body = null) {
+    try {
+      const options = {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          ...this._getAuthHeader()
+        }
+      };
+      if (body) {
+        options.body = JSON.stringify(body);
+      }
+      const res = await fetch(`${API_BASE_URL}${endpoint}`, options);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch (e) {
+      console.warn(`API call ${method} ${endpoint} failed:`, e);
+      return null;
+    }
+  },
+
+  async syncFromBackend() {
+    try {
+      const [prods, cats, revs, offs, hp, sets, nav, pgs] = await Promise.allSettled([
+        fetch(`${API_BASE_URL}/api/products`).then(r => r.ok ? r.json() : null),
+        fetch(`${API_BASE_URL}/api/categories`).then(r => r.ok ? r.json() : null),
+        fetch(`${API_BASE_URL}/api/reviews`).then(r => r.ok ? r.json() : null),
+        fetch(`${API_BASE_URL}/api/offers`).then(r => r.ok ? r.json() : null),
+        fetch(`${API_BASE_URL}/api/homepage`).then(r => r.ok ? r.json() : null),
+        fetch(`${API_BASE_URL}/api/settings`).then(r => r.ok ? r.json() : null),
+        fetch(`${API_BASE_URL}/api/navigation`).then(r => r.ok ? r.json() : null),
+        fetch(`${API_BASE_URL}/api/pages`).then(r => r.ok ? r.json() : null),
+      ]);
+
+      if (prods.status === "fulfilled" && Array.isArray(prods.value) && prods.value.length) {
+        localStorage.setItem(this.KEYS.PRODUCTS, JSON.stringify(prods.value));
+      }
+      if (cats.status === "fulfilled" && Array.isArray(cats.value) && cats.value.length) {
+        localStorage.setItem(this.KEYS.CATEGORIES, JSON.stringify(cats.value));
+      }
+      if (revs.status === "fulfilled" && Array.isArray(revs.value) && revs.value.length) {
+        localStorage.setItem(this.KEYS.REVIEWS, JSON.stringify(revs.value));
+      }
+      if (offs.status === "fulfilled" && offs.value) {
+        localStorage.setItem(this.KEYS.OFFERS, JSON.stringify(offs.value));
+      }
+      if (hp.status === "fulfilled" && hp.value) {
+        localStorage.setItem(this.KEYS.HOMEPAGE, JSON.stringify(hp.value));
+      }
+      if (sets.status === "fulfilled" && sets.value) {
+        localStorage.setItem(this.KEYS.SETTINGS, JSON.stringify(sets.value));
+      }
+      if (nav.status === "fulfilled" && nav.value) {
+        localStorage.setItem(this.KEYS.NAVIGATION, JSON.stringify(nav.value));
+      }
+      if (pgs.status === "fulfilled" && pgs.value) {
+        localStorage.setItem(this.KEYS.PAGES, JSON.stringify(pgs.value));
+      }
+
+      const authHeader = this._getAuthHeader();
+      if (authHeader.Authorization) {
+        try {
+          const ordRes = await fetch(`${API_BASE_URL}/api/orders`, { headers: authHeader });
+          if (ordRes.ok) {
+            const ords = await ordRes.json();
+            if (Array.isArray(ords)) {
+              localStorage.setItem(this.KEYS.ORDERS, JSON.stringify(ords));
+            }
+          }
+        } catch (e) {}
+      }
+      return true;
+    } catch (err) {
+      console.warn("DazzleStore background sync error:", err);
+      return false;
+    }
+  },
+
   KEYS: {
     PRODUCTS: "dazzle_products",
     CATEGORIES: "dazzle_categories",
@@ -428,6 +524,7 @@ const DazzleStore = {
     };
     prods.unshift(newProd);
     this.saveProducts(prods);
+    this._api('/api/products', 'POST', newProd).catch(() => {});
     return newProd;
   },
   updateProduct(id, updates) {
@@ -436,6 +533,7 @@ const DazzleStore = {
     if (idx >= 0) {
       prods[idx] = { ...prods[idx], ...updates };
       this.saveProducts(prods);
+      this._api(`/api/products/${id}`, 'PUT', updates).catch(() => {});
       return prods[idx];
     }
     return null;
@@ -444,6 +542,7 @@ const DazzleStore = {
     let prods = this.getProducts();
     prods = prods.filter(p => p.id !== parseInt(id, 10) && p.id !== String(id));
     this.saveProducts(prods);
+    this._api(`/api/products/${id}`, 'DELETE').catch(() => {});
   },
 
   // Backwards compatibility for PRODUCT_DETAILS map
@@ -486,6 +585,7 @@ const DazzleStore = {
     const list = this.getCategories();
     list.push(cat);
     this.saveCategories(list);
+    this._api('/api/categories', 'POST', cat).catch(() => {});
     return cat;
   },
   updateCategory(id, updates) {
@@ -494,6 +594,7 @@ const DazzleStore = {
     if (idx >= 0) {
       list[idx] = { ...list[idx], ...updates };
       this.saveCategories(list);
+      this._api(`/api/categories/${id}`, 'PUT', updates).catch(() => {});
       return list[idx];
     }
     return null;
@@ -502,6 +603,7 @@ const DazzleStore = {
     let list = this.getCategories();
     list = list.filter(c => c.id !== id);
     this.saveCategories(list);
+    this._api(`/api/categories/${id}`, 'DELETE').catch(() => {});
   },
 
   // Reviews
@@ -526,6 +628,7 @@ const DazzleStore = {
     };
     list.unshift(newRev);
     this.saveReviews(list);
+    this._api('/api/reviews', 'POST', newRev).catch(() => {});
     return newRev;
   },
   updateReview(id, updates) {
@@ -534,6 +637,7 @@ const DazzleStore = {
     if (idx >= 0) {
       list[idx] = { ...list[idx], ...updates };
       this.saveReviews(list);
+      this._api(`/api/reviews/${id}`, 'PUT', updates).catch(() => {});
       return list[idx];
     }
     return null;
@@ -542,6 +646,7 @@ const DazzleStore = {
     let list = this.getReviews();
     list = list.filter(r => r.id !== parseInt(id, 10));
     this.saveReviews(list);
+    this._api(`/api/reviews/${id}`, 'DELETE').catch(() => {});
   },
 
   // Offers & Combos
@@ -550,6 +655,7 @@ const DazzleStore = {
   },
   saveOffers(data) {
     this._set(this.KEYS.OFFERS, data);
+    this._api('/api/offers', 'PUT', data).catch(() => {});
   },
   addCoupon(coupon) {
     const data = this.getOffers();
@@ -602,6 +708,7 @@ const DazzleStore = {
   },
   saveHomepage(data) {
     this._set(this.KEYS.HOMEPAGE, data);
+    this._api('/api/homepage', 'PUT', data).catch(() => {});
   },
 
   // Orders
@@ -627,6 +734,7 @@ const DazzleStore = {
     };
     list.unshift(newOrder);
     this.saveOrders(list);
+    this._api('/api/orders', 'POST', newOrder).catch(() => {});
     return newOrder;
   },
   updateOrderStatus(id, status) {
@@ -635,6 +743,7 @@ const DazzleStore = {
     if (order) {
       order.status = status;
       this.saveOrders(list);
+      this._api(`/api/orders/${id}/status`, 'PATCH', { status }).catch(() => {});
       return order;
     }
     return null;
@@ -646,6 +755,7 @@ const DazzleStore = {
   },
   saveSettings(data) {
     this._set(this.KEYS.SETTINGS, data);
+    this._api('/api/settings', 'PUT', data).catch(() => {});
   },
 
   // Navigation
@@ -654,6 +764,7 @@ const DazzleStore = {
   },
   saveNavigation(data) {
     this._set(this.KEYS.NAVIGATION, data);
+    this._api('/api/navigation', 'PUT', data).catch(() => {});
   },
 
   // Data Export / Reset
@@ -695,6 +806,7 @@ const DazzleStore = {
     this.saveOrders(DEFAULT_ORDERS);
     this.saveSettings(DEFAULT_SETTINGS);
     this.saveNavigation(DEFAULT_NAVIGATION);
+    this._api('/api/backup/reset', 'POST').catch(() => {});
   }
 };
 
@@ -1365,6 +1477,23 @@ document.addEventListener("DOMContentLoaded", () => {
   initFAQ();
   updateNavBadges();
   hydrateFooter();
+
+  // Background synchronize with Render MongoDB Backend
+  if (window.DazzleStore && typeof window.DazzleStore.syncFromBackend === "function") {
+    window.DazzleStore.syncFromBackend().then(() => {
+      hydrateFooter();
+      if (document.querySelector(".hero") || document.getElementById("new-arrivals-grid")) {
+        hydrateHomePage();
+      }
+      if (document.getElementById("current-offers")) {
+        hydrateOffersPage();
+      }
+      if (typeof renderProductsGrid === "function") renderProductsGrid();
+      if (typeof renderShop === "function") renderShop();
+      if (typeof renderCheckout === "function") renderCheckout();
+      if (typeof renderCart === "function") renderCart();
+    });
+  }
 
   // If on index.html
   if (document.querySelector(".hero") || document.getElementById("new-arrivals-grid")) {

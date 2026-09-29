@@ -1,13 +1,16 @@
 /* ========================================================
-   DAZZLE BY DUA — Admin Authentication Layer (Prototype)
-   Protects all Admin CMS pages and manages session state.
+   DAZZLE BY DUA - Admin Authentication Layer
+   Connects to Render Deployed REST API with JWT Auth
    ======================================================== */
+
+const API_BASE_URL = "https://dazzle-backend-69un.onrender.com";
+window.API_BASE_URL = API_BASE_URL;
 
 const AdminAuth = {
   STORAGE_KEY: "dazzle_admin_session",
+  API_BASE_URL: API_BASE_URL,
 
-  // Accepted demo credentials for this prototype
-  // In production, this authentication logic connects to a secure backend API with bcrypt/JWT.
+  // Demo fallback credentials if offline
   CREDENTIALS: [
     {
       username: "admin",
@@ -38,60 +41,114 @@ const AdminAuth = {
     return null;
   },
 
+  getToken() {
+    const sess = this.getSession();
+    return sess && sess.token ? sess.token : null;
+  },
+
   isAuthenticated() {
     return !!this.getSession();
   },
 
-  // Perform login with simulated latency for realistic loading experience
+  // Perform login against Render FastAPI Backend
   async login(identifier, password, rememberMe = false) {
-    // Artificial 400ms delay to simulate secure authentication check
-    await new Promise(resolve => setTimeout(resolve, 400));
-
-    const cleanId = (identifier || "").trim().toLowerCase();
+    const cleanId = (identifier || "").trim();
     const cleanPass = (password || "").trim();
 
-    const matchedUser = this.CREDENTIALS.find(u =>
-      (u.username.toLowerCase() === cleanId || u.email.toLowerCase() === cleanId) &&
-      u.password === cleanPass
-    );
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: cleanId,
+          password: cleanPass,
+          rememberMe: !!rememberMe
+        })
+      });
 
-    if (!matchedUser) {
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data.success && data.token) {
+        const sessionData = {
+          user: (data.user && data.user.user) || "Dua",
+          email: (data.user && data.user.email) || cleanId,
+          role: (data.user && data.user.role) || "Master Administrator",
+          token: data.token,
+          loginTime: data.loginTime || new Date().toISOString()
+        };
+
+        // Clear any prior auth
+        localStorage.removeItem(this.STORAGE_KEY);
+        sessionStorage.removeItem(this.STORAGE_KEY);
+
+        if (rememberMe) {
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
+        } else {
+          sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
+        }
+
+        return {
+          success: true,
+          user: sessionData
+        };
+      } else {
+        return {
+          success: false,
+          message: data.detail || data.message || "Invalid admin credentials. Please check your username/email and password."
+        };
+      }
+    } catch (netErr) {
+      console.warn("Backend API unreachable, checking local credentials fallback:", netErr);
+      const matchedUser = this.CREDENTIALS.find(u =>
+        (u.username.toLowerCase() === cleanId.toLowerCase() || u.email.toLowerCase() === cleanId.toLowerCase()) &&
+        u.password === cleanPass
+      );
+
+      if (matchedUser) {
+        const sessionData = {
+          user: matchedUser.name,
+          email: matchedUser.email,
+          role: matchedUser.role,
+          token: "proto_jwt_" + Math.random().toString(36).substr(2) + Date.now().toString(36),
+          loginTime: new Date().toISOString()
+        };
+
+        localStorage.removeItem(this.STORAGE_KEY);
+        sessionStorage.removeItem(this.STORAGE_KEY);
+
+        if (rememberMe) {
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
+        } else {
+          sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
+        }
+
+        return { success: true, user: sessionData };
+      }
+
       return {
         success: false,
-        message: "Invalid admin credentials. Please check your username/email and password."
+        message: "Failed to connect to authentication server (" + API_BASE_URL + "). Please try again."
       };
     }
-
-    const sessionData = {
-      user: matchedUser.name,
-      email: matchedUser.email,
-      role: matchedUser.role,
-      token: "proto_jwt_" + Math.random().toString(36).substr(2) + Date.now().toString(36),
-      loginTime: new Date().toISOString()
-    };
-
-    try {
-      // Clear any prior auth
-      localStorage.removeItem(this.STORAGE_KEY);
-      sessionStorage.removeItem(this.STORAGE_KEY);
-
-      if (rememberMe) {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
-      } else {
-        sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
-      }
-    } catch (e) {
-      console.error("Failed to store session:", e);
-    }
-
-    return {
-      success: true,
-      user: sessionData
-    };
   },
 
-  // Clear session and redirect to login
-  logout() {
+  // Clear session and notify backend
+  async logout() {
+    const token = this.getToken();
+    if (token) {
+      try {
+        await fetch(`${API_BASE_URL}/api/auth/logout`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
+        }).catch(() => {});
+      } catch (e) {
+        console.warn("Logout notification error:", e);
+      }
+    }
+
     try {
       localStorage.removeItem(this.STORAGE_KEY);
       sessionStorage.removeItem(this.STORAGE_KEY);
@@ -108,11 +165,9 @@ const AdminAuth = {
   // Protect Admin pages: redirects unauthenticated users to login.html
   protectPage() {
     if (!this.isAuthenticated()) {
-      // Record current page to return after login
       const currentUrl = window.location.pathname + window.location.search + window.location.hash;
       const redirectTarget = encodeURIComponent(currentUrl);
 
-      // Hide content immediately to prevent Flash of Unauthenticated Content
       if (document.documentElement) {
         document.documentElement.style.visibility = "hidden";
       }
@@ -123,7 +178,6 @@ const AdminAuth = {
       return false;
     }
 
-    // Authenticated: make document visible
     if (document.documentElement) {
       document.documentElement.style.visibility = "";
     }
