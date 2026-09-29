@@ -3,10 +3,11 @@
    Connects to Render Deployed REST API with JWT Auth
    ======================================================== */
 
-const API_BASE_URL = "https://dazzle-backend-69un.onrender.com";
-window.API_BASE_URL = API_BASE_URL;
+window.API_BASE_URL = window.API_BASE_URL || "https://dazzle-backend-69un.onrender.com";
+var API_BASE_URL = window.API_BASE_URL;
 
-const AdminAuth = {
+window.AdminAuth = window.AdminAuth || {
+
   STORAGE_KEY: "dazzle_admin_session",
   API_BASE_URL: API_BASE_URL,
 
@@ -150,4 +151,5 @@ const AdminAuth = {
 })();
 
 // Expose globally
+var AdminAuth = window.AdminAuth;
 window.AdminAuth = AdminAuth;

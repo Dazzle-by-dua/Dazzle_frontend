@@ -3,11 +3,12 @@
    Centralized Control Center for Store Operations
    ======================================================== */
 
-const API_BASE_URL = window.API_BASE_URL || "https://dazzle-backend-69un.onrender.com";
-window.API_BASE_URL = API_BASE_URL;
+window.API_BASE_URL = window.API_BASE_URL || "https://dazzle-backend-69un.onrender.com";
+var API_BASE_URL = window.API_BASE_URL;
 
 // Global Admin State
-const AdminApp = {
+window.AdminApp = window.AdminApp || {
+
   // Exposed on window below for inline event handlers
   currentView: "dashboard",
   editingProductId: null,
@@ -47,7 +48,7 @@ const AdminApp = {
       item.addEventListener("click", () => {
         const view = item.dataset.view;
         if (view) {
-          window.location.hash = view;
+          this.navigateTo(view);
         }
       });
     });
@@ -68,8 +69,20 @@ const AdminApp = {
     }
   },
 
-  handleRouting() {
-    const hash = (window.location.hash || "#dashboard").replace("#", "");
+    navigateTo(view) {
+    if (view) {
+      try {
+        if (window.location.hash !== "#" + view) {
+          window.location.hash = view;
+        }
+      } catch (e) {}
+      this.handleRouting(view);
+    }
+  },
+
+  handleRouting(explicitView) {
+    const rawHash = (window.location.hash || "#dashboard").replace("#", "");
+    const hash = explicitView || rawHash;
     const validViews = ["dashboard", "products", "categories", "orders", "reviews", "offers", "homepage", "pages", "navigation", "media", "settings"];
     this.currentView = validViews.includes(hash) ? hash : "dashboard";
 
@@ -1507,6 +1520,7 @@ const AdminApp = {
 };
 
 // Expose globally to window so that all inline onclick and onsubmit handlers can access AdminApp
+var AdminApp = window.AdminApp;
 window.AdminApp = AdminApp;
 
 // Initialize on DOM Ready or immediately if DOM is already loaded

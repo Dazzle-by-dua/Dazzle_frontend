@@ -3,8 +3,8 @@
    Centralized Data Layer for Store & Admin Panel
    ======================================================== */
 
-const API_BASE_URL = "https://dazzle-backend-69un.onrender.com";
-window.API_BASE_URL = API_BASE_URL;
+window.API_BASE_URL = window.API_BASE_URL || "https://dazzle-backend-69un.onrender.com";
+var API_BASE_URL = window.API_BASE_URL;
 
 // ---- Default Initial Data ----
 const DEFAULT_PRODUCTS = [
@@ -372,7 +372,8 @@ const DEFAULT_NAVIGATION = {
 };
 
 // ---- Centralized Data Store API ----
-const DazzleStore = {
+window.DazzleStore = window.DazzleStore || {
+
   API_BASE_URL: API_BASE_URL,
 
   _getAuthHeader() {
@@ -908,6 +909,7 @@ const DazzleStore = {
   }
 };
 
+var DazzleStore = window.DazzleStore;
 window.DazzleStore = DazzleStore;
 
 // Define reactive window getters/setters for backward compatibility

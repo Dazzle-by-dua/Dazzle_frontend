@@ -29,7 +29,7 @@
 
   <nav class="sidebar-menu">
     <div class="menu-section-label">Overview</div>
-    <div class="sidebar-item active" data-view="dashboard">
+    <div class="sidebar-item active" data-view="dashboard" onclick="AdminApp.navigateTo('dashboard')">
       <div class="item-main">
         <i class="fa fa-chart-pie item-icon"></i>
         <span>Dashboard</span>
@@ -37,7 +37,7 @@
     </div>
 
     <div class="menu-section-label">Catalog & Sales</div>
-    <div class="sidebar-item" data-view="products">
+    <div class="sidebar-item" data-view="products" onclick="AdminApp.navigateTo('products')">
       <div class="item-main">
         <i class="fa fa-gem item-icon"></i>
         <span>Products</span>
@@ -45,7 +45,7 @@
       <span class="sidebar-badge" id="badge-products-count">8</span>
     </div>
 
-    <div class="sidebar-item" data-view="categories">
+    <div class="sidebar-item" data-view="categories" onclick="AdminApp.navigateTo('categories')">
       <div class="item-main">
         <i class="fa fa-tags item-icon"></i>
         <span>Categories</span>
@@ -53,7 +53,7 @@
       <span class="sidebar-badge" id="badge-categories-count">4</span>
     </div>
 
-    <div class="sidebar-item" data-view="orders">
+    <div class="sidebar-item" data-view="orders" onclick="AdminApp.navigateTo('orders')">
       <div class="item-main">
         <i class="fa fa-shopping-bag item-icon"></i>
         <span>Orders</span>
@@ -61,7 +61,7 @@
       <span class="sidebar-badge" id="badge-orders-count">3</span>
     </div>
 
-    <div class="sidebar-item" data-view="reviews">
+    <div class="sidebar-item" data-view="reviews" onclick="AdminApp.navigateTo('reviews')">
       <div class="item-main">
         <i class="fa fa-star item-icon"></i>
         <span>Reviews</span>
@@ -69,7 +69,7 @@
       <span class="sidebar-badge" id="badge-reviews-count">6</span>
     </div>
 
-    <div class="sidebar-item" data-view="offers">
+    <div class="sidebar-item" data-view="offers" onclick="AdminApp.navigateTo('offers')">
       <div class="item-main">
         <i class="fa fa-gift item-icon"></i>
         <span>Offers & Combos</span>
@@ -78,28 +78,28 @@
     </div>
 
     <div class="menu-section-label">Website & Content</div>
-    <div class="sidebar-item" data-view="homepage">
+    <div class="sidebar-item" data-view="homepage" onclick="AdminApp.navigateTo('homepage')">
       <div class="item-main">
         <i class="fa fa-home item-icon"></i>
         <span>Homepage Manager</span>
       </div>
     </div>
 
-    <div class="sidebar-item" data-view="pages">
+    <div class="sidebar-item" data-view="pages" onclick="AdminApp.navigateTo('pages')">
       <div class="item-main">
         <i class="fa fa-file-alt item-icon"></i>
         <span>Pages & Content</span>
       </div>
     </div>
 
-    <div class="sidebar-item" data-view="navigation">
+    <div class="sidebar-item" data-view="navigation" onclick="AdminApp.navigateTo('navigation')">
       <div class="item-main">
         <i class="fa fa-bars item-icon"></i>
         <span>Navigation</span>
       </div>
     </div>
 
-    <div class="sidebar-item" data-view="media">
+    <div class="sidebar-item" data-view="media" onclick="AdminApp.navigateTo('media')">
       <div class="item-main">
         <i class="fa fa-images item-icon"></i>
         <span>Media Gallery</span>
@@ -107,7 +107,7 @@
     </div>
 
     <div class="menu-section-label">Administration</div>
-    <div class="sidebar-item" data-view="settings">
+    <div class="sidebar-item" data-view="settings" onclick="AdminApp.navigateTo('settings')">
       <div class="item-main">
         <i class="fa fa-cog item-icon"></i>
         <span>Settings & Data</span>
@@ -223,7 +223,7 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title"><i class="fa fa-clock" style="color:var(--gold)"></i> Recent Orders</h3>
-            <button class="btn btn-outline btn-sm" onclick="window.location.hash='orders'">View All &rarr;</button>
+            <button class="btn btn-outline btn-sm" onclick="AdminApp.navigateTo('orders')">View All &rarr;</button>
           </div>
           <div class="table-responsive">
             <table class="data-table">
@@ -248,7 +248,7 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title"><i class="fa fa-exclamation-triangle" style="color:#F57F17"></i> Stock Alerts</h3>
-            <button class="btn btn-outline btn-sm" onclick="window.location.hash='products'">Manage Inventory &rarr;</button>
+            <button class="btn btn-outline btn-sm" onclick="AdminApp.navigateTo('products')">Manage Inventory &rarr;</button>
           </div>
           <div class="table-responsive">
             <table class="data-table">
@@ -272,7 +272,7 @@
       <div class="card" style="margin-top:1.5rem">
         <div class="card-header">
           <h3 class="card-title"><i class="fa fa-comments" style="color:var(--gold)"></i> Recent Customer Feedback</h3>
-          <button class="btn btn-outline btn-sm" onclick="window.location.hash='reviews'">Manage All &rarr;</button>
+          <button class="btn btn-outline btn-sm" onclick="AdminApp.navigateTo('reviews')">Manage All &rarr;</button>
         </div>
         <div id="dash-recent-reviews">
           <!-- Dynamically populated -->
