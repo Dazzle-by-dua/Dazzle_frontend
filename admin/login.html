@@ -311,13 +311,9 @@
   </form>
 
   <!-- Demo credentials hint for testing -->
-  <div class="demo-credentials-box">
-    <div class="demo-creds-title">
-      <span>Demo Administrator Access</span>
-      <button type="button" class="demo-autofill-btn" onclick="autofillDemo()">Autofill</button>
-    </div>
-    <div>Username: <strong style="color:#FFF">admin@dazzlebydua.com</strong> (or <strong style="color:#FFF">admin</strong>)</div>
-    <div>Password: <strong style="color:#FFF">admin123</strong></div>
+  <div class="demo-credentials-box" style="text-align:center;font-size:0.8rem;color:#AAA">
+    <div>✦ Dazzle by Dua Store Administration Portal</div>
+    <div style="margin-top:0.35rem">Protected by JWT &amp; FastAPI Production Authentication</div>
   </div>
 
   <div class="back-to-store">
@@ -345,13 +341,7 @@ toggleBtn.addEventListener("click", () => {
   toggleIcon.className = isPass ? "fa fa-eye-slash" : "fa fa-eye";
 });
 
-// Autofill helper
-function autofillDemo() {
-  document.getElementById("login-username").value = "admin@dazzlebydua.com";
-  document.getElementById("login-password").value = "admin123";
-  document.getElementById("login-remember").checked = true;
-  document.getElementById("login-error").classList.remove("show");
-}
+
 
 // Form submission handler
 async function handleLoginSubmit(e) {

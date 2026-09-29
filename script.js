@@ -401,7 +401,11 @@ const DazzleStore = {
         options.body = JSON.stringify(body);
       }
       const res = await fetch(`${API_BASE_URL}${endpoint}`, options);
-      if (!res.ok) return null;
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        console.warn(`API call ${method} ${endpoint} returned ${res.status}:`, errText);
+        return null;
+      }
       return await res.json();
     } catch (e) {
       console.warn(`API call ${method} ${endpoint} failed:`, e);
@@ -411,7 +415,7 @@ const DazzleStore = {
 
   async syncFromBackend() {
     try {
-      const [prods, cats, revs, offs, hp, sets, nav, pgs] = await Promise.allSettled([
+      const [prods, cats, revs, offs, hp, sets, nav, pgs, ords] = await Promise.allSettled([
         fetch(`${API_BASE_URL}/api/products`).then(r => r.ok ? r.json() : null),
         fetch(`${API_BASE_URL}/api/categories`).then(r => r.ok ? r.json() : null),
         fetch(`${API_BASE_URL}/api/reviews`).then(r => r.ok ? r.json() : null),
@@ -420,44 +424,35 @@ const DazzleStore = {
         fetch(`${API_BASE_URL}/api/settings`).then(r => r.ok ? r.json() : null),
         fetch(`${API_BASE_URL}/api/navigation`).then(r => r.ok ? r.json() : null),
         fetch(`${API_BASE_URL}/api/pages`).then(r => r.ok ? r.json() : null),
+        fetch(`${API_BASE_URL}/api/orders`).then(r => r.ok ? r.json() : null),
       ]);
 
-      if (prods.status === "fulfilled" && Array.isArray(prods.value) && prods.value.length) {
-        localStorage.setItem(this.KEYS.PRODUCTS, JSON.stringify(prods.value));
+      if (prods.status === "fulfilled" && Array.isArray(prods.value)) {
+        this._set(this.KEYS.PRODUCTS, prods.value);
       }
-      if (cats.status === "fulfilled" && Array.isArray(cats.value) && cats.value.length) {
-        localStorage.setItem(this.KEYS.CATEGORIES, JSON.stringify(cats.value));
+      if (cats.status === "fulfilled" && Array.isArray(cats.value)) {
+        this._set(this.KEYS.CATEGORIES, cats.value);
       }
-      if (revs.status === "fulfilled" && Array.isArray(revs.value) && revs.value.length) {
-        localStorage.setItem(this.KEYS.REVIEWS, JSON.stringify(revs.value));
+      if (revs.status === "fulfilled" && Array.isArray(revs.value)) {
+        this._set(this.KEYS.REVIEWS, revs.value);
       }
       if (offs.status === "fulfilled" && offs.value) {
-        localStorage.setItem(this.KEYS.OFFERS, JSON.stringify(offs.value));
+        this._set(this.KEYS.OFFERS, offs.value);
       }
       if (hp.status === "fulfilled" && hp.value) {
-        localStorage.setItem(this.KEYS.HOMEPAGE, JSON.stringify(hp.value));
+        this._set(this.KEYS.HOMEPAGE, hp.value);
       }
       if (sets.status === "fulfilled" && sets.value) {
-        localStorage.setItem(this.KEYS.SETTINGS, JSON.stringify(sets.value));
+        this._set(this.KEYS.SETTINGS, sets.value);
       }
       if (nav.status === "fulfilled" && nav.value) {
-        localStorage.setItem(this.KEYS.NAVIGATION, JSON.stringify(nav.value));
+        this._set(this.KEYS.NAVIGATION, nav.value);
       }
       if (pgs.status === "fulfilled" && pgs.value) {
-        localStorage.setItem(this.KEYS.PAGES, JSON.stringify(pgs.value));
+        this._set(this.KEYS.PAGES, pgs.value);
       }
-
-      const authHeader = this._getAuthHeader();
-      if (authHeader.Authorization) {
-        try {
-          const ordRes = await fetch(`${API_BASE_URL}/api/orders`, { headers: authHeader });
-          if (ordRes.ok) {
-            const ords = await ordRes.json();
-            if (Array.isArray(ords)) {
-              localStorage.setItem(this.KEYS.ORDERS, JSON.stringify(ords));
-            }
-          }
-        } catch (e) {}
+      if (ords.status === "fulfilled" && Array.isArray(ords.value)) {
+        this._set(this.KEYS.ORDERS, ords.value);
       }
       return true;
     } catch (err) {
@@ -474,7 +469,8 @@ const DazzleStore = {
     HOMEPAGE: "dazzle_homepage",
     ORDERS: "dazzle_orders",
     SETTINGS: "dazzle_settings",
-    NAVIGATION: "dazzle_navigation"
+    NAVIGATION: "dazzle_navigation",
+    PAGES: "dazzle_pages"
   },
 
   _get(key, fallback) {
@@ -508,41 +504,61 @@ const DazzleStore = {
   },
   getProductById(id) {
     const prods = this.getProducts();
-    return prods.find(p => p.id === parseInt(id, 10) || p.id === String(id));
+    return prods.find(p => p.id === parseInt(id, 10) || String(p.id) === String(id));
   },
-  addProduct(product) {
+  async addProduct(product) {
+    const res = await this._api('/api/products', 'POST', product);
+    let newProd = res;
+    if (!newProd) {
+      const prods = this.getProducts();
+      const maxId = prods.reduce((max, p) => Math.max(max, parseInt(p.id, 10) || 0), 0);
+      newProd = {
+        ...product,
+        id: maxId + 1,
+        rating: product.rating || 5.0,
+        reviews: product.reviews || 0,
+        badges: product.badges || [],
+        variants: product.variants || ["18K Champagne Gold"],
+        images: product.images && product.images.length ? product.images : [product.img || "product_flower_necklace.jpg"]
+      };
+    }
     const prods = this.getProducts();
-    const maxId = prods.reduce((max, p) => Math.max(max, parseInt(p.id, 10) || 0), 0);
-    const newProd = {
-      ...product,
-      id: maxId + 1,
-      rating: product.rating || 5.0,
-      reviews: product.reviews || 0,
-      badges: product.badges || [],
-      variants: product.variants || ["18K Champagne Gold"],
-      images: product.images && product.images.length ? product.images : [product.img || "product_flower_necklace.jpg"]
-    };
-    prods.unshift(newProd);
-    this.saveProducts(prods);
-    this._api('/api/products', 'POST', newProd).catch(() => {});
+    const filtered = prods.filter(p => String(p.id) !== String(newProd.id));
+    filtered.unshift(newProd);
+    this.saveProducts(filtered);
     return newProd;
   },
-  updateProduct(id, updates) {
+  async updateProduct(id, updates) {
+    const numId = parseInt(id, 10) || id;
+    const res = await this._api(`/api/products/${numId}`, 'PUT', updates);
     const prods = this.getProducts();
-    const idx = prods.findIndex(p => p.id === parseInt(id, 10) || p.id === String(id));
-    if (idx >= 0) {
-      prods[idx] = { ...prods[idx], ...updates };
+    const idx = prods.findIndex(p => p.id === parseInt(id, 10) || String(p.id) === String(id));
+    const merged = res || (idx >= 0 ? { ...prods[idx], ...updates } : null);
+    if (idx >= 0 && merged) {
+      prods[idx] = merged;
       this.saveProducts(prods);
-      this._api(`/api/products/${id}`, 'PUT', updates).catch(() => {});
       return prods[idx];
     }
-    return null;
+    return merged;
   },
-  deleteProduct(id) {
+  async toggleStock(id, inStock) {
+    const numId = parseInt(id, 10) || id;
+    const res = await this._api(`/api/products/${numId}/stock`, 'PATCH', { inStock });
+    const prods = this.getProducts();
+    const idx = prods.findIndex(p => p.id === parseInt(id, 10) || String(p.id) === String(id));
+    if (idx >= 0) {
+      prods[idx].inStock = inStock;
+      this.saveProducts(prods);
+    }
+    return res || (idx >= 0 ? prods[idx] : null);
+  },
+  async deleteProduct(id) {
+    const numId = parseInt(id, 10) || id;
+    await this._api(`/api/products/${numId}`, 'DELETE');
     let prods = this.getProducts();
-    prods = prods.filter(p => p.id !== parseInt(id, 10) && p.id !== String(id));
+    prods = prods.filter(p => p.id !== parseInt(id, 10) && String(p.id) !== String(id));
     this.saveProducts(prods);
-    this._api(`/api/products/${id}`, 'DELETE').catch(() => {});
+    return true;
   },
 
   // Backwards compatibility for PRODUCT_DETAILS map
@@ -562,7 +578,6 @@ const DazzleStore = {
     return map;
   },
   saveProductDetails(map) {
-    // Sync into products
     const prods = this.getProducts();
     let changed = false;
     prods.forEach(p => {
@@ -581,29 +596,31 @@ const DazzleStore = {
   saveCategories(arr) {
     this._set(this.KEYS.CATEGORIES, arr);
   },
-  addCategory(cat) {
-    const list = this.getCategories();
-    list.push(cat);
+  async addCategory(cat) {
+    const res = await this._api('/api/categories', 'POST', cat);
+    const newCat = res || cat;
+    const list = this.getCategories().filter(c => c.id !== newCat.id);
+    list.push(newCat);
     this.saveCategories(list);
-    this._api('/api/categories', 'POST', cat).catch(() => {});
-    return cat;
+    return newCat;
   },
-  updateCategory(id, updates) {
+  async updateCategory(id, updates) {
+    const res = await this._api(`/api/categories/${id}`, 'PUT', updates);
     const list = this.getCategories();
     const idx = list.findIndex(c => c.id === id);
     if (idx >= 0) {
-      list[idx] = { ...list[idx], ...updates };
+      list[idx] = res || { ...list[idx], ...updates };
       this.saveCategories(list);
-      this._api(`/api/categories/${id}`, 'PUT', updates).catch(() => {});
       return list[idx];
     }
-    return null;
+    return res;
   },
-  deleteCategory(id) {
+  async deleteCategory(id) {
+    await this._api(`/api/categories/${id}`, 'DELETE');
     let list = this.getCategories();
     list = list.filter(c => c.id !== id);
     this.saveCategories(list);
-    this._api(`/api/categories/${id}`, 'DELETE').catch(() => {});
+    return true;
   },
 
   // Reviews
@@ -613,11 +630,10 @@ const DazzleStore = {
   saveReviews(arr) {
     this._set(this.KEYS.REVIEWS, arr);
   },
-  addReview(r) {
-    const list = this.getReviews();
-    const maxId = list.reduce((m, x) => Math.max(m, x.id || 0), 0);
-    const newRev = {
-      id: maxId + 1,
+  async addReview(r) {
+    const res = await this._api('/api/reviews', 'POST', r);
+    const newRev = res || {
+      id: Date.now(),
       name: r.name || "Anonymous",
       rating: parseInt(r.rating, 10) || 5,
       text: r.text || "",
@@ -626,27 +642,35 @@ const DazzleStore = {
       approved: r.approved !== false,
       product: r.product || "General"
     };
+    const list = this.getReviews().filter(x => String(x.id) !== String(newRev.id));
     list.unshift(newRev);
     this.saveReviews(list);
-    this._api('/api/reviews', 'POST', newRev).catch(() => {});
     return newRev;
   },
-  updateReview(id, updates) {
+  async updateReview(id, updates) {
+    const numId = parseInt(id, 10) || id;
+    let res = null;
+    if (Object.keys(updates).length === 1 && typeof updates.approved === "boolean") {
+      res = await this._api(`/api/reviews/${numId}/status`, 'PATCH', { approved: updates.approved });
+    } else {
+      res = await this._api(`/api/reviews/${numId}`, 'PUT', updates);
+    }
     const list = this.getReviews();
-    const idx = list.findIndex(r => r.id === parseInt(id, 10));
+    const idx = list.findIndex(r => r.id === parseInt(id, 10) || String(r.id) === String(id));
     if (idx >= 0) {
-      list[idx] = { ...list[idx], ...updates };
+      list[idx] = res || { ...list[idx], ...updates };
       this.saveReviews(list);
-      this._api(`/api/reviews/${id}`, 'PUT', updates).catch(() => {});
       return list[idx];
     }
-    return null;
+    return res;
   },
-  deleteReview(id) {
+  async deleteReview(id) {
+    const numId = parseInt(id, 10) || id;
+    await this._api(`/api/reviews/${numId}`, 'DELETE');
     let list = this.getReviews();
-    list = list.filter(r => r.id !== parseInt(id, 10));
+    list = list.filter(r => r.id !== parseInt(id, 10) && String(r.id) !== String(id));
     this.saveReviews(list);
-    this._api(`/api/reviews/${id}`, 'DELETE').catch(() => {});
+    return true;
   },
 
   // Offers & Combos
@@ -655,60 +679,73 @@ const DazzleStore = {
   },
   saveOffers(data) {
     this._set(this.KEYS.OFFERS, data);
-    this._api('/api/offers', 'PUT', data).catch(() => {});
   },
-  addCoupon(coupon) {
+  async addCoupon(coupon) {
+    const res = await this._api('/api/offers/coupons', 'POST', coupon);
+    const newC = res || coupon;
     const data = this.getOffers();
     data.coupons = data.coupons || [];
-    data.coupons.push(coupon);
+    data.coupons = data.coupons.filter(c => c.id !== newC.id && c.code !== newC.code);
+    data.coupons.push(newC);
     this.saveOffers(data);
-    return coupon;
+    return newC;
   },
-  updateCoupon(id, updates) {
+  async updateCoupon(id, updates) {
+    const res = await this._api(`/api/offers/coupons/${id}`, 'PUT', updates);
     const data = this.getOffers();
     const idx = (data.coupons || []).findIndex(c => c.id === id);
     if (idx >= 0) {
-      data.coupons[idx] = { ...data.coupons[idx], ...updates };
+      data.coupons[idx] = res || { ...data.coupons[idx], ...updates };
       this.saveOffers(data);
       return data.coupons[idx];
     }
-    return null;
+    return res;
   },
-  deleteCoupon(id) {
+  async deleteCoupon(id) {
+    await this._api(`/api/offers/coupons/${id}`, 'DELETE');
     const data = this.getOffers();
     data.coupons = (data.coupons || []).filter(c => c.id !== id);
     this.saveOffers(data);
+    return true;
   },
-  addCombo(combo) {
+  async addCombo(combo) {
+    const res = await this._api('/api/offers/combos', 'POST', combo);
+    const newCb = res || combo;
     const data = this.getOffers();
     data.combos = data.combos || [];
-    data.combos.push(combo);
+    data.combos = data.combos.filter(c => c.id !== newCb.id);
+    data.combos.push(newCb);
     this.saveOffers(data);
-    return combo;
+    return newCb;
   },
-  updateCombo(id, updates) {
+  async updateCombo(id, updates) {
+    const res = await this._api(`/api/offers/combos/${id}`, 'PUT', updates);
     const data = this.getOffers();
     const idx = (data.combos || []).findIndex(c => c.id === id);
     if (idx >= 0) {
-      data.combos[idx] = { ...data.combos[idx], ...updates };
+      data.combos[idx] = res || { ...data.combos[idx], ...updates };
       this.saveOffers(data);
       return data.combos[idx];
     }
-    return null;
+    return res;
   },
-  deleteCombo(id) {
+  async deleteCombo(id) {
+    await this._api(`/api/offers/combos/${id}`, 'DELETE');
     const data = this.getOffers();
     data.combos = (data.combos || []).filter(c => c.id !== id);
     this.saveOffers(data);
+    return true;
   },
 
   // Homepage
   getHomepage() {
     return this._get(this.KEYS.HOMEPAGE, DEFAULT_HOMEPAGE);
   },
-  saveHomepage(data) {
+  async saveHomepage(data) {
     this._set(this.KEYS.HOMEPAGE, data);
-    this._api('/api/homepage', 'PUT', data).catch(() => {});
+    const res = await this._api('/api/homepage', 'PUT', data);
+    if (res) this._set(this.KEYS.HOMEPAGE, res);
+    return res || data;
   },
 
   // Orders
@@ -718,53 +755,75 @@ const DazzleStore = {
   saveOrders(arr) {
     this._set(this.KEYS.ORDERS, arr);
   },
-  addOrder(order) {
-    const list = this.getOrders();
-    const newOrder = {
-      id: order.id || `DBD-2025-${Math.floor(100 + Math.random() * 900)}`,
+  async addOrder(order) {
+    const res = await this._api('/api/orders', 'POST', order);
+    const newOrder = res || {
+      id: order.id || `DBD-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
       customer: order.customer || "Valued Customer",
       email: order.email || "customer@example.com",
       phone: order.phone || "+91 98765 00000",
       date: order.date || new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }),
       total: order.total || 0,
       status: order.status || "Processing",
-      paymentMethod: order.paymentMethod || "Credit Card",
+      paymentMethod: order.paymentMethod || "Cash on Delivery",
       address: order.address || "Mumbai, India",
       items: order.items || []
     };
+    const list = this.getOrders().filter(o => o.id !== newOrder.id);
     list.unshift(newOrder);
     this.saveOrders(list);
-    this._api('/api/orders', 'POST', newOrder).catch(() => {});
     return newOrder;
   },
-  updateOrderStatus(id, status) {
+  async updateOrderStatus(id, status) {
+    const res = await this._api(`/api/orders/${id}/status`, 'PATCH', { status });
     const list = this.getOrders();
     const order = list.find(o => o.id === id);
     if (order) {
-      order.status = status;
+      order.status = (res && res.status) ? res.status : status;
       this.saveOrders(list);
-      this._api(`/api/orders/${id}/status`, 'PATCH', { status }).catch(() => {});
       return order;
     }
-    return null;
+    return res;
+  },
+  async deleteOrder(id) {
+    await this._api(`/api/orders/${id}`, 'DELETE');
+    let list = this.getOrders();
+    list = list.filter(o => o.id !== id);
+    this.saveOrders(list);
+    return true;
   },
 
   // Settings
   getSettings() {
     return this._get(this.KEYS.SETTINGS, DEFAULT_SETTINGS);
   },
-  saveSettings(data) {
+  async saveSettings(data) {
     this._set(this.KEYS.SETTINGS, data);
-    this._api('/api/settings', 'PUT', data).catch(() => {});
+    const res = await this._api('/api/settings', 'PUT', data);
+    if (res) this._set(this.KEYS.SETTINGS, res);
+    return res || data;
   },
 
   // Navigation
   getNavigation() {
     return this._get(this.KEYS.NAVIGATION, DEFAULT_NAVIGATION);
   },
-  saveNavigation(data) {
+  async saveNavigation(data) {
     this._set(this.KEYS.NAVIGATION, data);
-    this._api('/api/navigation', 'PUT', data).catch(() => {});
+    const res = await this._api('/api/navigation', 'PUT', data);
+    if (res) this._set(this.KEYS.NAVIGATION, res);
+    return res || data;
+  },
+
+  // Pages
+  getPages() {
+    return this._get(this.KEYS.PAGES, {});
+  },
+  async savePages(data) {
+    this._set(this.KEYS.PAGES, data);
+    const res = await this._api('/api/pages', 'PUT', data);
+    if (res) this._set(this.KEYS.PAGES, res);
+    return res || data;
   },
 
   // Data Export / Reset
@@ -782,7 +841,7 @@ const DazzleStore = {
   },
   importAll(jsonStr) {
     try {
-      const data = JSON.parse(jsonStr);
+      const data = typeof jsonStr === "string" ? JSON.parse(jsonStr) : jsonStr;
       if (data.products) this.saveProducts(data.products);
       if (data.categories) this.saveCategories(data.categories);
       if (data.reviews) this.saveReviews(data.reviews);
@@ -797,7 +856,8 @@ const DazzleStore = {
       return false;
     }
   },
-  resetAll() {
+  async resetAll() {
+    await this._api('/api/backup/reset', 'POST');
     this.saveProducts(DEFAULT_PRODUCTS);
     this.saveCategories(DEFAULT_CATEGORIES);
     this.saveReviews(DEFAULT_REVIEWS);
@@ -806,11 +866,10 @@ const DazzleStore = {
     this.saveOrders(DEFAULT_ORDERS);
     this.saveSettings(DEFAULT_SETTINGS);
     this.saveNavigation(DEFAULT_NAVIGATION);
-    this._api('/api/backup/reset', 'POST').catch(() => {});
+    return true;
   }
 };
 
-// Expose globally
 window.DazzleStore = DazzleStore;
 
 // Define reactive window getters/setters for backward compatibility
@@ -1490,8 +1549,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (typeof renderProductsGrid === "function") renderProductsGrid();
       if (typeof renderShop === "function") renderShop();
+      if (typeof renderProductDetails === "function") renderProductDetails();
       if (typeof renderCheckout === "function") renderCheckout();
       if (typeof renderCart === "function") renderCart();
+      if (typeof renderOrdersPage === "function") renderOrdersPage();
+      if (typeof populateShopFilters === "function") populateShopFilters();
     });
   }
 

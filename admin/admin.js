@@ -388,12 +388,12 @@ const AdminApp = {
     this.renderProducts();
   },
 
-  toggleProductStock(id) {
+  async toggleProductStock(id) {
     const p = DazzleStore.getProductById(id);
     if (!p) return;
     const newStock = !p.inStock;
-    DazzleStore.updateProduct(id, { inStock: newStock });
-    this.showToast(`✦ "${p.name}" marked as ${newStock ? 'In Stock' : 'Out of Stock'}`);
+    await DazzleStore.toggleStock(id, newStock);
+    this.showToast(`✦ "${p.name}" marked as ${newStock ? 'In Stock' : 'Out of Stock'} in MongoDB`);
     this.renderProducts();
     this.renderDashboard();
     this.updateSidebarBadges();
@@ -446,7 +446,7 @@ const AdminApp = {
     document.getElementById("modal-product").classList.add("open");
   },
 
-  saveProductForm(e) {
+  async saveProductForm(e) {
     e.preventDefault();
     const name = document.getElementById("prod-name").value.trim();
     const price = parseInt(document.getElementById("prod-price").value, 10) || 0;
@@ -484,12 +484,28 @@ const AdminApp = {
       images: [img, "featured_collection.jpg", "hero_necklace.jpg"]
     };
 
-    if (this.editingProductId) {
-      DazzleStore.updateProduct(this.editingProductId, productPayload);
-      this.showToast(`✦ Product "${name}" updated successfully!`);
-    } else {
-      DazzleStore.addProduct(productPayload);
-      this.showToast(`✦ New product "${name}" added to collection!`);
+    const submitBtn = e.target.querySelector('button[type="submit"]') || document.querySelector('#modal-product .btn-gold');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Saving to MongoDB...";
+    }
+
+    try {
+      if (this.editingProductId) {
+        await DazzleStore.updateProduct(this.editingProductId, productPayload);
+        this.showToast(`✦ Product "${name}" updated successfully in MongoDB!`);
+      } else {
+        await DazzleStore.addProduct(productPayload);
+        this.showToast(`✦ New product "${name}" added to collection and saved to MongoDB!`);
+      }
+    } catch (err) {
+      console.error("Save product error:", err);
+      this.showToast(`Error saving product: ${err.message || err}`);
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Save Product";
+      }
     }
 
     this.closeModal("modal-product");
@@ -498,12 +514,12 @@ const AdminApp = {
     this.updateSidebarBadges();
   },
 
-  deleteProductPrompt(id) {
+  async deleteProductPrompt(id) {
     const p = DazzleStore.getProductById(id);
     if (!p) return;
-    if (confirm(`Are you sure you want to delete "${p.name}"? This action removes it from the store.`)) {
-      DazzleStore.deleteProduct(id);
-      this.showToast(`✦ Product "${p.name}" deleted.`);
+    if (confirm(`Are you sure you want to delete "${p.name}"? This action removes it from MongoDB.`)) {
+      await DazzleStore.deleteProduct(id);
+      this.showToast(`✦ Product "${p.name}" deleted from MongoDB.`);
       this.renderProducts();
       this.renderDashboard();
       this.updateSidebarBadges();
@@ -563,7 +579,7 @@ const AdminApp = {
     document.getElementById("modal-category").classList.add("open");
   },
 
-  saveCategoryForm(e) {
+  async saveCategoryForm(e) {
     e.preventDefault();
     const id = document.getElementById("cat-id").value.trim().toLowerCase().replace(/[^a-z0-9]/g, "-");
     const name = document.getElementById("cat-name").value.trim();
@@ -572,11 +588,11 @@ const AdminApp = {
     const desc = document.getElementById("cat-desc").value.trim();
 
     if (this.editingCategoryId) {
-      DazzleStore.updateCategory(this.editingCategoryId, { name, count, img, desc });
-      this.showToast(`✦ Category "${name}" updated.`);
+      await DazzleStore.updateCategory(this.editingCategoryId, { name, count, img, desc });
+      this.showToast(`✦ Category "${name}" updated in MongoDB.`);
     } else {
-      DazzleStore.addCategory({ id, name, count, img, desc });
-      this.showToast(`✦ Category "${name}" added.`);
+      await DazzleStore.addCategory({ id, name, count, img, desc });
+      this.showToast(`✦ Category "${name}" added to MongoDB.`);
     }
 
     this.closeModal("modal-category");
@@ -584,10 +600,10 @@ const AdminApp = {
     this.updateSidebarBadges();
   },
 
-  deleteCategoryPrompt(id) {
+  async deleteCategoryPrompt(id) {
     if (confirm(`Are you sure you want to delete category "${id}"?`)) {
-      DazzleStore.deleteCategory(id);
-      this.showToast(`✦ Category "${id}" removed.`);
+      await DazzleStore.deleteCategory(id);
+      this.showToast(`✦ Category "${id}" removed from MongoDB.`);
       this.renderCategories();
       this.updateSidebarBadges();
     }
@@ -668,10 +684,10 @@ const AdminApp = {
     this.renderOrders();
   },
 
-  changeOrderStatus(id, newStatus) {
-    const updated = DazzleStore.updateOrderStatus(id, newStatus);
+  async changeOrderStatus(id, newStatus) {
+    const updated = await DazzleStore.updateOrderStatus(id, newStatus);
     if (updated) {
-      this.showToast(`✦ Order #${id} status changed to ${newStatus}`);
+      this.showToast(`✦ Order #${id} status updated to ${newStatus} in MongoDB`);
       this.renderOrders();
       this.renderDashboard();
       this.updateSidebarBadges();
@@ -805,13 +821,13 @@ const AdminApp = {
     this.renderReviews();
   },
 
-  toggleReviewApproval(id) {
+  async toggleReviewApproval(id) {
     const reviews = DazzleStore.getReviews();
     const r = reviews.find(x => x.id === parseInt(id, 10));
     if (!r) return;
     const newStatus = r.approved === false ? true : false;
-    DazzleStore.updateReview(id, { approved: newStatus });
-    this.showToast(`✦ Review from "${r.name}" marked as ${newStatus ? 'Approved' : 'Hidden'}`);
+    await DazzleStore.updateReview(id, { approved: newStatus });
+    this.showToast(`✦ Review from "${r.name}" marked as ${newStatus ? 'Approved' : 'Hidden'} in MongoDB`);
     this.renderReviews();
     this.updateSidebarBadges();
   },
@@ -976,7 +992,7 @@ const AdminApp = {
     document.getElementById("modal-coupon").classList.add("open");
   },
 
-  saveCouponForm(e) {
+  async saveCouponForm(e) {
     e.preventDefault();
     const code = document.getElementById("cp-code").value.trim().toUpperCase();
     const title = document.getElementById("cp-title").value.trim();
@@ -991,12 +1007,12 @@ const AdminApp = {
     const payload = { code, title, type, discount, minOrder, expiry, desc, badge, active };
 
     if (this.editingCouponId) {
-      DazzleStore.updateCoupon(this.editingCouponId, payload);
-      this.showToast(`✦ Coupon "${code}" updated.`);
+      await DazzleStore.updateCoupon(this.editingCouponId, payload);
+      this.showToast(`✦ Coupon "${code}" updated in MongoDB.`);
     } else {
       payload.id = `cp-${Date.now().toString().slice(-4)}`;
-      DazzleStore.addCoupon(payload);
-      this.showToast(`✦ Coupon "${code}" created.`);
+      await DazzleStore.addCoupon(payload);
+      this.showToast(`✦ Coupon "${code}" created in MongoDB.`);
     }
 
     this.closeModal("modal-coupon");
@@ -1004,10 +1020,10 @@ const AdminApp = {
     this.updateSidebarBadges();
   },
 
-  deleteCouponPrompt(id) {
+  async deleteCouponPrompt(id) {
     if (confirm("Delete this coupon code?")) {
-      DazzleStore.deleteCoupon(id);
-      this.showToast("✦ Coupon deleted.");
+      await DazzleStore.deleteCoupon(id);
+      this.showToast("✦ Coupon deleted from MongoDB.");
       this.renderOffers();
       this.updateSidebarBadges();
     }
@@ -1035,7 +1051,7 @@ const AdminApp = {
     document.getElementById("modal-combo").classList.add("open");
   },
 
-  saveComboForm(e) {
+  async saveComboForm(e) {
     e.preventDefault();
     const name = document.getElementById("combo-name").value.trim();
     const discount = document.getElementById("combo-discount").value.trim();
@@ -1049,22 +1065,22 @@ const AdminApp = {
     const payload = { name, discount, price, oldPrice, items, images };
 
     if (this.editingComboId) {
-      DazzleStore.updateCombo(this.editingComboId, payload);
-      this.showToast(`✦ Combo "${name}" updated.`);
+      await DazzleStore.updateCombo(this.editingComboId, payload);
+      this.showToast(`✦ Combo "${name}" updated in MongoDB.`);
     } else {
       payload.id = `cb-${Date.now().toString().slice(-4)}`;
-      DazzleStore.addCombo(payload);
-      this.showToast(`✦ Combo "${name}" created.`);
+      await DazzleStore.addCombo(payload);
+      this.showToast(`✦ Combo "${name}" created in MongoDB.`);
     }
 
     this.closeModal("modal-combo");
     this.renderOffers();
   },
 
-  deleteComboPrompt(id) {
+  async deleteComboPrompt(id) {
     if (confirm("Delete this jewellery combo set?")) {
-      DazzleStore.deleteCombo(id);
-      this.showToast("✦ Combo deleted.");
+      await DazzleStore.deleteCombo(id);
+      this.showToast("✦ Combo deleted from MongoDB.");
       this.renderOffers();
     }
   },
@@ -1140,7 +1156,7 @@ const AdminApp = {
     document.getElementById("hp-foot-copy").value = hp.footer?.copyright || "";
   },
 
-  saveHomepageManager(e) {
+  async saveHomepageManager(e) {
     if (e) e.preventDefault();
     const existing = DazzleStore.getHomepage();
 
@@ -1214,8 +1230,8 @@ const AdminApp = {
       }
     };
 
-    DazzleStore.saveHomepage(updated);
-    this.showToast("✦ Homepage content saved! Changes are live on index.html");
+    await DazzleStore.saveHomepage(updated);
+    this.showToast("✦ Homepage content saved to MongoDB! Live on index.html");
   },
 
   // ========================================================
@@ -1247,16 +1263,16 @@ const AdminApp = {
     `).join("");
   },
 
-  updateNavItem(idx, field, val) {
+  async updateNavItem(idx, field, val) {
     const nav = DazzleStore.getNavigation();
     if (nav.header && nav.header[idx]) {
       nav.header[idx][field] = val;
-      DazzleStore.saveNavigation(nav);
+      await DazzleStore.saveNavigation(nav);
       this.showToast("✦ Navigation link updated.");
     }
   },
 
-  addNavItem() {
+  async addNavItem() {
     const name = prompt("Enter Link Name (e.g. Lookbook):");
     if (!name) return;
     const href = prompt("Enter Link URL (e.g. shop.html):", "shop.html");
@@ -1264,16 +1280,16 @@ const AdminApp = {
     const nav = DazzleStore.getNavigation();
     nav.header = nav.header || [];
     nav.header.push({ name, href });
-    DazzleStore.saveNavigation(nav);
+    await DazzleStore.saveNavigation(nav);
     this.renderNavigation();
     this.showToast("✦ Navigation link added.");
   },
 
-  deleteNavItem(idx) {
+  async deleteNavItem(idx) {
     const nav = DazzleStore.getNavigation();
     if (nav.header) {
       nav.header.splice(idx, 1);
-      DazzleStore.saveNavigation(nav);
+      await DazzleStore.saveNavigation(nav);
       this.renderNavigation();
       this.showToast("✦ Navigation link removed.");
     }
@@ -1343,7 +1359,7 @@ const AdminApp = {
     document.getElementById("set-whatsapp").value = s.social?.whatsapp || "";
   },
 
-  saveSettingsForm(e) {
+  async saveSettingsForm(e) {
     e.preventDefault();
     const updated = {
       siteName: document.getElementById("set-name").value.trim(),
@@ -1358,8 +1374,8 @@ const AdminApp = {
         whatsapp: document.getElementById("set-whatsapp").value.trim()
       }
     };
-    DazzleStore.saveSettings(updated);
-    this.showToast("✦ Store settings saved successfully!");
+    await DazzleStore.saveSettings(updated);
+    this.showToast("✦ Store settings saved to MongoDB successfully!");
   },
 
   exportStoreData() {
@@ -1396,10 +1412,10 @@ const AdminApp = {
     }
   },
 
-  resetStoreDataPrompt() {
-    if (confirm("Reset the entire Dazzle by Dua store to initial factory demo data? This will restore original products, categories, reviews, and orders.")) {
-      DazzleStore.resetAll();
-      this.showToast("✦ Store reset to default initial state.");
+  async resetStoreDataPrompt() {
+    if (confirm("Reset the entire Dazzle by Dua store to initial factory defaults in MongoDB? This will restore original products, categories, reviews, and orders.")) {
+      await DazzleStore.resetAll();
+      this.showToast("✦ Store reset to factory defaults in MongoDB.");
       this.renderCurrentView();
       this.updateSidebarBadges();
     }

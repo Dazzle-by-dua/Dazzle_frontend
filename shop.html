@@ -324,6 +324,23 @@ function updatePagination(total) {
   bar.style.display = totalPages <= 1 ? 'none' : 'flex';
 }
 
+function populateShopFilters() {
+  const catSelect = document.getElementById('category-select');
+  if (catSelect) {
+    const currentVal = catSelect.value;
+    const cats = DazzleStore.getCategories();
+    catSelect.innerHTML = `<option value="all">All Categories</option>` +
+      cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    if (currentVal) catSelect.value = currentVal;
+  }
+  const reviewProdSelect = document.querySelector('.write-review-form select');
+  if (reviewProdSelect) {
+    const prods = DazzleStore.getProducts();
+    reviewProdSelect.innerHTML = prods.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+  }
+}
+window.populateShopFilters = populateShopFilters;
+
 function renderShop() {
   const grid = document.getElementById('shop-grid');
   const countEl = document.getElementById('product-count');

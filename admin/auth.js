@@ -10,23 +10,7 @@ const AdminAuth = {
   STORAGE_KEY: "dazzle_admin_session",
   API_BASE_URL: API_BASE_URL,
 
-  // Demo fallback credentials if offline
-  CREDENTIALS: [
-    {
-      username: "admin",
-      email: "admin@dazzlebydua.com",
-      password: "admin123",
-      name: "Dua",
-      role: "Master Administrator"
-    },
-    {
-      username: "dua",
-      email: "dua@dazzlebydua.com",
-      password: "dazzleadmin",
-      name: "Dua",
-      role: "Store Owner"
-    }
-  ],
+
 
   // Check if an authenticated session exists in localStorage or sessionStorage
   getSession() {
@@ -98,36 +82,10 @@ const AdminAuth = {
         };
       }
     } catch (netErr) {
-      console.warn("Backend API unreachable, checking local credentials fallback:", netErr);
-      const matchedUser = this.CREDENTIALS.find(u =>
-        (u.username.toLowerCase() === cleanId.toLowerCase() || u.email.toLowerCase() === cleanId.toLowerCase()) &&
-        u.password === cleanPass
-      );
-
-      if (matchedUser) {
-        const sessionData = {
-          user: matchedUser.name,
-          email: matchedUser.email,
-          role: matchedUser.role,
-          token: "proto_jwt_" + Math.random().toString(36).substr(2) + Date.now().toString(36),
-          loginTime: new Date().toISOString()
-        };
-
-        localStorage.removeItem(this.STORAGE_KEY);
-        sessionStorage.removeItem(this.STORAGE_KEY);
-
-        if (rememberMe) {
-          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
-        } else {
-          sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
-        }
-
-        return { success: true, user: sessionData };
-      }
-
+      console.warn("Backend authentication connection error:", netErr);
       return {
         success: false,
-        message: "Failed to connect to authentication server (" + API_BASE_URL + "). Please try again."
+        message: "Failed to connect to authentication server at " + API_BASE_URL + ". Please check your network connection and verify backend is running."
       };
     }
   },

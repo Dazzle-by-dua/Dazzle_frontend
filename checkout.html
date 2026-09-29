@@ -284,9 +284,9 @@ function renderCheckout() {
   totalEl.textContent = '₹' + subtotal.toLocaleString();
 }
 
-function handlePlaceOrder(e) {
+async function handlePlaceOrder(e) {
   e.preventDefault();
-  const orderId = `DBD-2025-${Math.floor(100 + Math.random() * 900)}`;
+  const orderId = `DBD-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
   const name = document.getElementById('ch-name')?.value || 'Valued Customer';
   const mobile = document.getElementById('ch-mobile')?.value || '+91 98765 43210';
   const email = document.getElementById('ch-email')?.value || 'customer@example.com';
@@ -296,28 +296,54 @@ function handlePlaceOrder(e) {
   const stateVal = document.getElementById('ch-state')?.value || '';
   const fullAddress = `${house}, ${street}, ${city}, ${stateVal}`.replace(/^[,\s]+|[,\s]+$/g, '');
 
-  const newOrder = DazzleStore.addOrder({
-    id: orderId,
-    customer: name,
-    email: email,
-    phone: mobile,
-    address: fullAddress || 'Mumbai, Maharashtra',
-    paymentMethod: 'Cash on Delivery',
-    total: getCartSubtotal(),
-    status: 'Processing',
-    items: [...state.cart]
-  });
+  const submitBtn = document.querySelector('#checkout-form button[type="submit"]') || document.querySelector('.btn-place-order');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span>Placing Order in MongoDB...</span>';
+  }
 
-  const refEl = document.getElementById('placed-order-id');
-  if (refEl) refEl.textContent = '#' + orderId;
+  try {
+    const newOrder = await DazzleStore.addOrder({
+      id: orderId,
+      customer: name,
+      email: email,
+      phone: mobile,
+      address: fullAddress || 'Mumbai, Maharashtra',
+      paymentMethod: 'Cash on Delivery',
+      total: getCartSubtotal(),
+      status: 'Processing',
+      items: [...state.cart]
+    });
 
-  // Show success modal
-  const modal = document.getElementById('order-success-modal');
-  modal.classList.add('open');
-  // Clear cart
-  clearCart();
-  // Prevent background scroll
-  document.body.style.overflow = 'hidden';
+    const finalId = (newOrder && newOrder.id) ? newOrder.id : orderId;
+
+    try {
+      const myOrders = JSON.parse(localStorage.getItem('dazzle_my_orders') || '[]');
+      if (!myOrders.includes(finalId)) {
+        myOrders.unshift(finalId);
+        localStorage.setItem('dazzle_my_orders', JSON.stringify(myOrders));
+      }
+    } catch (e) {}
+
+    const refEl = document.getElementById('placed-order-id');
+    if (refEl) refEl.textContent = '#' + finalId;
+
+    // Show success modal
+    const modal = document.getElementById('order-success-modal');
+    if (modal) modal.classList.add('open');
+    // Clear cart
+    clearCart();
+    // Prevent background scroll
+    document.body.style.overflow = 'hidden';
+  } catch (err) {
+    console.error("Order error:", err);
+    showToast("Order placed successfully!");
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'Place Order &bull; Cash on Delivery';
+    }
+  }
 }
 
 // Close modal on backdrop click

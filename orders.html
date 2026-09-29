@@ -80,6 +80,12 @@
       <button class="orders-tab" data-panel="panel-cancelled">Cancelled</button>
     </div>
 
+    <!-- Live MongoDB Order Tracking Search Bar -->
+    <div style="display:flex;gap:0.75rem;margin:1.5rem 0 2rem;max-width:540px">
+      <input type="text" id="order-lookup-input" placeholder="Enter Order ID to track (e.g. DBD-2026-306)..." style="flex:1;padding:0.7rem 1.1rem;border:1px solid #D4AF7C;border-radius:40px;background:#FFF;font-size:0.85rem;font-family:inherit;outline:none" onkeyup="if(event.key==='Enter')searchOrderById()">
+      <button class="btn btn-gold btn-sm" onclick="searchOrderById()" style="border-radius:40px;padding:0.7rem 1.5rem">&#128269; Track</button>
+    </div>
+
     <!-- All Orders -->
     <div id="panel-all">
       <!-- Order 1 -->
@@ -330,6 +336,38 @@
 </footer>
 <script src="script.js"></script>
 <script>
+async function searchOrderById() {
+  const input = document.getElementById('order-lookup-input');
+  if (!input) return;
+  const q = input.value.trim().toUpperCase();
+  if (!q) {
+    if (typeof renderOrdersPage === 'function') renderOrdersPage();
+    return;
+  }
+  const container = document.getElementById('panel-all');
+  if (!container) return;
+  container.innerHTML = `<div style="text-align:center;padding:2rem"><p style="color:#777">Fetching live order ${q} from MongoDB...</p></div>`;
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/orders/${encodeURIComponent(q)}`);
+    if (res.ok) {
+      const order = await res.json();
+      DazzleStore._set(DazzleStore.KEYS.ORDERS, [order]);
+      if (typeof renderOrdersPage === 'function') renderOrdersPage();
+      showToast(`✦ Order #${order.id} found: ${order.status}`);
+    } else {
+      container.innerHTML = `
+        <div class="empty-state" style="padding:3rem 1rem">
+          <div class="empty-icon">&#10007;</div>
+          <h3 class="empty-title">Order #${q} Not Found</h3>
+          <p class="empty-sub">Please verify your order number and try again.</p>
+          <button class="btn btn-gold btn-sm" onclick="location.reload()">View All Orders</button>
+        </div>`;
+    }
+  } catch (e) {
+    showToast('Failed to connect to backend.');
+    if (typeof renderOrdersPage === 'function') renderOrdersPage();
+  }
+}
 document.addEventListener('DOMContentLoaded', initOrderTabs);
 </script>
 </body>
