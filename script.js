@@ -878,6 +878,54 @@ window.DazzleStore = window.DazzleStore || {
       navigation: this.getNavigation()
     }, null, 2);
   },
+  // Media & Cloudinary Storage
+  async uploadImage(file, folder = "dazzle_by_dua") {
+    const token = this._getAuthHeader() ? this._getAuthHeader().replace('Bearer ', '') : null;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("folder", folder);
+
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_BASE_URL}/api/upload/image`, {
+      method: "POST",
+      headers: headers,
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Cloudinary image upload failed.");
+    }
+    return await res.json();
+  },
+
+  async deleteImage(publicId) {
+    const token = this._getAuthHeader() ? this._getAuthHeader().replace('Bearer ', '') : null;
+    const res = await fetch(`${API_BASE_URL}/api/upload/image`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { "Authorization": `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify({ public_id: publicId })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Cloudinary image deletion failed.");
+    }
+    return await res.json();
+  },
+
+  async getMedia() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/media`);
+      if (res.ok) return await res.json();
+    } catch (e) {}
+    return [];
+  },
+
   importAll(jsonStr) {
     try {
       const data = typeof jsonStr === "string" ? JSON.parse(jsonStr) : jsonStr;

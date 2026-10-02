@@ -11,6 +11,8 @@ window.AdminApp = window.AdminApp || {
 
   // Exposed on window below for inline event handlers
   currentView: "dashboard",
+  currentProductGallery: [],
+  currentComboGallery: [],
   editingProductId: null,
   editingReviewId: null,
   editingCouponId: null,
@@ -186,6 +188,198 @@ window.AdminApp = window.AdminApp || {
     if (catBadge) catBadge.textContent = categories.length;
   },
 
+  formatImgUrl(url, fallback = 'product_flower_necklace.jpg') {
+    if (!url) return fallback.startsWith('http') ? fallback : `../${fallback}`;
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('/uploads/')) {
+      return url;
+    }
+    return `../${url}`;
+  },
+
+  async uploadToCloudinary(file, folder = "dazzle_by_dua") {
+    const token = (typeof AdminAuth !== 'undefined' && AdminAuth.getToken) ? AdminAuth.getToken() : null;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("folder", folder);
+
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_BASE_URL}/api/upload/image`, {
+      method: "POST",
+      headers: headers,
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Cloudinary upload failed. Check backend credentials.");
+    }
+
+    return await res.json();
+  },
+
+  async handleImageUpload(e, inputId, previewId, statusId, folder = "dazzle_by_dua") {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    const statusEl = document.getElementById(statusId);
+    const previewEl = document.getElementById(previewId);
+    const inputEl = document.getElementById(inputId);
+
+    if (statusEl) {
+      statusEl.className = "upload-status loading";
+      statusEl.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Uploading "${file.name}" to Cloudinary...`;
+    }
+
+    // Instant local preview while uploading
+    try {
+      const objectUrl = URL.createObjectURL(file);
+      if (previewEl) previewEl.src = objectUrl;
+    } catch (e) {}
+
+    try {
+      const data = await this.uploadToCloudinary(file, folder);
+      if (inputEl) inputEl.value = data.secure_url;
+      if (previewEl) previewEl.src = data.secure_url;
+
+      if (statusEl) {
+        statusEl.className = "upload-status success";
+        statusEl.innerHTML = `<i class="fa fa-check-circle"></i> Uploaded to Cloudinary (${data.format || 'img'}, ${(data.size / 1024).toFixed(1)} KB)`;
+      }
+      this.showToast(`✦ "${file.name}" uploaded to Cloudinary successfully!`);
+    } catch (err) {
+      console.error("Cloudinary upload error:", err);
+      if (statusEl) {
+        statusEl.className = "upload-status error";
+        statusEl.innerHTML = `<i class="fa fa-exclamation-circle"></i> ${err.message || 'Upload failed'}`;
+      }
+      this.showToast(err.message || "Failed to upload image to Cloudinary", "error");
+    } finally {
+      e.target.value = "";
+    }
+  },
+
+  removeImage(inputId, previewId, fallback = "product_flower_necklace.jpg") {
+    const inputEl = document.getElementById(inputId);
+    const previewEl = document.getElementById(previewId);
+    if (inputEl) inputEl.value = fallback;
+    if (previewEl) previewEl.src = this.formatImgUrl(fallback);
+    this.showToast("Image reset to default placeholder.");
+  },
+
+  renderProductGallery() {
+    const listEl = document.getElementById("prod-gallery-list");
+    if (!listEl) return;
+
+    if (!this.currentProductGallery || !this.currentProductGallery.length) {
+      listEl.innerHTML = `<span style="font-size:0.75rem;color:var(--text-muted);font-style:italic">No gallery photography added yet. Click below to add multiple images.</span>`;
+      return;
+    }
+
+    listEl.innerHTML = this.currentProductGallery.map((imgUrl, idx) => `
+      <div class="gallery-thumb-item">
+        <img src="${this.formatImgUrl(imgUrl)}" alt="Gallery ${idx + 1}">
+        <button type="button" class="gallery-thumb-remove" onclick="AdminApp.removeProductGalleryImage(${idx})" title="Remove this photo">&times;</button>
+      </div>
+    `).join("");
+  },
+
+  async handleGalleryUpload(e) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    const statusEl = document.getElementById("prod-gallery-status");
+    if (statusEl) {
+      statusEl.className = "upload-status loading";
+      statusEl.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Uploading ${files.length} image(s) to Cloudinary...`;
+    }
+
+    let successCount = 0;
+    for (const file of files) {
+      try {
+        const data = await this.uploadToCloudinary(file, "dazzle_by_dua/products");
+        this.currentProductGallery.push(data.secure_url);
+        successCount++;
+        this.renderProductGallery();
+      } catch (err) {
+        console.error("Gallery upload error:", err);
+        this.showToast(`Failed to upload ${file.name}: ${err.message}`, "error");
+      }
+    }
+
+    if (statusEl) {
+      statusEl.className = "upload-status success";
+      statusEl.innerHTML = `<i class="fa fa-check-circle"></i> Added ${successCount} image(s) to gallery.`;
+    }
+    this.showToast(`✦ Added ${successCount} gallery image(s).`);
+    e.target.value = "";
+  },
+
+  removeProductGalleryImage(idx) {
+    if (idx >= 0 && idx < this.currentProductGallery.length) {
+      this.currentProductGallery.splice(idx, 1);
+      this.renderProductGallery();
+      this.showToast("Gallery image removed.");
+    }
+  },
+
+  renderComboGallery() {
+    const listEl = document.getElementById("combo-gallery-list");
+    if (!listEl) return;
+
+    if (!this.currentComboGallery || !this.currentComboGallery.length) {
+      listEl.innerHTML = `<span style="font-size:0.75rem;color:var(--text-muted);font-style:italic">No combo images added yet. Click below to upload.</span>`;
+      return;
+    }
+
+    listEl.innerHTML = this.currentComboGallery.map((imgUrl, idx) => `
+      <div class="gallery-thumb-item">
+        <img src="${this.formatImgUrl(imgUrl)}" alt="Combo ${idx + 1}">
+        <button type="button" class="gallery-thumb-remove" onclick="AdminApp.removeComboGalleryImage(${idx})" title="Remove image">&times;</button>
+      </div>
+    `).join("");
+  },
+
+  async handleComboGalleryUpload(e) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    const statusEl = document.getElementById("combo-gallery-status");
+    if (statusEl) {
+      statusEl.className = "upload-status loading";
+      statusEl.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Uploading ${files.length} image(s) to Cloudinary...`;
+    }
+
+    let successCount = 0;
+    for (const file of files) {
+      try {
+        const data = await this.uploadToCloudinary(file, "dazzle_by_dua/combos");
+        this.currentComboGallery.push(data.secure_url);
+        successCount++;
+        this.renderComboGallery();
+      } catch (err) {
+        console.error("Combo upload error:", err);
+        this.showToast(`Failed to upload ${file.name}: ${err.message}`, "error");
+      }
+    }
+
+    if (statusEl) {
+      statusEl.className = "upload-status success";
+      statusEl.innerHTML = `<i class="fa fa-check-circle"></i> Added ${successCount} image(s).`;
+    }
+    this.showToast(`✦ Added ${successCount} combo image(s).`);
+    e.target.value = "";
+  },
+
+  removeComboGalleryImage(idx) {
+    if (idx >= 0 && idx < this.currentComboGallery.length) {
+      this.currentComboGallery.splice(idx, 1);
+      this.renderComboGallery();
+      this.showToast("Combo image removed.");
+    }
+  },
+
   showToast(msg, type = "success") {
     let container = document.querySelector(".admin-toast-container");
     if (!container) {
@@ -274,7 +468,7 @@ window.AdminApp = window.AdminApp || {
           <tr>
             <td>
               <div class="prod-thumb-row">
-                <img src="../${p.img}" class="prod-thumb" alt="${p.name}">
+                <img src="${this.formatImgUrl(p.img)}" class="prod-thumb" alt="${p.name}">
                 <div>
                   <div class="prod-title">${p.name}</div>
                   <div class="prod-meta">${p.sku || ''}</div>
@@ -367,7 +561,7 @@ window.AdminApp = window.AdminApp || {
         <tr data-product-id="${p.id}">
           <td>
             <div class="prod-thumb-row">
-              <img src="../${p.img}" class="prod-thumb" alt="${p.name}" onerror="this.src='../product_flower_necklace.jpg'">
+              <img src="${this.formatImgUrl(p.img)}" class="prod-thumb" alt="${p.name}" onerror="this.src='../product_flower_necklace.jpg'">
               <div>
                 <div class="prod-title">${p.name}</div>
                 <div class="prod-meta">SKU: ${p.sku || ('DBD-' + p.id)}</div>
@@ -433,8 +627,18 @@ window.AdminApp = window.AdminApp || {
 
     // Default image preview
     const preview = document.getElementById("prod-img-preview");
-    if (preview) preview.src = "../product_flower_necklace.jpg";
+    if (preview) preview.src = this.formatImgUrl("product_flower_necklace.jpg");
     document.getElementById("prod-img").value = "product_flower_necklace.jpg";
+
+    // Initialize gallery list
+    this.currentProductGallery = ["product_flower_necklace.jpg", "featured_collection.jpg"];
+    this.renderProductGallery();
+
+    const statusEl = document.getElementById("prod-upload-status");
+    if (statusEl) {
+      statusEl.className = "upload-status";
+      statusEl.innerHTML = `<span class="status-hint"><i class="fa fa-info-circle"></i> Ready to upload to Cloudinary</span>`;
+    }
 
     document.getElementById("modal-product").classList.add("open");
   },
@@ -467,7 +671,18 @@ window.AdminApp = window.AdminApp || {
     document.getElementById("prod-desc").value = p.description || "";
 
     const preview = document.getElementById("prod-img-preview");
-    if (preview) preview.src = `../${p.img || 'product_flower_necklace.jpg'}`;
+    if (preview) preview.src = this.formatImgUrl(p.img || 'product_flower_necklace.jpg');
+
+    // Populate gallery list
+    this.currentProductGallery = Array.isArray(p.images) && p.images.length ? [...p.images] : (p.img ? [p.img] : []);
+    this.renderProductGallery();
+
+    const statusEl = document.getElementById("prod-upload-status");
+    if (statusEl) {
+      const isCloudinary = (p.img || '').startsWith('http');
+      statusEl.className = "upload-status" + (isCloudinary ? " success" : "");
+      statusEl.innerHTML = isCloudinary ? `<i class="fa fa-cloud"></i> Hosted on Cloudinary` : `<span class="status-hint"><i class="fa fa-info-circle"></i> Upload to replace with Cloudinary image</span>`;
+    }
 
     document.getElementById("modal-product").classList.add("open");
   },
@@ -507,7 +722,7 @@ window.AdminApp = window.AdminApp || {
       dimensions,
       variants,
       description: desc,
-      images: [img, "featured_collection.jpg", "hero_necklace.jpg"]
+      images: (this.currentProductGallery && this.currentProductGallery.length) ? this.currentProductGallery : [img]
     };
 
     const submitBtn = e.target.querySelector('button[type="submit"]') || document.querySelector('#modal-product .btn-gold');
@@ -568,7 +783,7 @@ window.AdminApp = window.AdminApp || {
       <div class="card" style="display:flex;flex-direction:column;justify-content:space-between">
         <div>
           <div style="width:100%;height:140px;border-radius:var(--radius-sm);overflow:hidden;background:#F0EAE1;margin-bottom:1rem">
-            <img src="../${c.img}" style="width:100%;height:140px;object-fit:cover" alt="${c.name}">
+            <img src="${this.formatImgUrl(c.img)}" style="width:100%;height:140px;object-fit:cover" alt="${c.name}">
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem">
             <h3 style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700">${c.name}</h3>
@@ -1090,6 +1305,8 @@ window.AdminApp = window.AdminApp || {
     this.editingComboId = null;
     document.getElementById("modal-combo-title").textContent = "Add Jewellery Combo";
     document.getElementById("combo-form").reset();
+    this.currentComboGallery = ["product_flower_necklace.jpg", "product_pearl_earrings.jpg"];
+    this.renderComboGallery();
     document.getElementById("modal-combo").classList.add("open");
   },
 
@@ -1104,7 +1321,8 @@ window.AdminApp = window.AdminApp || {
     document.getElementById("combo-price").value = cb.price || 0;
     document.getElementById("combo-oldprice").value = cb.oldPrice || 0;
     document.getElementById("combo-items").value = (cb.items || []).join(", ");
-    document.getElementById("combo-images").value = (cb.images || []).join(", ");
+    this.currentComboGallery = Array.isArray(cb.images) ? [...cb.images] : [];
+    this.renderComboGallery();
     document.getElementById("modal-combo").classList.add("open");
   },
 
@@ -1116,8 +1334,7 @@ window.AdminApp = window.AdminApp || {
     const oldPrice = parseInt(document.getElementById("combo-oldprice").value, 10) || 0;
     const itemsRaw = document.getElementById("combo-items").value.trim();
     const items = itemsRaw ? itemsRaw.split(",").map(i => i.trim()).filter(Boolean) : [];
-    const imagesRaw = document.getElementById("combo-images").value.trim();
-    const images = imagesRaw ? imagesRaw.split(",").map(i => i.trim()).filter(Boolean) : ["product_flower_necklace.jpg"];
+    const images = (this.currentComboGallery && this.currentComboGallery.length) ? this.currentComboGallery : ["product_flower_necklace.jpg"];
 
     const payload = { name, discount, price, oldPrice, items, images };
 
@@ -1359,39 +1576,110 @@ window.AdminApp = window.AdminApp || {
   // ========================================================
   // 10. MEDIA ASSET GALLERY
   // ========================================================
-  renderMedia() {
-    const mediaFiles = [
-      { name: "product_flower_necklace.jpg", title: "Flower Pendant Necklace", type: "Product Hero" },
-      { name: "product_pearl_earrings.jpg", title: "Pearl Drop Earrings", type: "Product" },
-      { name: "product_bracelet.jpg", title: "Delicate Chain Bracelet", type: "Product" },
-      { name: "product_ring.jpg", title: "Minimal Diamond Ring", type: "Product" },
-      { name: "hero_necklace.jpg", title: "Luxury Model Hero", type: "Hero Banner" },
-      { name: "featured_collection.jpg", title: "Grace Collection Banner", type: "Collection Banner" },
-      { name: "marble_bg.jpg", title: "Luxury Marble Texture", type: "Background" }
-    ];
-
+  async renderMedia() {
     const grid = document.getElementById("media-gallery-grid");
     if (!grid) return;
 
-    grid.innerHTML = mediaFiles.map(m => `
-      <div class="media-card">
-        <div class="media-thumb-wrap">
-          <img src="../${m.name}" alt="${m.title}" loading="lazy">
-        </div>
-        <div class="media-details">
-          <div class="media-filename">${m.name}</div>
-          <div style="font-size:0.72rem;color:var(--text-muted)">${m.title}</div>
-          <div class="media-actions">
-            <button class="btn btn-outline btn-sm" style="flex:1" onclick="AdminApp.copyMediaUrl('${m.name}')">
-              <i class="fa fa-copy"></i> Copy Name
-            </button>
-            <a href="../${m.name}" target="_blank" class="btn btn-icon" title="View Full Image">
-              <i class="fa fa-external-link-alt"></i>
-            </a>
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-muted)"><i class="fa fa-spinner fa-spin fa-2x"></i><p style="margin-top:0.5rem">Loading media library...</p></div>`;
+
+    let items = [];
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/media`);
+      if (res.ok) {
+        items = await res.json();
+      }
+    } catch (e) {
+      console.warn("Could not fetch media list from API:", e);
+    }
+
+    const defaultMedia = [
+      { filename: "product_flower_necklace.jpg", title: "Flower Pendant Necklace", type: "Store Photography", url: "product_flower_necklace.jpg" },
+      { filename: "product_pearl_earrings.jpg", title: "Pearl Drop Earrings", type: "Store Photography", url: "product_pearl_earrings.jpg" },
+      { filename: "product_bracelet.jpg", title: "Delicate Chain Bracelet", type: "Store Photography", url: "product_bracelet.jpg" },
+      { filename: "product_ring.jpg", title: "Minimal Diamond Ring", type: "Store Photography", url: "product_ring.jpg" },
+      { filename: "hero_necklace.jpg", title: "Luxury Model Hero", type: "Hero Banner", url: "hero_necklace.jpg" },
+      { filename: "featured_collection.jpg", title: "Grace Collection Banner", type: "Collection Banner", url: "featured_collection.jpg" },
+      { filename: "marble_bg.jpg", title: "Luxury Marble Texture", type: "Background", url: "marble_bg.jpg" }
+    ];
+
+    const combined = [...items];
+    const seen = new Set(items.map(x => x.filename || x.url));
+    for (const d of defaultMedia) {
+      if (!seen.has(d.filename) && !seen.has(d.url)) {
+        combined.push(d);
+      }
+    }
+
+    grid.innerHTML = combined.map(m => {
+      const displayUrl = m.secure_url || m.url || m.filename;
+      const fullImgSrc = this.formatImgUrl(displayUrl);
+      const isCloudinary = displayUrl.startsWith("http://") || displayUrl.startsWith("https://");
+      const pubId = m.public_id || m.filename;
+
+      return `
+        <div class="media-card">
+          <div class="media-thumb-wrap" style="position:relative;height:160px;background:#F0EAE1;overflow:hidden">
+            <img src="${fullImgSrc}" alt="${m.title || m.filename}" style="width:100%;height:100%;object-fit:cover" loading="lazy">
+            ${isCloudinary ? `<span style="position:absolute;top:6px;left:6px;background:rgba(26,26,26,0.8);color:var(--gold);font-size:0.68rem;padding:2px 6px;border-radius:3px;font-weight:600"><i class="fa fa-cloud"></i> Cloudinary</span>` : ''}
+          </div>
+          <div class="media-details" style="padding:0.85rem">
+            <div class="media-filename" style="font-weight:600;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${m.filename || displayUrl}">${m.filename || 'Cloudinary Image'}</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);margin:0.2rem 0">${m.title || (isCloudinary ? 'Cloudinary Photography' : 'Store Asset')}</div>
+            <div class="media-actions" style="display:flex;gap:0.4rem;margin-top:0.65rem">
+              <button type="button" class="btn btn-outline btn-xs" style="flex:1" onclick="AdminApp.copyMediaUrl('${displayUrl}')" title="Copy URL">
+                <i class="fa fa-copy"></i> Copy URL
+              </button>
+              <a href="${fullImgSrc}" target="_blank" class="btn btn-outline btn-xs" title="View Full Image">
+                <i class="fa fa-external-link-alt"></i>
+              </a>
+              ${m.id && isCloudinary ? `
+              <button type="button" class="btn btn-danger btn-xs" onclick="AdminApp.deleteMediaPrompt('${pubId}')" title="Delete from Cloudinary">
+                <i class="fa fa-trash"></i>
+              </button>` : ''}
+            </div>
           </div>
         </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
+  },
+
+  async handleMediaLibraryUpload(e) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    this.showToast(`✦ Uploading ${files.length} file(s) to Cloudinary...`);
+    let count = 0;
+    for (const file of files) {
+      try {
+        await this.uploadToCloudinary(file, "dazzle_by_dua/media");
+        count++;
+      } catch (err) {
+        console.error("Media upload error:", err);
+        this.showToast(`Upload failed for ${file.name}: ${err.message}`, "error");
+      }
+    }
+
+    this.showToast(`✦ Successfully uploaded ${count} file(s) to Cloudinary!`);
+    e.target.value = "";
+    this.renderMedia();
+  },
+
+  async deleteMediaPrompt(identifier) {
+    if (confirm("Are you sure you want to delete this media asset from Cloudinary and MongoDB?")) {
+      try {
+        const token = (typeof AdminAuth !== 'undefined' && AdminAuth.getToken) ? AdminAuth.getToken() : null;
+        const res = await fetch(`${API_BASE_URL}/api/media/${encodeURIComponent(identifier)}`, {
+          method: "DELETE",
+          headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
+        if (!res.ok) throw new Error("Deletion failed on server.");
+        this.showToast("Media asset deleted from Cloudinary & database.");
+        this.renderMedia();
+      } catch (err) {
+        console.error("Delete media error:", err);
+        this.showToast(err.message || "Failed to delete media", "error");
+      }
+    }
   },
 
   copyMediaUrl(name) {

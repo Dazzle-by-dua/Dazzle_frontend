@@ -571,7 +571,26 @@
             </div>
             <div class="form-group">
               <label class="form-label">Hero Background Image</label>
-              <input type="text" class="form-control" id="hp-hero-bg" placeholder="hero_necklace.jpg">
+              <input type="hidden" id="hp-hero-bg" value="hero_necklace.jpg">
+              <input type="file" id="hp-hero-bg-file" accept="image/*" style="display:none" onchange="AdminApp.handleImageUpload(event, 'hp-hero-bg', 'hp-hero-bg-preview', 'hp-hero-upload-status')">
+              <div class="cloudinary-upload-card">
+                <div class="upload-preview-box" style="width:110px;height:65px">
+                  <img id="hp-hero-bg-preview" src="../hero_necklace.jpg" alt="Hero Preview">
+                </div>
+                <div class="upload-controls">
+                  <div class="upload-btn-row">
+                    <button type="button" class="btn btn-gold btn-sm" onclick="document.getElementById('hp-hero-bg-file').click()">
+                      <i class="fa fa-cloud-upload-alt"></i> Upload Banner
+                    </button>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="AdminApp.removeImage('hp-hero-bg', 'hp-hero-bg-preview', 'hero_necklace.jpg')">
+                      <i class="fa fa-trash"></i> Reset
+                    </button>
+                  </div>
+                  <div class="upload-status" id="hp-hero-upload-status">
+                    <span class="status-hint"><i class="fa fa-info-circle"></i> High-resolution hero photography</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="form-group">
@@ -672,8 +691,27 @@
               <input type="text" class="form-control" id="hp-feat-tag" placeholder="Our Featured Collection">
             </div>
             <div class="form-group">
-              <label class="form-label">Banner Image</label>
-              <input type="text" class="form-control" id="hp-feat-img" placeholder="featured_collection.jpg">
+              <label class="form-label">Featured Collection Banner</label>
+              <input type="hidden" id="hp-feat-img" value="featured_collection.jpg">
+              <input type="file" id="hp-feat-img-file" accept="image/*" style="display:none" onchange="AdminApp.handleImageUpload(event, 'hp-feat-img', 'hp-feat-img-preview', 'hp-feat-upload-status')">
+              <div class="cloudinary-upload-card">
+                <div class="upload-preview-box" style="width:110px;height:65px">
+                  <img id="hp-feat-img-preview" src="../featured_collection.jpg" alt="Featured Preview">
+                </div>
+                <div class="upload-controls">
+                  <div class="upload-btn-row">
+                    <button type="button" class="btn btn-gold btn-sm" onclick="document.getElementById('hp-feat-img-file').click()">
+                      <i class="fa fa-cloud-upload-alt"></i> Upload Banner
+                    </button>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="AdminApp.removeImage('hp-feat-img', 'hp-feat-img-preview', 'featured_collection.jpg')">
+                      <i class="fa fa-trash"></i> Reset
+                    </button>
+                  </div>
+                  <div class="upload-status" id="hp-feat-upload-status">
+                    <span class="status-hint"><i class="fa fa-info-circle"></i> Uploads directly to Cloudinary</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="form-group">
@@ -881,8 +919,9 @@
           <p class="view-subheading">Browse store photography, copy relative asset filenames, or preview images.</p>
         </div>
         <div class="view-actions">
-          <button class="btn btn-gold btn-sm" onclick="AdminApp.showToast('✦ To add a new photo, place the JPG in the project folder and use its filename.')">
-            <i class="fa fa-info-circle"></i> Asset Helper
+          <input type="file" id="media-gallery-file-input" accept="image/*" multiple style="display:none" onchange="AdminApp.handleMediaLibraryUpload(event)">
+          <button type="button" class="btn btn-gold btn-sm" onclick="document.getElementById('media-gallery-file-input').click()">
+            <i class="fa fa-cloud-upload-alt"></i> Upload to Cloudinary
           </button>
         </div>
       </div>
@@ -1061,16 +1100,45 @@
           </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-group" style="flex:2">
-            <label class="form-label">Primary Image URL or Filename</label>
-            <input type="text" class="form-control" id="prod-img" placeholder="product_flower_necklace.jpg">
-            <div class="form-help">Choose: product_flower_necklace.jpg, product_pearl_earrings.jpg, product_bracelet.jpg, product_ring.jpg</div>
+        <!-- Product Primary Image (Cloudinary) -->
+        <div class="form-group">
+          <label class="form-label">Primary Product Photography <span class="req">*</span></label>
+          <input type="hidden" id="prod-img" value="product_flower_necklace.jpg">
+          <input type="file" id="prod-file-input" accept="image/*" style="display:none" onchange="AdminApp.handleImageUpload(event, 'prod-img', 'prod-img-preview', 'prod-upload-status')">
+          
+          <div class="cloudinary-upload-card" id="prod-upload-container">
+            <div class="upload-preview-box">
+              <img id="prod-img-preview" src="../product_flower_necklace.jpg" alt="Preview">
+            </div>
+            <div class="upload-controls">
+              <div class="upload-btn-row">
+                <button type="button" class="btn btn-gold btn-sm" onclick="document.getElementById('prod-file-input').click()">
+                  <i class="fa fa-cloud-upload-alt"></i> Upload from Device
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" id="prod-img-remove-btn" onclick="AdminApp.removeImage('prod-img', 'prod-img-preview')">
+                  <i class="fa fa-trash"></i> Reset
+                </button>
+              </div>
+              <div class="upload-status" id="prod-upload-status">
+                <span class="status-hint"><i class="fa fa-info-circle"></i> Uploads directly to Cloudinary &bull; Supports PNG, JPG, WEBP</span>
+              </div>
+            </div>
           </div>
-          <div class="form-group" style="flex:1">
-            <label class="form-label">Image Preview</label>
-            <div style="width:70px;height:70px;border-radius:4px;overflow:hidden;border:1px solid var(--border-color);background:#F0EAE1">
-              <img id="prod-img-preview" src="../product_flower_necklace.jpg" style="width:100%;height:100%;object-fit:cover" alt="preview">
+        </div>
+
+        <!-- Product Gallery Images (Cloudinary Multi-Upload) -->
+        <div class="form-group">
+          <label class="form-label">Product Gallery Photography (Multiple Angles)</label>
+          <input type="file" id="prod-gallery-file-input" accept="image/*" multiple style="display:none" onchange="AdminApp.handleGalleryUpload(event)">
+          <div class="gallery-upload-card">
+            <div class="gallery-thumbs-list" id="prod-gallery-list">
+              <!-- Dynamically populated thumbnail chips with remove 'x' buttons -->
+            </div>
+            <div class="gallery-actions">
+              <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('prod-gallery-file-input').click()">
+                <i class="fa fa-plus-circle" style="color:var(--gold)"></i> Add Gallery Images
+              </button>
+              <div class="upload-status" id="prod-gallery-status"></div>
             </div>
           </div>
         </div>
@@ -1123,14 +1191,34 @@
             <input type="text" class="form-control" id="cat-id" placeholder="necklaces" required>
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Item Count</label>
-            <input type="number" class="form-control" id="cat-count" value="10">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Thumbnail Image</label>
-            <input type="text" class="form-control" id="cat-img" placeholder="product_flower_necklace.jpg">
+        <div class="form-group">
+          <label class="form-label">Item Count</label>
+          <input type="number" class="form-control" id="cat-count" value="10">
+        </div>
+
+        <!-- Category Thumbnail Image (Cloudinary) -->
+        <div class="form-group">
+          <label class="form-label">Category Image / Banner</label>
+          <input type="hidden" id="cat-img" value="product_flower_necklace.jpg">
+          <input type="file" id="cat-file-input" accept="image/*" style="display:none" onchange="AdminApp.handleImageUpload(event, 'cat-img', 'cat-img-preview', 'cat-upload-status')">
+          
+          <div class="cloudinary-upload-card">
+            <div class="upload-preview-box">
+              <img id="cat-img-preview" src="../product_flower_necklace.jpg" alt="Category Preview">
+            </div>
+            <div class="upload-controls">
+              <div class="upload-btn-row">
+                <button type="button" class="btn btn-gold btn-sm" onclick="document.getElementById('cat-file-input').click()">
+                  <i class="fa fa-cloud-upload-alt"></i> Upload from Device
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="AdminApp.removeImage('cat-img', 'cat-img-preview')">
+                  <i class="fa fa-trash"></i> Reset
+                </button>
+              </div>
+              <div class="upload-status" id="cat-upload-status">
+                <span class="status-hint"><i class="fa fa-info-circle"></i> Uploads directly to Cloudinary</span>
+              </div>
+            </div>
           </div>
         </div>
         <div class="form-group">
@@ -1291,9 +1379,21 @@
           <label class="form-label">Included Items (Comma-separated)</label>
           <input type="text" class="form-control" id="combo-items" placeholder="Flower Pendant Necklace, Pearl Drop Earrings">
         </div>
+        <!-- Combo Images (Cloudinary Multi-Upload) -->
         <div class="form-group">
-          <label class="form-label">Image Filenames (Comma-separated)</label>
-          <input type="text" class="form-control" id="combo-images" placeholder="product_flower_necklace.jpg, product_pearl_earrings.jpg">
+          <label class="form-label">Combo Set Images</label>
+          <input type="file" id="combo-file-input" accept="image/*" multiple style="display:none" onchange="AdminApp.handleComboGalleryUpload(event)">
+          <div class="gallery-upload-card">
+            <div class="gallery-thumbs-list" id="combo-gallery-list">
+              <!-- Dynamically populated combo thumbnails -->
+            </div>
+            <div class="gallery-actions">
+              <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('combo-file-input').click()">
+                <i class="fa fa-plus-circle" style="color:var(--gold)"></i> Add Combo Images
+              </button>
+              <div class="upload-status" id="combo-gallery-status"></div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
