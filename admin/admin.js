@@ -907,7 +907,16 @@ window.AdminApp = window.AdminApp || {
           </td>
           <td>${o.date || 'Recent'}</td>
           <td>${itemsCount} item${itemsCount > 1 ? 's' : ''}</td>
-          <td><strong>₹${Number(o.total || 0).toLocaleString()}</strong> <div style="font-size:0.7rem;color:var(--text-muted)">${o.paymentMethod || 'Paid'}</div></td>
+          <td>
+            <strong>₹${Number(o.total || 0).toLocaleString()}</strong>
+            <div style="display:flex;align-items:center;gap:4px;margin-top:3px;flex-wrap:wrap">
+              <span class="badge" style="font-size:0.68rem;padding:2px 6px;border-radius:4px;font-weight:700;background:${(o.paymentStatus || '').toLowerCase() === 'paid' ? '#e6f4ea' : ((o.paymentStatus || '').toLowerCase() === 'failed' ? '#fde8e8' : '#fef7e0')};color:${(o.paymentStatus || '').toLowerCase() === 'paid' ? '#137333' : ((o.paymentStatus || '').toLowerCase() === 'failed' ? '#9b1c1c' : '#b06000')}">
+                ${(o.paymentStatus || 'Pending').toUpperCase()}
+              </span>
+              <span style="font-size:0.7rem;color:var(--text-muted)">${o.paymentMethod || 'Online'}</span>
+            </div>
+            ${o.razorpay_payment_id ? `<div style="font-size:0.68rem;color:var(--text-muted);font-family:monospace;margin-top:2px" title="Razorpay Payment ID">Ref: ${o.razorpay_payment_id}</div>` : (o.razorpay_order_id ? `<div style="font-size:0.68rem;color:var(--text-muted);font-family:monospace;margin-top:2px" title="Razorpay Order ID">RZP: ${o.razorpay_order_id}</div>` : '')}
+          </td>
           <td>
             <select class="form-select" style="font-size:0.75rem;padding:0.35rem 0.65rem;border-radius:var(--radius-pill)" onchange="AdminApp.changeOrderStatus('${o.id}', this.value)">
               <option value="Processing" ${o.status === 'Processing' ? 'selected' : ''}>Processing</option>
@@ -967,7 +976,20 @@ window.AdminApp = window.AdminApp || {
     document.getElementById("drawer-customer-name").textContent = o.customer || "Customer";
     document.getElementById("drawer-customer-contact").textContent = `${o.email || ''} | ${o.phone || ''}`;
     document.getElementById("drawer-shipping-address").textContent = o.address || "Mumbai, India";
-    document.getElementById("drawer-payment-method").textContent = o.paymentMethod || "Online";
+    const payStatus = o.paymentStatus || 'Pending';
+    const payMethod = o.paymentMethod || 'Online';
+    const payMethodEl = document.getElementById("drawer-payment-method");
+    if (payMethodEl) {
+      payMethodEl.innerHTML = `
+        ${payMethod}
+        <span class="badge" style="margin-left:6px;font-size:0.68rem;padding:2px 6px;border-radius:4px;font-weight:700;background:${payStatus.toLowerCase() === 'paid' ? '#e6f4ea' : (payStatus.toLowerCase() === 'failed' ? '#fde8e8' : '#fef7e0')};color:${payStatus.toLowerCase() === 'paid' ? '#137333' : (payStatus.toLowerCase() === 'failed' ? '#9b1c1c' : '#b06000')}">
+          ${payStatus.toUpperCase()}
+        </span>
+        ${o.razorpay_payment_id ? `<div style="font-size:0.72rem;color:var(--text-muted);font-family:monospace;margin-top:4px"><strong>Razorpay Payment ID:</strong> ${o.razorpay_payment_id}</div>` : ''}
+        ${o.razorpay_order_id ? `<div style="font-size:0.72rem;color:var(--text-muted);font-family:monospace"><strong>Razorpay Order ID:</strong> ${o.razorpay_order_id}</div>` : ''}
+        ${o.paid_at ? `<div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px"><strong>Paid At:</strong> ${new Date(o.paid_at).toLocaleString()}</div>` : ''}
+      `;
+    }
 
     // Status Timeline
     const steps = ["Processing", "Packed", "Shipped", "Delivered"];

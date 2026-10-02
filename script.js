@@ -801,6 +801,25 @@ window.DazzleStore = window.DazzleStore || {
     this.saveOrders(list);
     return res;
   },
+  async createRazorpayOrder(orderData) {
+    return await this._api('/api/orders/razorpay/create-order', 'POST', orderData);
+  },
+  async verifyRazorpayPayment(paymentData) {
+    const res = await this._api('/api/orders/razorpay/verify-payment', 'POST', paymentData);
+    try {
+      const live = await fetch(`${API_BASE_URL}/api/orders`).then(r => r.ok ? r.json() : null);
+      if (Array.isArray(live)) {
+        this.saveOrders(live);
+      }
+    } catch (e) {}
+    return res;
+  },
+  async recordPaymentFailure(failureData) {
+    return await this._api('/api/orders/razorpay/payment-failed', 'POST', failureData);
+  },
+  async getRazorpayConfig() {
+    return await this._api('/api/orders/razorpay/config', 'GET');
+  },
   async updateOrderStatus(id, status) {
     const res = await this._api(`/api/orders/${id}/status`, 'PATCH', { status });
     try {
@@ -1323,8 +1342,14 @@ function renderOrdersPage() {
           </div>
           <div class="order-footer">
             <div>
-              <div class="order-total-label">Order Total (${order.paymentMethod || 'Paid'})</div>
+              <div class="order-total-label">
+                Order Total &bull; ${order.paymentMethod || 'Online'}
+                <span style="margin-left:6px;font-size:0.7rem;padding:2px 6px;border-radius:4px;font-weight:700;background:${(order.paymentStatus||'').toLowerCase()==='paid'?'#e6f4ea':'#fef7e0'};color:${(order.paymentStatus||'').toLowerCase()==='paid'?'#137333':'#b06000'}">
+                  ${(order.paymentStatus || 'Pending').toUpperCase()}
+                </span>
+              </div>
               <div class="order-total-value">₹${Number(order.total || 0).toLocaleString()}</div>
+              ${order.razorpay_payment_id ? `<div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;font-family:monospace">Payment ID: ${order.razorpay_payment_id}</div>` : ''}
             </div>
             <div class="order-actions">
               <button class="btn btn-outline btn-sm" onclick="showToast('✦ Invoice downloaded for Order #${order.id}')">Invoice</button>
