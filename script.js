@@ -1395,7 +1395,11 @@ function hydrateHomePage() {
       annEl.style.display = "none";
     } else {
       annEl.style.display = "";
-      annEl.innerHTML = `${hp.announcement.text || ''} <a href="${hp.announcement.linkUrl || 'offers.html'}">${hp.announcement.linkText || 'View Offers &rarr;'}</a>`;
+      let annText = (hp.announcement.text || '').replace(/(\d+)\?/g, '₹$1').replace(/\?(\d+)/g, '₹$1');
+      let annLink = (hp.announcement.linkText || 'View Offers &rarr;').trim();
+      if (annLink.endsWith('?')) annLink = annLink.replace(/\s*\?+$/, '') + ' &rarr;';
+      else if (!annLink.includes('→') && !annLink.includes('&rarr;')) annLink += ' &rarr;';
+      annEl.innerHTML = `${annText} <a href="${hp.announcement.linkUrl || 'offers.html'}">${annLink}</a>`;
     }
   }
 
@@ -1420,7 +1424,9 @@ function hydrateHomePage() {
 
       const btns = heroEl.querySelectorAll(".hero-btns a");
       if (btns.length >= 1 && hp.hero.btn1Text) {
-        btns[0].innerHTML = hp.hero.btn1Text;
+        let b1 = (hp.hero.btn1Text || 'Shop Collection &rarr;').trim();
+        if (b1.endsWith('?')) b1 = b1.replace(/\s*\?+$/, '') + ' &rarr;';
+        btns[0].innerHTML = b1;
         if (hp.hero.btn1Url) btns[0].href = hp.hero.btn1Url;
       }
       if (btns.length >= 2 && hp.hero.btn2Text) {
@@ -1486,7 +1492,9 @@ function hydrateHomePage() {
       if (titleEl && hp.featured.title) titleEl.innerHTML = hp.featured.title;
 
       const descEl = featSection.querySelector(".featured-desc");
-      if (descEl && hp.featured.desc) descEl.innerHTML = hp.featured.desc;
+      if (descEl && hp.featured.desc) {
+        descEl.innerHTML = hp.featured.desc.replace(/\s*\?\s*/g, ' &mdash; ');
+      }
 
       const stats = featSection.querySelectorAll(".featured-stats > div");
       if (stats.length >= 3) {
@@ -1494,13 +1502,19 @@ function hydrateHomePage() {
         if (hp.featured.stat1Label) stats[0].querySelector(".stat-label").textContent = hp.featured.stat1Label;
         if (hp.featured.stat2Num) stats[1].querySelector(".stat-num").textContent = hp.featured.stat2Num;
         if (hp.featured.stat2Label) stats[1].querySelector(".stat-label").textContent = hp.featured.stat2Label;
-        if (hp.featured.stat3Num) stats[2].querySelector(".stat-num").innerHTML = hp.featured.stat3Num;
+        if (hp.featured.stat3Num) {
+          stats[2].querySelector(".stat-num").innerHTML = hp.featured.stat3Num.replace(/\?+$/, '★');
+        }
         if (hp.featured.stat3Label) stats[2].querySelector(".stat-label").textContent = hp.featured.stat3Label;
       }
 
       const btnEl = featSection.querySelector(".featured-content a.btn");
       if (btnEl) {
-        if (hp.featured.btnText) btnEl.innerHTML = hp.featured.btnText;
+        if (hp.featured.btnText) {
+          let fb = hp.featured.btnText.trim();
+          if (fb.endsWith('?')) fb = fb.replace(/\s*\?+$/, '') + ' &rarr;';
+          btnEl.innerHTML = fb;
+        }
         if (hp.featured.btnUrl) btnEl.href = hp.featured.btnUrl;
       }
     }
@@ -1567,6 +1581,20 @@ function hydrateFooter() {
   });
   document.querySelectorAll(".footer-brand-tag").forEach(el => {
     el.textContent = settings.tagline || "Fine Jewellery";
+  });
+}
+
+
+// ---- Global Button & Arrow Sanitizer ----
+function sanitizeButtonArrows() {
+  document.querySelectorAll('a, button, .btn').forEach(el => {
+    // Only inspect interactive buttons, links, and banners
+    if (el.matches('.btn, .btn-gold, .btn-outline, .btn-dark, .announcement-bar a, .hero-btns a, .featured-content a, .section-header a')) {
+      let html = el.innerHTML.trim();
+      if (html.endsWith('?') || /\s\?$/.test(html)) {
+        el.innerHTML = html.replace(/\s*\?+$/, '') + ' &rarr;';
+      }
+    }
   });
 }
 
@@ -1648,14 +1676,17 @@ document.addEventListener("DOMContentLoaded", () => {
   setActiveNavLink();
   initFAQ();
   updateNavBadges();
+  sanitizeButtonArrows();
   hydrateFooter();
 
   // Background synchronize with Render MongoDB Backend
   if (window.DazzleStore && typeof window.DazzleStore.syncFromBackend === "function") {
     window.DazzleStore.syncFromBackend().then(() => {
       hydrateFooter();
+      sanitizeButtonArrows();
       if (document.querySelector(".hero") || document.getElementById("new-arrivals-grid")) {
         hydrateHomePage();
+        sanitizeButtonArrows();
       }
       if (document.getElementById("current-offers")) {
         hydrateOffersPage();
@@ -1673,6 +1704,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // If on index.html
   if (document.querySelector(".hero") || document.getElementById("new-arrivals-grid")) {
     hydrateHomePage();
+    sanitizeButtonArrows();
   }
 
   // If on offers.html

@@ -1394,7 +1394,7 @@ window.AdminApp = window.AdminApp || {
     // 1. Announcement
     document.getElementById("hp-ann-enabled").checked = hp.announcement?.enabled !== false;
     document.getElementById("hp-ann-text").value = hp.announcement?.text || "";
-    document.getElementById("hp-ann-link-text").value = hp.announcement?.linkText || "";
+    document.getElementById("hp-ann-link-text").value = (hp.announcement?.linkText || "").replace(/\s*\?+$/, " →");
     document.getElementById("hp-ann-link-url").value = hp.announcement?.linkUrl || "";
 
     // 2. Hero
@@ -1403,7 +1403,7 @@ window.AdminApp = window.AdminApp || {
     document.getElementById("hp-hero-title").value = hp.hero?.title || "";
     document.getElementById("hp-hero-desc").value = hp.hero?.desc || "";
     document.getElementById("hp-hero-bg").value = hp.hero?.bgImg || "hero_necklace.jpg";
-    document.getElementById("hp-hero-btn1-text").value = hp.hero?.btn1Text || "";
+    document.getElementById("hp-hero-btn1-text").value = (hp.hero?.btn1Text || "").replace(/\s*\?+$/, " →");
     document.getElementById("hp-hero-btn1-url").value = hp.hero?.btn1Url || "";
     document.getElementById("hp-hero-btn2-text").value = hp.hero?.btn2Text || "";
     document.getElementById("hp-hero-btn2-url").value = hp.hero?.btn2Url || "";
@@ -1425,13 +1425,13 @@ window.AdminApp = window.AdminApp || {
     document.getElementById("hp-feat-title").value = hp.featured?.title || "";
     document.getElementById("hp-feat-desc").value = hp.featured?.desc || "";
     document.getElementById("hp-feat-img").value = hp.featured?.img || "featured_collection.jpg";
-    document.getElementById("hp-feat-btn-text").value = hp.featured?.btnText || "";
+    document.getElementById("hp-feat-btn-text").value = (hp.featured?.btnText || "").replace(/\s*\?+$/, " →");
     document.getElementById("hp-feat-btn-url").value = hp.featured?.btnUrl || "";
     document.getElementById("hp-feat-stat1-num").value = hp.featured?.stat1Num || "500+";
     document.getElementById("hp-feat-stat1-lbl").value = hp.featured?.stat1Label || "Happy Customers";
     document.getElementById("hp-feat-stat2-num").value = hp.featured?.stat2Num || "50+";
     document.getElementById("hp-feat-stat2-lbl").value = hp.featured?.stat2Label || "Unique Designs";
-    document.getElementById("hp-feat-stat3-num").value = hp.featured?.stat3Num || "4.8★";
+    document.getElementById("hp-feat-stat3-num").value = (hp.featured?.stat3Num || "4.8★").replace(/\?+$/, "★");
     document.getElementById("hp-feat-stat3-lbl").value = hp.featured?.stat3Label || "Avg. Rating";
 
     // 6. Why Choose Us
@@ -1464,7 +1464,7 @@ window.AdminApp = window.AdminApp || {
       announcement: {
         enabled: document.getElementById("hp-ann-enabled").checked,
         text: document.getElementById("hp-ann-text").value,
-        linkText: document.getElementById("hp-ann-link-text").value,
+        linkText: document.getElementById("hp-ann-link-text").value.replace(/\s*\?+$/, " →"),
         linkUrl: document.getElementById("hp-ann-link-url").value
       },
       hero: {
@@ -1473,7 +1473,7 @@ window.AdminApp = window.AdminApp || {
         title: document.getElementById("hp-hero-title").value,
         desc: document.getElementById("hp-hero-desc").value,
         bgImg: document.getElementById("hp-hero-bg").value,
-        btn1Text: document.getElementById("hp-hero-btn1-text").value,
+        btn1Text: document.getElementById("hp-hero-btn1-text").value.replace(/\s*\?+$/, " →"),
         btn1Url: document.getElementById("hp-hero-btn1-url").value,
         btn2Text: document.getElementById("hp-hero-btn2-text").value,
         btn2Url: document.getElementById("hp-hero-btn2-url").value
@@ -1495,13 +1495,13 @@ window.AdminApp = window.AdminApp || {
         title: document.getElementById("hp-feat-title").value,
         desc: document.getElementById("hp-feat-desc").value,
         img: document.getElementById("hp-feat-img").value,
-        btnText: document.getElementById("hp-feat-btn-text").value,
+        btnText: document.getElementById("hp-feat-btn-text").value.replace(/\s*\?+$/, " →"),
         btnUrl: document.getElementById("hp-feat-btn-url").value,
         stat1Num: document.getElementById("hp-feat-stat1-num").value,
         stat1Label: document.getElementById("hp-feat-stat1-lbl").value,
         stat2Num: document.getElementById("hp-feat-stat2-num").value,
         stat2Label: document.getElementById("hp-feat-stat2-lbl").value,
-        stat3Num: document.getElementById("hp-feat-stat3-num").value,
+        stat3Num: document.getElementById("hp-feat-stat3-num").value.replace(/\?+$/, "★"),
         stat3Label: document.getElementById("hp-feat-stat3-lbl").value
       },
       whyChooseUs: {
