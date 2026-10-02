@@ -28,8 +28,8 @@ p{font-size:.95rem;color:var(--text-muted);}
 .section-header-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2.5rem;}
 .announcement-bar{background:var(--black);color:var(--gold-light);text-align:center;padding:.55rem 1rem;font-size:.75rem;letter-spacing:.1em;font-weight:500;}
 .announcement-bar a{color:var(--gold);margin-left:.5rem;font-weight:600;}
-.navbar{position:sticky;top:0;z-index:1000;background:var(--ivory);border-bottom:1px solid var(--border);height:var(--nav-height);display:flex;align-items:center;transition:all var(--transition);box-shadow:0 1px 0 rgba(232,221,208,0.5);}
-.navbar.scrolled{box-shadow:var(--shadow-sm);}
+.navbar{position:sticky;top:0;z-index:1000;background:#F5EBDD;border-bottom:1px solid rgba(212,175,124,0.3);height:var(--nav-height);display:flex;align-items:center;transition:all var(--transition);box-shadow:0 2px 10px rgba(45,36,30,0.04);}
+.navbar.scrolled{background:#F5EBDD;box-shadow:0 4px 18px rgba(45,36,30,0.08);border-bottom-color:rgba(212,175,124,0.38);}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;width:100%;}
 .nav-logo{display:flex;flex-direction:column;text-decoration:none;}
 .nav-logo-name{font-family:"Playfair Display",serif;font-size:1.5rem;font-weight:700;color:var(--text-dark);letter-spacing:.02em;line-height:1;}
