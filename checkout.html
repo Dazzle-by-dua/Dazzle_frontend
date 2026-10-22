@@ -558,6 +558,9 @@ async function handlePlaceOrder(e) {
         }
       };
 
+      if (typeof window.Razorpay === 'undefined') {
+        throw new Error('Razorpay Checkout SDK is unavailable. Please check your network connection or disable ad-blockers and try again.');
+      }
       const rzpInstance = new Razorpay(options);
 
       rzpInstance.on('payment.failed', async function (response) {
