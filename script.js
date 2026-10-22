@@ -271,7 +271,7 @@ const DEFAULT_HOMEPAGE = {
   instagram: {
     enabled: true,
     tag: "Follow Our Journey",
-    handle: "@dazzlebydua",
+    handle: "@dazzle.by.dua",
     subtitle: "Share your Dazzle moments with us",
     images: ["product_flower_necklace.jpg", "product_pearl_earrings.jpg", "product_bracelet.jpg", "product_ring.jpg"]
   },
@@ -331,15 +331,15 @@ const DEFAULT_ORDERS = [
 const DEFAULT_SETTINGS = {
   siteName: "Dazzle by Dua",
   tagline: "Fine Jewellery",
-  email: "contact@dazzlebydua.com",
-  phone: "+91 98765 43210",
+  email: "duasalam021@gmail.com",
+  phone: "+91 63091 39498",
   address: "Shop 4, Luxury Arcade, Bandra West, Mumbai, MH 400050",
   currency: "₹",
   freeShippingThreshold: 2500,
   logoText: "Dazzle by Dua",
   social: {
-    instagram: "https://instagram.com/dazzlebydua",
-    whatsapp: "https://wa.me/919876543210",
+    instagram: "https://instagram.com/dazzle.by.dua",
+    whatsapp: "https://wa.me/916309139498",
     pinterest: "#",
     facebook: "#"
   }
