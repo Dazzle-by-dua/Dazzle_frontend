@@ -821,7 +821,7 @@ window.DazzleStore = window.DazzleStore || {
     return await this._api('/api/orders/razorpay/config', 'GET');
   },
   async getPaymentStatus(orderId) {
-    return await this._api(/api/orders//payment-status, 'GET');
+    return await this._api('/api/orders/' + encodeURIComponent(orderId) + '/payment-status', 'GET');
   },
   async updateOrderStatus(id, status) {
     const res = await this._api(`/api/orders/${id}/status`, 'PATCH', { status });
