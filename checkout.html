@@ -182,7 +182,7 @@
             <div id="payment-alert" style="display:none;padding:0.85rem 1rem;border-radius:8px;margin-bottom:1.25rem;font-size:0.88rem;line-height:1.4"></div>
 
             <button type="submit" class="btn btn-gold" id="place-order-btn" style="width:100%;justify-content:center;margin-top:0.5rem;font-size:0.95rem;padding:0.95rem;font-weight:600">
-              <i class="fa fa-lock" id="place-order-icon" style="margin-right:6px"></i> <span id="place-order-btn-text">Pay Now &bull; &#8377;0</span>
+              <i class="fa fa-lock" id="place-order-icon" style="margin-right:6px"></i> <span id="place-order-btn-text">Pay Now &bull; ₹0</span>
             </button>
           </form>
         </div>
@@ -199,7 +199,7 @@
           </div>
           <div class="summary-line">
             <span class="summary-label">Delivery Charges</span>
-            <span class="summary-val-accent">Calculated at checkout</span>
+            <span class="summary-val-accent" id="ch-delivery">Calculated at checkout</span>
           </div>
           <div class="summary-total-line">
             <span class="summary-total-label">Total</span>
@@ -324,7 +324,7 @@ function handlePaymentMethodChange(method) {
       codCard.style.border = '1px solid var(--border)';
       codCard.style.background = 'var(--white)';
     }
-    if (btnText) btnText.innerHTML = `Pay Now &bull; &#8377;${total.toLocaleString()}`;
+    if (btnText) btnText.innerHTML = `Pay Now &bull; ₹${total.toLocaleString()}`;
     if (icon) icon.className = 'fa fa-lock';
   } else {
     if (codCard) {
@@ -396,7 +396,7 @@ function renderCheckout() {
         <div class="checkout-mini-title">${item.name}</div>
         <div class="checkout-mini-qty">Qty: ${item.qty || 1} ${item.variant ? '&bull; ' + item.variant : ''}</div>
       </div>
-      <div class="checkout-mini-price">&#8377;${itemTotal.toLocaleString()}</div>
+      <div class="checkout-mini-price">₹${itemTotal.toLocaleString()}</div>
     </div>`;
   }).join('');
 
@@ -404,8 +404,21 @@ function renderCheckout() {
   const delivery = subtotal >= 2500 ? 0 : 150;
   const total = subtotal + delivery;
 
-  subtotalEl.textContent = '&#8377;' + subtotal.toLocaleString();
-  totalEl.textContent = '&#8377;' + total.toLocaleString();
+  subtotalEl.textContent = '₹' + subtotal.toLocaleString();
+  totalEl.textContent = '₹' + total.toLocaleString();
+
+  const deliveryEl = document.getElementById('ch-delivery');
+  if (deliveryEl) {
+    if (delivery === 0) {
+      deliveryEl.textContent = 'FREE';
+      deliveryEl.style.color = '#137333';
+      deliveryEl.style.fontWeight = '600';
+    } else {
+      deliveryEl.textContent = '₹' + delivery.toLocaleString();
+      deliveryEl.style.color = 'var(--text-dark)';
+      deliveryEl.style.fontWeight = '500';
+    }
+  }
 
   handlePaymentMethodChange(selectedPaymentMethod);
 }
@@ -536,7 +549,7 @@ async function handlePlaceOrder(e) {
             showPaymentAlert(`Payment verification failed: ${err.message || 'Signature mismatch'}. Please contact support with Payment ID: ${response.razorpay_payment_id}`, 'danger');
             if (submitBtn) submitBtn.disabled = false;
             if (icon) icon.className = 'fa fa-redo';
-            if (btnText) btnText.innerHTML = `Retry Payment &bull; &#8377;${total.toLocaleString()}`;
+            if (btnText) btnText.innerHTML = `Retry Payment &bull; ₹${total.toLocaleString()}`;
           }
         },
         modal: {
@@ -545,7 +558,7 @@ async function handlePlaceOrder(e) {
             showPaymentAlert('Payment was cancelled. Your items remain saved in your cart. You can retry whenever you are ready.', 'warning');
             if (submitBtn) submitBtn.disabled = false;
             if (icon) icon.className = 'fa fa-redo';
-            if (btnText) btnText.innerHTML = `Retry Payment &bull; &#8377;${total.toLocaleString()}`;
+            if (btnText) btnText.innerHTML = `Retry Payment &bull; ₹${total.toLocaleString()}`;
 
             try {
               await DazzleStore.recordPaymentFailure({
@@ -570,7 +583,7 @@ async function handlePlaceOrder(e) {
 
         if (submitBtn) submitBtn.disabled = false;
         if (icon) icon.className = 'fa fa-redo';
-        if (btnText) btnText.innerHTML = `Retry Payment &bull; &#8377;${total.toLocaleString()}`;
+        if (btnText) btnText.innerHTML = `Retry Payment &bull; ₹${total.toLocaleString()}`;
 
         try {
           await DazzleStore.recordPaymentFailure({
@@ -591,7 +604,7 @@ async function handlePlaceOrder(e) {
       showPaymentAlert(`Unable to open Razorpay Checkout: ${err.message || err}. Please try Cash on Delivery or contact store support.`, 'danger');
       if (submitBtn) submitBtn.disabled = false;
       if (icon) icon.className = 'fa fa-redo';
-      if (btnText) btnText.innerHTML = `Retry Payment &bull; &#8377;${total.toLocaleString()}`;
+      if (btnText) btnText.innerHTML = `Retry Payment &bull; ₹${total.toLocaleString()}`;
     }
 
   // ==========================================
@@ -647,7 +660,7 @@ async function handlePlaceOrder(e) {
             <i class="fa fa-truck"></i> Payment Method: Cash on Delivery
           </div>
           <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">
-            Please keep &#8377;${total.toLocaleString()} ready at delivery.
+            Please keep ₹${total.toLocaleString()} ready at delivery.
           </div>
         `;
       }
