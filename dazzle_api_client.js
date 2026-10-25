@@ -351,6 +351,16 @@
       }
     },
 
+    // Delivery & Google Routes Quotes
+    delivery: {
+      async getConfig() {
+        return await request("/api/delivery/config");
+      },
+      async getQuote(payload) {
+        return await request("/api/delivery/quote", { method: "POST", body: payload });
+      }
+    },
+
     // Dashboard
     dashboard: {
       async getStats() {
