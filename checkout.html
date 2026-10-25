@@ -122,6 +122,10 @@
               <label class="form-label" for="ch-street">Street / Area *</label>
               <input class="form-input" type="text" id="ch-street" placeholder="MG Road, Indiranagar" required>
             </div>
+            <div class="form-group">
+              <label class="form-label" for="ch-landmark">Landmark *</label>
+              <input class="form-input" type="text" id="ch-landmark" placeholder="e.g. Near Apollo Pharmacy, Opposite Metro Station" required>
+            </div>
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label" for="ch-city">City *</label>
@@ -432,11 +436,23 @@ async function handlePlaceOrder(e) {
   const email = document.getElementById('ch-email')?.value?.trim() || 'customer@example.com';
   const house = document.getElementById('ch-house')?.value?.trim() || '';
   const street = document.getElementById('ch-street')?.value?.trim() || '';
+  const landmark = document.getElementById('ch-landmark')?.value?.trim() || '';
   const city = document.getElementById('ch-city')?.value?.trim() || '';
   const stateVal = document.getElementById('ch-state')?.value?.trim() || '';
   const pin = document.getElementById('ch-pin')?.value?.trim() || '';
   const notes = document.getElementById('ch-notes')?.value?.trim() || '';
-  const fullAddress = `${house}, ${street}, ${city}, ${stateVal} - ${pin}`.replace(/^[,\s-]+|[,\s-]+$/g, '');
+
+  if (!landmark) {
+    showPaymentAlert('Please enter a nearby landmark for delivery. Landmark is mandatory.', 'danger');
+    const landmarkInput = document.getElementById('ch-landmark');
+    if (landmarkInput) {
+      landmarkInput.focus();
+      landmarkInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+
+  const fullAddress = `${house}, ${street}, Landmark: ${landmark}, ${city}, ${stateVal} - ${pin}`.replace(/^[,\s-]+|[,\s-]+$/g, '');
 
   const submitBtn = document.getElementById('place-order-btn');
   const btnText = document.getElementById('place-order-btn-text');
@@ -462,6 +478,7 @@ async function handlePlaceOrder(e) {
         email: email,
         phone: mobile,
         address: fullAddress,
+        landmark: landmark,
         notes: notes
       });
 
@@ -624,6 +641,7 @@ async function handlePlaceOrder(e) {
         email: email,
         phone: mobile,
         address: fullAddress || 'Mumbai, Maharashtra',
+        landmark: landmark,
         paymentMethod: 'Cash on Delivery',
         paymentStatus: 'Pending',
         total: total,

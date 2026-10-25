@@ -974,8 +974,11 @@ window.AdminApp = window.AdminApp || {
     document.getElementById("drawer-order-id").textContent = `#${o.id}`;
     document.getElementById("drawer-order-date").textContent = `Placed on ${o.date || 'Recent'}`;
     document.getElementById("drawer-customer-name").textContent = o.customer || "Customer";
-    document.getElementById("drawer-customer-contact").textContent = `${o.email || ''} | ${o.phone || ''}`;
-    document.getElementById("drawer-shipping-address").textContent = o.address || "Mumbai, India";
+    let addrText = o.address || "Mumbai, India";
+    if (o.landmark && !addrText.toLowerCase().includes(o.landmark.toLowerCase())) {
+      addrText += ` (Landmark: ${o.landmark})`;
+    }
+    document.getElementById("drawer-shipping-address").textContent = addrText;
     const payStatus = o.paymentStatus || 'Pending';
     const payMethod = o.paymentMethod || 'Online';
     const payMethodEl = document.getElementById("drawer-payment-method");
