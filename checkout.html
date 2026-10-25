@@ -350,7 +350,7 @@ let cachedRazorpayKey = null;
 
 // ==========================================
 // LOCATION-BASED FIXED DELIVERY CHARGES
-// Hyderabad: ₹50 | Rest of Telangana: ₹70 | Other Indian States/UTs: ₹90
+// Hyderabad: ₹50 | Telangana: ₹70 | Other Indian States/UTs: ₹90
 // ==========================================
 const INDIAN_STATES = {
   "andhra pradesh": "Andhra Pradesh", "ap": "Andhra Pradesh",
@@ -464,7 +464,7 @@ function calculateDeliveryRate(cityStr, stateStr) {
         fee: null,
         valid: false,
         error: 'city_required',
-        message: 'City is required for Telangana delivery (Hyderabad: ₹50, Rest of Telangana: ₹70).'
+        message: 'City is required for Telangana delivery (Hyderabad: ₹50, Telangana: ₹70).'
       };
     }
     const resolvedCity = cityStr.trim();
@@ -474,7 +474,7 @@ function calculateDeliveryRate(cityStr, stateStr) {
       rate_type: 'telangana',
       city: resolvedCity,
       state: 'Telangana',
-      label: 'Rest of Telangana: ₹70'
+      label: 'Telangana: ₹70'
     };
   }
 
