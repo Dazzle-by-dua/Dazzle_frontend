@@ -801,6 +801,9 @@ window.DazzleStore = window.DazzleStore || {
     this.saveOrders(list);
     return res;
   },
+  async getDeliveryCharge(payload) {
+    return await this._api("/api/orders/delivery-charge", "POST", payload);
+  },
   async createRazorpayOrder(orderData) {
     return await this._api('/api/orders/razorpay/create-order', 'POST', orderData);
   },

@@ -199,6 +199,9 @@
       async getPaymentStatus(orderId) {
         return await request(`/api/orders/${orderId}/payment-status`);
       },
+      async getDeliveryCharge(payload) {
+        return await request("/api/orders/delivery-charge", { method: "POST", body: payload });
+      },
       async getRazorpayConfig() {
         return await request("/api/orders/razorpay/config");
       }

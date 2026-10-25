@@ -129,13 +129,53 @@
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label" for="ch-city">City *</label>
-                <input class="form-input" type="text" id="ch-city" placeholder="Bangalore" required>
+                <input class="form-input" type="text" id="ch-city" placeholder="e.g. Hyderabad, Warangal, Bangalore" required autocomplete="address-level2">
               </div>
               <div class="form-group">
                 <label class="form-label" for="ch-state">State *</label>
-                <input class="form-input" type="text" id="ch-state" placeholder="Karnataka" required>
+                <input class="form-input" type="text" id="ch-state" list="indian-states-list" placeholder="e.g. Telangana, Karnataka, Maharashtra" required autocomplete="address-level1">
+                <datalist id="indian-states-list">
+                  <option value="Andhra Pradesh">
+                  <option value="Arunachal Pradesh">
+                  <option value="Assam">
+                  <option value="Bihar">
+                  <option value="Chhattisgarh">
+                  <option value="Goa">
+                  <option value="Gujarat">
+                  <option value="Haryana">
+                  <option value="Himachal Pradesh">
+                  <option value="Jharkhand">
+                  <option value="Karnataka">
+                  <option value="Kerala">
+                  <option value="Madhya Pradesh">
+                  <option value="Maharashtra">
+                  <option value="Manipur">
+                  <option value="Meghalaya">
+                  <option value="Mizoram">
+                  <option value="Nagaland">
+                  <option value="Odisha">
+                  <option value="Punjab">
+                  <option value="Rajasthan">
+                  <option value="Sikkim">
+                  <option value="Tamil Nadu">
+                  <option value="Telangana">
+                  <option value="Tripura">
+                  <option value="Uttar Pradesh">
+                  <option value="Uttarakhand">
+                  <option value="West Bengal">
+                  <option value="Andaman and Nicobar Islands">
+                  <option value="Chandigarh">
+                  <option value="Dadra and Nagar Haveli and Daman and Diu">
+                  <option value="Delhi">
+                  <option value="Jammu and Kashmir">
+                  <option value="Ladakh">
+                  <option value="Lakshadweep">
+                  <option value="Puducherry">
+                </datalist>
               </div>
             </div>
+            <!-- Live Location-Based Delivery Charge Notice -->
+            <div id="delivery-rate-badge" style="display:none;margin-top:4px;margin-bottom:12px;padding:8px 12px;border-radius:6px;font-size:0.84rem;line-height:1.4;"></div>
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label" for="ch-pin">PIN Code *</label>
@@ -308,6 +348,175 @@
 let selectedPaymentMethod = 'razorpay';
 let cachedRazorpayKey = null;
 
+// ==========================================
+// LOCATION-BASED FIXED DELIVERY CHARGES
+// Hyderabad: ₹50 | Rest of Telangana: ₹70 | Other Indian States/UTs: ₹90
+// ==========================================
+const INDIAN_STATES = {
+  "andhra pradesh": "Andhra Pradesh", "ap": "Andhra Pradesh",
+  "arunachal pradesh": "Arunachal Pradesh",
+  "assam": "Assam", "bihar": "Bihar",
+  "chhattisgarh": "Chhattisgarh", "chattisgarh": "Chhattisgarh",
+  "goa": "Goa", "gujarat": "Gujarat", "haryana": "Haryana",
+  "himachal pradesh": "Himachal Pradesh", "hp": "Himachal Pradesh",
+  "jharkhand": "Jharkhand", "karnataka": "Karnataka", "kerala": "Kerala",
+  "madhya pradesh": "Madhya Pradesh", "mp": "Madhya Pradesh",
+  "maharashtra": "Maharashtra", "mh": "Maharashtra",
+  "manipur": "Manipur", "meghalaya": "Meghalaya", "mizoram": "Mizoram",
+  "nagaland": "Nagaland", "odisha": "Odisha", "orissa": "Odisha",
+  "punjab": "Punjab", "rajasthan": "Rajasthan", "sikkim": "Sikkim",
+  "tamil nadu": "Tamil Nadu", "tamilnadu": "Tamil Nadu", "tn": "Tamil Nadu",
+  "telangana": "Telangana", "telengana": "Telangana", "ts": "Telangana", "tg": "Telangana",
+  "tripura": "Tripura", "uttar pradesh": "Uttar Pradesh", "up": "Uttar Pradesh",
+  "uttarakhand": "Uttarakhand", "uttaranchal": "Uttarakhand", "uk": "Uttarakhand",
+  "west bengal": "West Bengal", "wb": "West Bengal",
+  "andaman and nicobar islands": "Andaman and Nicobar Islands",
+  "andaman and nicobar": "Andaman and Nicobar Islands",
+  "andaman & nicobar islands": "Andaman and Nicobar Islands",
+  "chandigarh": "Chandigarh",
+  "dadra and nagar haveli and daman and diu": "Dadra and Nagar Haveli and Daman and Diu",
+  "dadra & nagar haveli and daman & diu": "Dadra and Nagar Haveli and Daman and Diu",
+  "dadra and nagar haveli": "Dadra and Nagar Haveli and Daman and Diu",
+  "daman and diu": "Dadra and Nagar Haveli and Daman and Diu",
+  "delhi": "Delhi", "new delhi": "Delhi", "delhi ncr": "Delhi", "nct of delhi": "Delhi",
+  "jammu and kashmir": "Jammu and Kashmir", "jammu & kashmir": "Jammu and Kashmir", "j&k": "Jammu and Kashmir",
+  "ladakh": "Ladakh", "lakshadweep": "Lakshadweep", "puducherry": "Puducherry", "pondicherry": "Puducherry"
+};
+
+const HYDERABAD_ALIASES = [
+  "hyderabad", "secunderabad", "cyberabad", "greater hyderabad", "hyd", "sec-bad"
+];
+
+const TELANGANA_OTHER_CITIES = [
+  "warangal", "hanumakonda", "hanamkonda", "kazipet", "karimnagar", "nizamabad",
+  "khammam", "ramagundam", "mahabubnagar", "mahbubnagar", "nalgonda", "suryapet",
+  "siddipet", "miryalaguda", "adilabad", "mancherial", "jagtial", "nirmal",
+  "kamareddy", "kothagudem", "sangareddy", "medak", "wanaparthy", "gadwal",
+  "nagarkurnool", "vikarabad", "bhongir", "yadadri", "peddapalli", "asifabad",
+  "jangaon", "bhadradri", "mulugu", "narayanpet"
+];
+
+const FOREIGN_COUNTRIES = [
+  "usa", "united states", "america", "uk", "united kingdom", "canada",
+  "australia", "germany", "france", "uae", "dubai", "pakistan", "bangladesh"
+];
+
+function calculateDeliveryRate(cityStr, stateStr) {
+  const c = (cityStr || '').trim().toLowerCase();
+  const s = (stateStr || '').trim().toLowerCase();
+
+  // Foreign location check
+  for (const fc of FOREIGN_COUNTRIES) {
+    if (c.includes(fc) || s.includes(fc)) {
+      return {
+        fee: null,
+        valid: false,
+        error: 'foreign',
+        message: 'We currently deliver only within India. International delivery is not supported.'
+      };
+    }
+  }
+
+  // 1. Hyderabad Check (₹50)
+  if (HYDERABAD_ALIASES.includes(c)) {
+    return {
+      fee: 50,
+      valid: true,
+      rate_type: 'hyderabad',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      label: 'Hyderabad Delivery: ₹50'
+    };
+  }
+
+  // 2. Resolve Indian State
+  let resolvedState = null;
+  if (s) {
+    resolvedState = INDIAN_STATES[s];
+    if (!resolvedState) {
+      for (const [k, v] of Object.entries(INDIAN_STATES)) {
+        if (s.includes(k) || k.includes(s)) {
+          resolvedState = v;
+          break;
+        }
+      }
+    }
+  }
+
+  if (!resolvedState && TELANGANA_OTHER_CITIES.includes(c)) {
+    resolvedState = 'Telangana';
+  }
+
+  // 3. Telangana (excluding Hyderabad: ₹70)
+  if (resolvedState === 'Telangana') {
+    if (HYDERABAD_ALIASES.includes(c)) {
+      return {
+        fee: 50,
+        valid: true,
+        rate_type: 'hyderabad',
+        city: 'Hyderabad',
+        state: 'Telangana',
+        label: 'Hyderabad Delivery: ₹50'
+      };
+    }
+    if (!c) {
+      return {
+        fee: null,
+        valid: false,
+        error: 'city_required',
+        message: 'City is required for Telangana delivery (Hyderabad: ₹50, Rest of Telangana: ₹70).'
+      };
+    }
+    const resolvedCity = cityStr.trim();
+    return {
+      fee: 70,
+      valid: true,
+      rate_type: 'telangana',
+      city: resolvedCity,
+      state: 'Telangana',
+      label: 'Rest of Telangana: ₹70'
+    };
+  }
+
+  // 4. Other Indian States and UTs (₹90)
+  if (resolvedState) {
+    const resolvedCity = cityStr.trim() || resolvedState;
+    return {
+      fee: 90,
+      valid: true,
+      rate_type: 'rest_of_india',
+      city: resolvedCity,
+      state: resolvedState,
+      label: `National Delivery (${resolvedState}): ₹90`
+    };
+  }
+
+  if (!cityStr && !stateStr) {
+    return {
+      fee: null,
+      valid: false,
+      error: 'missing',
+      message: 'Please enter your City and State to determine delivery charges.'
+    };
+  }
+
+  if (stateStr && !resolvedState) {
+    return {
+      fee: null,
+      valid: false,
+      error: 'invalid_state',
+      message: `'${stateStr}' is not a recognized Indian state. We only deliver within India.`
+    };
+  }
+
+  return {
+    fee: null,
+    valid: false,
+    error: 'incomplete',
+    message: 'Please provide a valid Indian city and state to calculate delivery.'
+  };
+}
+
 function handlePaymentMethodChange(method) {
   selectedPaymentMethod = method;
   const rzpCard = document.getElementById('pay-card-razorpay');
@@ -316,7 +525,10 @@ function handlePaymentMethodChange(method) {
   const icon = document.getElementById('place-order-icon');
 
   const subtotal = getCartSubtotal();
-  const delivery = subtotal >= 2500 ? 0 : 150;
+  const city = document.getElementById('ch-city')?.value?.trim() || '';
+  const stateVal = document.getElementById('ch-state')?.value?.trim() || '';
+  const rateInfo = calculateDeliveryRate(city, stateVal);
+  const delivery = rateInfo.valid ? rateInfo.fee : 0;
   const total = subtotal + delivery;
 
   if (method === 'razorpay') {
@@ -328,7 +540,7 @@ function handlePaymentMethodChange(method) {
       codCard.style.border = '1px solid var(--border)';
       codCard.style.background = 'var(--white)';
     }
-    if (btnText) btnText.innerHTML = `Pay Now &bull; ₹${total.toLocaleString()}`;
+    if (btnText) btnText.innerHTML = rateInfo.valid ? `Pay Now &bull; ₹${total.toLocaleString()}` : `Pay Now &bull; ₹${subtotal.toLocaleString()} + Delivery`;
     if (icon) icon.className = 'fa fa-lock';
   } else {
     if (codCard) {
@@ -339,7 +551,7 @@ function handlePaymentMethodChange(method) {
       rzpCard.style.border = '1px solid var(--border)';
       rzpCard.style.background = 'var(--white)';
     }
-    if (btnText) btnText.innerHTML = 'Place Order &bull; Cash on Delivery';
+    if (btnText) btnText.innerHTML = rateInfo.valid ? `Place Order &bull; Cash on Delivery (₹${total.toLocaleString()})` : 'Place Order &bull; Cash on Delivery';
     if (icon) icon.className = 'fa fa-truck';
   }
 }
@@ -381,6 +593,8 @@ function renderCheckout() {
   const itemsList = document.getElementById('checkout-items-list');
   const subtotalEl = document.getElementById('ch-subtotal');
   const totalEl = document.getElementById('ch-total');
+  const deliveryEl = document.getElementById('ch-delivery');
+  const badgeEl = document.getElementById('delivery-rate-badge');
 
   if (state.cart.length === 0) {
     emptyEl.style.display = '';
@@ -405,23 +619,52 @@ function renderCheckout() {
   }).join('');
 
   const subtotal = getCartSubtotal();
-  const delivery = subtotal >= 2500 ? 0 : 150;
+  const city = document.getElementById('ch-city')?.value?.trim() || '';
+  const stateVal = document.getElementById('ch-state')?.value?.trim() || '';
+  const rateInfo = calculateDeliveryRate(city, stateVal);
+
+  const delivery = rateInfo.valid ? rateInfo.fee : 0;
   const total = subtotal + delivery;
 
   subtotalEl.textContent = '₹' + subtotal.toLocaleString();
-  totalEl.textContent = '₹' + total.toLocaleString();
 
-  const deliveryEl = document.getElementById('ch-delivery');
   if (deliveryEl) {
-    if (delivery === 0) {
-      deliveryEl.textContent = 'FREE';
-      deliveryEl.style.color = '#137333';
+    if (rateInfo.valid) {
+      deliveryEl.textContent = '₹' + rateInfo.fee.toLocaleString();
+      deliveryEl.style.color = 'var(--text-dark)';
       deliveryEl.style.fontWeight = '600';
     } else {
-      deliveryEl.textContent = '₹' + delivery.toLocaleString();
-      deliveryEl.style.color = 'var(--text-dark)';
-      deliveryEl.style.fontWeight = '500';
+      deliveryEl.textContent = 'Enter City & State';
+      deliveryEl.style.color = '#888';
+      deliveryEl.style.fontWeight = '400';
     }
+  }
+
+  if (badgeEl) {
+    if (rateInfo.valid) {
+      badgeEl.style.display = 'flex';
+      badgeEl.style.alignItems = 'center';
+      badgeEl.style.background = '#f3faf5';
+      badgeEl.style.border = '1px solid #b7ebd0';
+      badgeEl.style.color = '#0f5132';
+      badgeEl.innerHTML = `<i class="fa fa-truck" style="margin-right:6px;color:#137333"></i> <span><strong>${rateInfo.label}</strong> (Fixed rate)</span>`;
+    } else if (city || stateVal) {
+      badgeEl.style.display = 'flex';
+      badgeEl.style.alignItems = 'center';
+      badgeEl.style.background = '#fff8e6';
+      badgeEl.style.border = '1px solid #ffe199';
+      badgeEl.style.color = '#8f5800';
+      badgeEl.innerHTML = `<i class="fa fa-info-circle" style="margin-right:6px;color:#d97706"></i> <span>${rateInfo.message}</span>`;
+    } else {
+      badgeEl.style.display = 'none';
+      badgeEl.innerHTML = '';
+    }
+  }
+
+  if (rateInfo.valid) {
+    totalEl.textContent = '₹' + total.toLocaleString();
+  } else {
+    totalEl.textContent = '₹' + subtotal.toLocaleString() + ' + Delivery';
   }
 
   handlePaymentMethodChange(selectedPaymentMethod);
@@ -452,15 +695,26 @@ async function handlePlaceOrder(e) {
     return;
   }
 
+  // Validate location for delivery charge
+  const rateInfo = calculateDeliveryRate(city, stateVal);
+  if (!rateInfo.valid) {
+    showPaymentAlert(rateInfo.message || 'Please provide a valid Indian City and State to calculate delivery charges.', 'danger');
+    const targetInput = (!city && rateInfo.error === 'city_required') ? document.getElementById('ch-city') : (document.getElementById('ch-state') || document.getElementById('ch-city'));
+    if (targetInput) {
+      targetInput.focus();
+      targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+
   const fullAddress = `${house}, ${street}, Landmark: ${landmark}, ${city}, ${stateVal} - ${pin}`.replace(/^[,\s-]+|[,\s-]+$/g, '');
+  const delivery = rateInfo.fee;
+  const subtotal = getCartSubtotal();
+  const total = subtotal + delivery;
 
   const submitBtn = document.getElementById('place-order-btn');
   const btnText = document.getElementById('place-order-btn-text');
   const icon = document.getElementById('place-order-icon');
-
-  const subtotal = getCartSubtotal();
-  const delivery = subtotal >= 2500 ? 0 : 150;
-  const total = subtotal + delivery;
 
   // ==========================================
   // FLOW 1: RAZORPAY STANDARD ONLINE CHECKOUT
@@ -471,7 +725,7 @@ async function handlePlaceOrder(e) {
     if (btnText) btnText.innerHTML = 'Connecting to Secure Razorpay Gateway...';
 
     try {
-      // 1. Create server-side Razorpay order with trusted backend pricing
+      // 1. Create server-side Razorpay order with trusted backend pricing and delivery fee
       const rzpData = await DazzleStore.createRazorpayOrder({
         items: [...state.cart],
         customer: name,
@@ -479,6 +733,10 @@ async function handlePlaceOrder(e) {
         phone: mobile,
         address: fullAddress,
         landmark: landmark,
+        city: city,
+        state: stateVal,
+        postal_code: pin,
+        delivery_fee: delivery,
         notes: notes
       });
 
@@ -506,11 +764,9 @@ async function handlePlaceOrder(e) {
           color: "#C5A880" // Dazzle Luxury Gold
         },
         handler: async function (response) {
-          // Customer successfully authorized payment in popup
           if (btnText) btnText.innerHTML = 'Verifying Payment Signature with Server...';
 
           try {
-            // 3. Cryptographically verify signature on server
             const verifyRes = await DazzleStore.verifyRazorpayPayment({
               order_id: rzpData.order_id,
               razorpay_order_id: response.razorpay_order_id,
@@ -519,10 +775,8 @@ async function handlePlaceOrder(e) {
             });
 
             if (verifyRes && verifyRes.success) {
-              // 4. Verification successful: CLEAR CART ONLY NOW
               clearCart();
 
-              // Save to customer order tracking history
               try {
                 const myOrders = JSON.parse(localStorage.getItem('dazzle_my_orders') || '[]');
                 if (!myOrders.includes(rzpData.order_id)) {
@@ -531,7 +785,6 @@ async function handlePlaceOrder(e) {
                 }
               } catch(e) {}
 
-              // Update success modal
               const idEl = document.getElementById('placed-order-id');
               if (idEl) idEl.textContent = '#' + rzpData.order_id;
 
@@ -554,7 +807,6 @@ async function handlePlaceOrder(e) {
                 `;
               }
 
-              // Show Success Modal
               const modal = document.getElementById('order-success-modal');
               if (modal) modal.classList.add('open');
               document.body.style.overflow = 'hidden';
@@ -571,7 +823,6 @@ async function handlePlaceOrder(e) {
         },
         modal: {
           ondismiss: async function () {
-            // Customer cancelled/closed popup: Cart is preserved
             showPaymentAlert('Payment was cancelled. Your items remain saved in your cart. You can retry whenever you are ready.', 'warning');
             if (submitBtn) submitBtn.disabled = false;
             if (icon) icon.className = 'fa fa-redo';
@@ -640,8 +891,12 @@ async function handlePlaceOrder(e) {
         customer: name,
         email: email,
         phone: mobile,
-        address: fullAddress || 'Mumbai, Maharashtra',
+        address: fullAddress,
         landmark: landmark,
+        city: city,
+        state: stateVal,
+        postal_code: pin,
+        delivery_fee: delivery,
         paymentMethod: 'Cash on Delivery',
         paymentStatus: 'Pending',
         total: total,
@@ -660,7 +915,6 @@ async function handlePlaceOrder(e) {
         }
       } catch (e) {}
 
-      // Update success modal
       const idEl = document.getElementById('placed-order-id');
       if (idEl) idEl.textContent = '#' + finalId;
 
@@ -683,7 +937,6 @@ async function handlePlaceOrder(e) {
         `;
       }
 
-      // Show success modal & clear cart
       const modal = document.getElementById('order-success-modal');
       if (modal) modal.classList.add('open');
       clearCart();
@@ -711,6 +964,16 @@ document.getElementById('order-success-modal').addEventListener('click', functio
 
 document.addEventListener('DOMContentLoaded', () => {
   renderCheckout();
+  const cityInput = document.getElementById('ch-city');
+  const stateInput = document.getElementById('ch-state');
+  if (cityInput) {
+    cityInput.addEventListener('input', renderCheckout);
+    cityInput.addEventListener('change', renderCheckout);
+  }
+  if (stateInput) {
+    stateInput.addEventListener('input', renderCheckout);
+    stateInput.addEventListener('change', renderCheckout);
+  }
 });
 </script>
 </body>
