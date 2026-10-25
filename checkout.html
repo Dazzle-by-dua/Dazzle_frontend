@@ -8,136 +8,6 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<style>
-/* Google Places Autocomplete & Delivery Search UI */
-.delivery-search-card {
-  background: #fbfbfa;
-  border: 1px solid #e0dfd8;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-}
-.delivery-search-header {
-  margin-bottom: 8px;
-}
-.places-badge {
-  font-size: 0.72rem;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 12px;
-  background: #eef2f6;
-  color: #3b5998;
-  font-weight: 600;
-}
-.places-badge.active {
-  background: #e6f4ea;
-  color: #137333;
-}
-.places-badge.standard {
-  background: #fef7e0;
-  color: #b06000;
-}
-.places-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-.places-search-icon {
-  position: absolute;
-  left: 14px;
-  color: #C5A880;
-  font-size: 0.95rem;
-  pointer-events: none;
-}
-.places-search-input {
-  width: 100%;
-  padding-left: 40px !important;
-  padding-right: 38px !important;
-  font-size: 0.92rem;
-  border: 1.5px solid #d4af7c !important;
-  border-radius: 6px !important;
-  transition: all 0.2s ease;
-}
-.places-search-input:focus {
-  border-color: #1A1A1A !important;
-  box-shadow: 0 0 0 3px rgba(197, 168, 128, 0.25) !important;
-}
-.places-clear-btn {
-  position: absolute;
-  right: 10px;
-  background: none;
-  border: none;
-  color: #888;
-  cursor: pointer;
-  padding: 6px;
-  font-size: 1rem;
-}
-.places-clear-btn:hover {
-  color: #333;
-}
-.delivery-quote-feedback {
-  margin-top: 12px;
-  padding: 12px 14px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  line-height: 1.45;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.delivery-quote-feedback.loading {
-  background: #f0f7ff;
-  border: 1px solid #c8e1ff;
-  color: #0353a4;
-}
-.delivery-quote-feedback.success {
-  background: #f3faf5;
-  border: 1px solid #b7ebd0;
-  color: #0f5132;
-}
-.delivery-quote-feedback.warning {
-  background: #fff8e6;
-  border: 1px solid #ffe199;
-  color: #8f5800;
-}
-.delivery-quote-feedback.error {
-  background: #fdf2f2;
-  border: 1px solid #f8b4b4;
-  color: #9b1c1c;
-}
-
-/* Styled Google Places Dropdown (.pac-container) */
-.pac-container {
-  z-index: 999999 !important;
-  border-radius: 8px !important;
-  border: 1px solid #C5A880 !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
-  font-family: inherit !important;
-  background-color: #FFFFFF !important;
-  margin-top: 4px !important;
-}
-.pac-item {
-  padding: 10px 14px !important;
-  font-size: 0.9rem !important;
-  cursor: pointer !important;
-  border-bottom: 1px solid #f0f0f0 !important;
-  line-height: 1.4 !important;
-}
-.pac-item:hover, .pac-item-selected {
-  background-color: #FBF8F3 !important;
-}
-.pac-item-query {
-  font-size: 0.95rem !important;
-  font-weight: 600 !important;
-  color: #1A1A1A !important;
-}
-.pac-matched {
-  color: #C5A880 !important;
-  font-weight: 700 !important;
-}
-</style>
 </head>
 <body>
 <!-- Announcement -->
@@ -243,63 +113,6 @@
 
             <div style="margin-top:1.5rem">
               <div class="checkout-section-heading"><span>2</span> Delivery Address</div>
-            </div>
-
-            <!-- Google Maps Delivery Location Search & Autocomplete -->
-            <div class="delivery-search-card" id="google-search-section">
-              <div class="delivery-search-header">
-                <label class="form-label" for="ch-place-search" style="margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;width:100%;">
-                  <span>
-                    <i class="fa fa-map-marker-alt" style="color:#C5A880;margin-right:6px;"></i>
-                    Search your delivery location
-                  </span>
-                  <span id="places-status-badge" class="places-badge">Google Places</span>
-                </label>
-                <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;">
-                  Search your area, street, or building to calculate precise driving route & delivery fee.
-                </div>
-              </div>
-
-              <div class="places-input-wrapper">
-                <i class="fa fa-search places-search-icon" aria-hidden="true"></i>
-                <input
-                  class="form-input places-search-input"
-                  type="text"
-                  id="ch-place-search"
-                  placeholder="Search your area, street, building or address"
-                  autocomplete="off"
-                  aria-label="Search delivery location"
-                >
-                <button
-                  type="button"
-                  id="ch-place-clear-btn"
-                  class="places-clear-btn"
-                  onclick="handleClearLocation()"
-                  title="Clear selected location"
-                  aria-label="Clear selected location"
-                  style="display:none;"
-                >
-                  <i class="fa fa-times-circle"></i>
-                </button>
-              </div>
-
-              <!-- Live Delivery Route & Fee Feedback Banner -->
-              <div id="delivery-quote-feedback" class="delivery-quote-feedback" style="display:none;" role="status" aria-live="polite"></div>
-
-              <!-- Hidden Location Meta Inputs -->
-              <input type="hidden" id="ch-place-id" value="">
-              <input type="hidden" id="ch-lat" value="">
-              <input type="hidden" id="ch-lng" value="">
-              <input type="hidden" id="ch-distance-km" value="">
-              <input type="hidden" id="ch-delivery-fee" value="">
-              <input type="hidden" id="ch-formatted-address" value="">
-              <input type="hidden" id="ch-verified-location" value="false">
-            </div>
-
-            <div style="margin:12px 0 16px 0;display:flex;align-items:center;gap:10px;">
-              <div style="height:1px;background:#e5e5e0;flex:1;"></div>
-              <span style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:#888;font-weight:600;">Address Details</span>
-              <div style="height:1px;background:#e5e5e0;flex:1;"></div>
             </div>
             <div class="form-group">
               <label class="form-label" for="ch-house">House / Flat / Building *</label>
@@ -490,302 +303,10 @@
     </div>
   </div>
 </footer>
-<script src="dazzle_api_client.js"></script>
 <script src="script.js"></script>
 <script>
 let selectedPaymentMethod = 'razorpay';
 let cachedRazorpayKey = null;
-
-// ==========================================
-// GOOGLE PLACES & DISTANCE DELIVERY QUOTE STATE
-// ==========================================
-let googleMapsConfig = null;
-let googleMapsLoaded = false;
-let placesAutocomplete = null;
-let placesSessionToken = null;
-let selectedDeliveryQuote = null;
-let activeQuoteRequestId = 0;
-let isLocationVerified = false;
-
-// 1. Fetch backend delivery config & initialize Google Places
-async function initDeliveryLocationService() {
-  const badgeEl = document.getElementById('places-status-badge');
-
-  try {
-    const config = await DazzleStore.getDeliveryConfig();
-    googleMapsConfig = config;
-
-    if (config && config.google_maps_browser_key) {
-      if (badgeEl) {
-        badgeEl.textContent = 'Google Places Active';
-        badgeEl.className = 'places-badge active';
-      }
-      loadGoogleMapsScript(config.google_maps_browser_key);
-    } else {
-      if (badgeEl) {
-        badgeEl.textContent = 'Standard Shipping';
-        badgeEl.className = 'places-badge standard';
-      }
-      console.info('Google Maps browser key not configured on server. Operating in standard delivery mode.');
-    }
-  } catch (err) {
-    console.warn('Could not fetch delivery configuration:', err);
-    if (badgeEl) {
-      badgeEl.textContent = 'Standard Shipping';
-      badgeEl.className = 'places-badge standard';
-    }
-  }
-}
-
-// 2. Dynamically inject Google Maps JavaScript SDK
-function loadGoogleMapsScript(browserKey) {
-  if (window.google && window.google.maps && window.google.maps.places) {
-    initGooglePlacesAutocomplete();
-    return;
-  }
-  const scriptId = 'google-maps-places-sdk';
-  if (document.getElementById(scriptId)) return;
-
-  const script = document.createElement('script');
-  script.id = scriptId;
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(browserKey)}&libraries=places&callback=initGooglePlacesAutocomplete`;
-  script.async = true;
-  script.defer = true;
-  script.onerror = () => {
-    console.error('Failed to load Google Maps SDK.');
-    showDeliveryFeedback('<i class="fa fa-exclamation-triangle"></i> Google Maps search is unavailable. You may type your address manually below.', 'warning');
-  };
-  document.head.appendChild(script);
-}
-
-// 3. Callback fired when Google Maps SDK finishes loading
-window.initGooglePlacesAutocomplete = function() {
-  googleMapsLoaded = true;
-  const inputEl = document.getElementById('ch-place-search');
-  if (!inputEl) return;
-
-  try {
-    placesSessionToken = new google.maps.places.AutocompleteSessionToken();
-  } catch(e) {}
-
-  placesAutocomplete = new google.maps.places.Autocomplete(inputEl, {
-    componentRestrictions: { country: 'in' },
-    fields: ['place_id', 'geometry', 'formatted_address', 'address_components', 'name'],
-    strictBounds: false
-  });
-
-  inputEl.addEventListener('focus', () => {
-    if (!placesSessionToken && window.google?.maps?.places?.AutocompleteSessionToken) {
-      placesSessionToken = new google.maps.places.AutocompleteSessionToken();
-    }
-  });
-
-  inputEl.addEventListener('input', () => {
-    const clearBtn = document.getElementById('ch-place-clear-btn');
-    if (clearBtn) clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none';
-
-    // User modified text without selecting suggestion -> mark unverified
-    if (isLocationVerified) {
-      isLocationVerified = false;
-      document.getElementById('ch-verified-location').value = 'false';
-      showDeliveryFeedback('<i class="fa fa-info-circle"></i> Address modified. Please select from the dropdown to recalculate the driving distance.', 'warning');
-    }
-  });
-
-  placesAutocomplete.addListener('place_changed', onPlaceSelected);
-};
-
-// 4. Handle suggestion selection
-async function onPlaceSelected() {
-  if (!placesAutocomplete) return;
-  const place = placesAutocomplete.getPlace();
-
-  if (!place || !place.geometry || !place.geometry.location) {
-    showDeliveryFeedback('<i class="fa fa-exclamation-circle"></i> Please select a valid address from the dropdown suggestions.', 'warning');
-    return;
-  }
-
-  const lat = place.geometry.location.lat();
-  const lng = place.geometry.location.lng();
-  const placeId = place.place_id || '';
-  const formattedAddress = place.formatted_address || place.name || '';
-
-  // Refresh session token for billing isolation on subsequent searches
-  try {
-    if (window.google?.maps?.places?.AutocompleteSessionToken) {
-      placesSessionToken = new google.maps.places.AutocompleteSessionToken();
-    }
-  } catch(e) {}
-
-  // Parse address components
-  let city = '';
-  let stateVal = '';
-  let pin = '';
-  let street = '';
-
-  if (Array.isArray(place.address_components)) {
-    for (const comp of place.address_components) {
-      const types = comp.types || [];
-      if (types.includes('locality')) {
-        city = comp.long_name;
-      } else if (!city && types.includes('sublocality_level_1')) {
-        city = comp.long_name;
-      } else if (!city && types.includes('administrative_area_level_2')) {
-        city = comp.long_name;
-      }
-
-      if (types.includes('administrative_area_level_1')) {
-        stateVal = comp.long_name;
-      }
-
-      if (types.includes('postal_code')) {
-        pin = comp.long_name;
-      }
-
-      if (types.includes('route') || types.includes('sublocality_level_2')) {
-        street = street ? `${street}, ${comp.long_name}` : comp.long_name;
-      }
-    }
-  }
-
-  // Populate address form fields
-  if (street) {
-    const streetInput = document.getElementById('ch-street');
-    if (streetInput) streetInput.value = street;
-  }
-  if (city) {
-    const cityInput = document.getElementById('ch-city');
-    if (cityInput) cityInput.value = city;
-  }
-  if (stateVal) {
-    const stateInput = document.getElementById('ch-state');
-    if (stateInput) stateInput.value = stateVal;
-  }
-  if (pin && pin.length === 6) {
-    const pinInput = document.getElementById('ch-pin');
-    if (pinInput) pinInput.value = pin;
-  }
-
-  // Set hidden metadata fields
-  document.getElementById('ch-lat').value = lat;
-  document.getElementById('ch-lng').value = lng;
-  document.getElementById('ch-place-id').value = placeId;
-  document.getElementById('ch-formatted-address').value = formattedAddress;
-  document.getElementById('ch-verified-location').value = 'true';
-  isLocationVerified = true;
-
-  const clearBtn = document.getElementById('ch-place-clear-btn');
-  if (clearBtn) clearBtn.style.display = 'block';
-
-  // Request authoritative route distance and fee quote from backend
-  await fetchDeliveryQuote(lat, lng, placeId, formattedAddress, pin);
-}
-
-// 5. Fetch delivery quote from backend with stale response protection
-async function fetchDeliveryQuote(lat, lng, placeId, formattedAddress, pin) {
-  const currentReqId = ++activeQuoteRequestId;
-
-  showDeliveryFeedback('<i class="fa fa-spinner fa-spin"></i> Calculating driving route from Hyderabad shop...', 'loading');
-
-  const submitBtn = document.getElementById('place-order-btn');
-  if (submitBtn) submitBtn.disabled = true;
-
-  try {
-    const quote = await DazzleStore.getDeliveryQuote({
-      latitude: lat,
-      longitude: lng,
-      place_id: placeId,
-      formatted_address: formattedAddress,
-      postal_code: pin
-    });
-
-    // Check if a newer selection occurred while waiting
-    if (currentReqId !== activeQuoteRequestId) return;
-
-    if (quote && quote.success && quote.available) {
-      selectedDeliveryQuote = quote;
-      document.getElementById('ch-distance-km').value = quote.distance_km;
-      document.getElementById('ch-delivery-fee').value = quote.delivery_fee;
-
-      showDeliveryFeedback(
-        `<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-          <div>
-            <i class="fa fa-check-circle" style="color:#137333;margin-right:6px"></i>
-            <strong>Driving Route:</strong> ${quote.distance_km} km (${quote.duration_text || 'approx. 30 mins'})
-          </div>
-          <div style="font-weight:700;color:var(--text-dark);font-size:0.95rem">
-            Delivery Fee: ₹${Number(quote.delivery_fee).toLocaleString()}
-          </div>
-        </div>`,
-        'success'
-      );
-    } else if (quote && quote.success && !quote.available) {
-      selectedDeliveryQuote = quote;
-      showDeliveryFeedback(
-        `<i class="fa fa-exclamation-triangle" style="margin-right:6px"></i> ${quote.message || 'Location is outside our maximum delivery radius.'}`,
-        'warning'
-      );
-    } else {
-      // Unconfigured or error: Fallback gracefully to standard shipping
-      selectedDeliveryQuote = null;
-      showDeliveryFeedback(
-        `<i class="fa fa-info-circle" style="margin-right:6px"></i> ${quote?.message || 'Standard store delivery applies.'}`,
-        'info'
-      );
-    }
-  } catch (err) {
-    if (currentReqId !== activeQuoteRequestId) return;
-    console.warn('Delivery quote error:', err);
-    selectedDeliveryQuote = null;
-    showDeliveryFeedback(
-      '<i class="fa fa-info-circle" style="margin-right:6px"></i> Unable to calculate driving route. Standard shipping applies.',
-      'info'
-    );
-  } finally {
-    if (currentReqId === activeQuoteRequestId) {
-      if (submitBtn) submitBtn.disabled = false;
-      renderCheckout();
-    }
-  }
-}
-
-// 6. Clear selected location
-function handleClearLocation() {
-  const searchInput = document.getElementById('ch-place-search');
-  if (searchInput) searchInput.value = '';
-
-  const clearBtn = document.getElementById('ch-place-clear-btn');
-  if (clearBtn) clearBtn.style.display = 'none';
-
-  document.getElementById('ch-lat').value = '';
-  document.getElementById('ch-lng').value = '';
-  document.getElementById('ch-place-id').value = '';
-  document.getElementById('ch-distance-km').value = '';
-  document.getElementById('ch-delivery-fee').value = '';
-  document.getElementById('ch-formatted-address').value = '';
-  document.getElementById('ch-verified-location').value = 'false';
-  isLocationVerified = false;
-  selectedDeliveryQuote = null;
-
-  hideDeliveryFeedback();
-  renderCheckout();
-}
-
-// 7. Feedback banner helpers
-function showDeliveryFeedback(htmlMessage, stateClass = 'info') {
-  const fb = document.getElementById('delivery-quote-feedback');
-  if (!fb) return;
-  fb.style.display = 'block';
-  fb.className = `delivery-quote-feedback ${stateClass}`;
-  fb.innerHTML = htmlMessage;
-}
-
-function hideDeliveryFeedback() {
-  const fb = document.getElementById('delivery-quote-feedback');
-  if (!fb) return;
-  fb.style.display = 'none';
-  fb.innerHTML = '';
-}
 
 function handlePaymentMethodChange(method) {
   selectedPaymentMethod = method;
@@ -795,10 +316,7 @@ function handlePaymentMethodChange(method) {
   const icon = document.getElementById('place-order-icon');
 
   const subtotal = getCartSubtotal();
-  let delivery = subtotal >= 2500 ? 0 : 150;
-  if (selectedDeliveryQuote && selectedDeliveryQuote.available && selectedDeliveryQuote.delivery_fee !== null) {
-    delivery = Number(selectedDeliveryQuote.delivery_fee);
-  }
+  const delivery = subtotal >= 2500 ? 0 : 150;
   const total = subtotal + delivery;
 
   if (method === 'razorpay') {
@@ -823,15 +341,6 @@ function handlePaymentMethodChange(method) {
     }
     if (btnText) btnText.innerHTML = 'Place Order &bull; Cash on Delivery';
     if (icon) icon.className = 'fa fa-truck';
-  }
-
-  // Handle outside delivery area: disable checkout button
-  const submitBtn = document.getElementById('place-order-btn');
-  if (selectedDeliveryQuote && !selectedDeliveryQuote.available) {
-    if (submitBtn) submitBtn.disabled = true;
-    if (btnText) btnText.innerHTML = 'Delivery Unavailable for this Location';
-  } else {
-    if (submitBtn) submitBtn.disabled = false;
   }
 }
 
@@ -896,12 +405,7 @@ function renderCheckout() {
   }).join('');
 
   const subtotal = getCartSubtotal();
-  let delivery = subtotal >= 2500 ? 0 : 150;
-
-  if (selectedDeliveryQuote && selectedDeliveryQuote.available && selectedDeliveryQuote.delivery_fee !== null) {
-    delivery = Number(selectedDeliveryQuote.delivery_fee);
-  }
-
+  const delivery = subtotal >= 2500 ? 0 : 150;
   const total = subtotal + delivery;
 
   subtotalEl.textContent = '₹' + subtotal.toLocaleString();
@@ -927,12 +431,6 @@ async function handlePlaceOrder(e) {
   e.preventDefault();
   clearPaymentAlert();
 
-  // If outside delivery area, block submission with friendly alert
-  if (selectedDeliveryQuote && !selectedDeliveryQuote.available) {
-    showPaymentAlert('Your selected delivery destination is outside our delivery area. Please choose a delivery address within Hyderabad.', 'danger');
-    return;
-  }
-
   const name = document.getElementById('ch-name')?.value?.trim() || 'Valued Customer';
   const mobile = document.getElementById('ch-mobile')?.value?.trim() || '+91 98765 43210';
   const email = document.getElementById('ch-email')?.value?.trim() || 'customer@example.com';
@@ -956,22 +454,12 @@ async function handlePlaceOrder(e) {
 
   const fullAddress = `${house}, ${street}, Landmark: ${landmark}, ${city}, ${stateVal} - ${pin}`.replace(/^[,\s-]+|[,\s-]+$/g, '');
 
-  const latVal = parseFloat(document.getElementById('ch-lat')?.value) || null;
-  const lngVal = parseFloat(document.getElementById('ch-lng')?.value) || null;
-  const placeIdVal = document.getElementById('ch-place-id')?.value || null;
-  const distVal = parseFloat(document.getElementById('ch-distance-km')?.value) || null;
-  const feeVal = (selectedDeliveryQuote && selectedDeliveryQuote.available) ? selectedDeliveryQuote.delivery_fee : null;
-  const fmtAddr = document.getElementById('ch-formatted-address')?.value || null;
-
   const submitBtn = document.getElementById('place-order-btn');
   const btnText = document.getElementById('place-order-btn-text');
   const icon = document.getElementById('place-order-icon');
 
   const subtotal = getCartSubtotal();
-  let delivery = subtotal >= 2500 ? 0 : 150;
-  if (selectedDeliveryQuote && selectedDeliveryQuote.available && selectedDeliveryQuote.delivery_fee !== null) {
-    delivery = Number(selectedDeliveryQuote.delivery_fee);
-  }
+  const delivery = subtotal >= 2500 ? 0 : 150;
   const total = subtotal + delivery;
 
   // ==========================================
@@ -983,7 +471,7 @@ async function handlePlaceOrder(e) {
     if (btnText) btnText.innerHTML = 'Connecting to Secure Razorpay Gateway...';
 
     try {
-      // 1. Create server-side Razorpay order with trusted backend pricing & delivery fee
+      // 1. Create server-side Razorpay order with trusted backend pricing
       const rzpData = await DazzleStore.createRazorpayOrder({
         items: [...state.cart],
         customer: name,
@@ -991,12 +479,6 @@ async function handlePlaceOrder(e) {
         phone: mobile,
         address: fullAddress,
         landmark: landmark,
-        destination_lat: latVal,
-        destination_lng: lngVal,
-        place_id: placeIdVal,
-        delivery_distance_km: distVal,
-        delivery_fee: feeVal,
-        formatted_address: fmtAddr,
         notes: notes
       });
 
@@ -1021,9 +503,10 @@ async function handlePlaceOrder(e) {
           contact: mobile
         },
         theme: {
-          color: "#C5A880"
+          color: "#C5A880" // Dazzle Luxury Gold
         },
         handler: async function (response) {
+          // Customer successfully authorized payment in popup
           if (btnText) btnText.innerHTML = 'Verifying Payment Signature with Server...';
 
           try {
@@ -1039,6 +522,7 @@ async function handlePlaceOrder(e) {
               // 4. Verification successful: CLEAR CART ONLY NOW
               clearCart();
 
+              // Save to customer order tracking history
               try {
                 const myOrders = JSON.parse(localStorage.getItem('dazzle_my_orders') || '[]');
                 if (!myOrders.includes(rzpData.order_id)) {
@@ -1087,6 +571,7 @@ async function handlePlaceOrder(e) {
         },
         modal: {
           ondismiss: async function () {
+            // Customer cancelled/closed popup: Cart is preserved
             showPaymentAlert('Payment was cancelled. Your items remain saved in your cart. You can retry whenever you are ready.', 'warning');
             if (submitBtn) submitBtn.disabled = false;
             if (icon) icon.className = 'fa fa-redo';
@@ -1155,14 +640,8 @@ async function handlePlaceOrder(e) {
         customer: name,
         email: email,
         phone: mobile,
-        address: fullAddress || 'Hyderabad, Telangana',
+        address: fullAddress || 'Mumbai, Maharashtra',
         landmark: landmark,
-        destination_lat: latVal,
-        destination_lng: lngVal,
-        place_id: placeIdVal,
-        delivery_distance_km: distVal,
-        delivery_fee: feeVal,
-        formatted_address: fmtAddr,
         paymentMethod: 'Cash on Delivery',
         paymentStatus: 'Pending',
         total: total,
@@ -1232,7 +711,6 @@ document.getElementById('order-success-modal').addEventListener('click', functio
 
 document.addEventListener('DOMContentLoaded', () => {
   renderCheckout();
-  initDeliveryLocationService();
 });
 </script>
 </body>

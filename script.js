@@ -801,12 +801,6 @@ window.DazzleStore = window.DazzleStore || {
     this.saveOrders(list);
     return res;
   },
-  async getDeliveryConfig() {
-    return await this._api('/api/delivery/config', 'GET');
-  },
-  async getDeliveryQuote(payload) {
-    return await this._api('/api/delivery/quote', 'POST', payload);
-  },
   async createRazorpayOrder(orderData) {
     return await this._api('/api/orders/razorpay/create-order', 'POST', orderData);
   },
