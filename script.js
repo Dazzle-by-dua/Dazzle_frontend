@@ -1803,17 +1803,9 @@ function renderAuthNavElements(isAuth, customerUser) {
               <div style="font-size:0.72rem;color:var(--text-muted);text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">${userEmail}</div>
             </div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:0.35rem;">
-            <a href="orders.html" class="mobile-nav-link" style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;font-size:0.9rem;">
-              <i class="fa fa-box" style="color:var(--gold);width:16px;"></i> My Orders
-            </a>
-            <a href="wishlist.html" class="mobile-nav-link" style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;font-size:0.9rem;">
-              <i class="fa fa-heart" style="color:var(--gold);width:16px;"></i> My Wishlist
-            </a>
-            <button type="button" onclick="handleCustomerLogout()" class="btn btn-outline btn-sm" style="color:#C62828;border-color:rgba(198,40,40,0.35);width:100%;padding:0.6rem;margin-top:0.6rem;display:flex;align-items:center;justify-content:center;gap:0.5rem;font-size:0.8rem;border-radius:var(--radius-sm);">
-              <i class="fa fa-sign-out-alt"></i> Sign Out / Logout
-            </button>
-          </div>
+          <button type="button" onclick="handleCustomerLogout()" class="btn btn-outline btn-sm" style="color:#C62828;border-color:rgba(198,40,40,0.35);width:100%;padding:0.6rem;margin-top:0.4rem;display:flex;align-items:center;justify-content:center;gap:0.5rem;font-size:0.8rem;border-radius:var(--radius-sm);">
+            <i class="fa fa-sign-out-alt"></i> Sign Out / Logout
+          </button>
         </div>
       `;
       mobileNavLinks.appendChild(li);
