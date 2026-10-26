@@ -1742,7 +1742,6 @@ function renderAuthNavElements(isAuth, customerUser) {
           </div>
           <a href="orders.html"><i class="fa fa-box"></i> My Orders</a>
           <a href="wishlist.html"><i class="fa fa-heart"></i> My Wishlist</a>
-          <a href="auth.html"><i class="fa fa-user-cog"></i> Account Settings</a>
           <div class="divider"></div>
           <button type="button" onclick="handleCustomerLogout()" style="color:#C62828;"><i class="fa fa-sign-out-alt"></i> Sign Out / Logout</button>
         </div>
