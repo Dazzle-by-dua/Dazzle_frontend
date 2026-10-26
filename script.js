@@ -1765,17 +1765,32 @@ function renderAuthNavElements(isAuth, customerUser) {
       if (emailEl) emailEl.textContent = userEmail;
     }
 
-    // 2. Mobile Nav Links
+    // 2. Mobile Nav Links (Shown only when mobile menu drawer is clicked)
     if (mobileNavLinks) {
       const li = document.createElement("li");
       li.className = "mobile-auth-link";
       li.innerHTML = `
-        <div style="padding:0.75rem 1rem;border-top:1px solid var(--border);margin-top:0.75rem;display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <div style="font-weight:700;font-size:0.85rem;color:var(--text-dark);">Hi, ${firstName}</div>
-            <div style="font-size:0.7rem;color:var(--text-muted);">${userEmail}</div>
+        <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+            <div style="width:40px;height:40px;border-radius:50%;background:rgba(212,175,124,0.22);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:1.2rem;flex-shrink:0;">
+              <i class="fa fa-user"></i>
+            </div>
+            <div style="overflow:hidden;">
+              <div style="font-weight:700;font-size:0.92rem;color:var(--text-dark);">${fullName}</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">${userEmail}</div>
+            </div>
           </div>
-          <button type="button" onclick="handleCustomerLogout()" class="btn btn-outline btn-sm" style="padding:0.4rem 0.8rem;font-size:0.7rem;">Sign Out</button>
+          <div style="display:flex;flex-direction:column;gap:0.35rem;">
+            <a href="orders.html" class="mobile-nav-link" style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;font-size:0.9rem;">
+              <i class="fa fa-box" style="color:var(--gold);width:16px;"></i> My Orders
+            </a>
+            <a href="wishlist.html" class="mobile-nav-link" style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;font-size:0.9rem;">
+              <i class="fa fa-heart" style="color:var(--gold);width:16px;"></i> My Wishlist
+            </a>
+            <button type="button" onclick="handleCustomerLogout()" class="btn btn-outline btn-sm" style="color:#C62828;border-color:rgba(198,40,40,0.35);width:100%;padding:0.6rem;margin-top:0.6rem;display:flex;align-items:center;justify-content:center;gap:0.5rem;font-size:0.8rem;border-radius:var(--radius-sm);">
+              <i class="fa fa-sign-out-alt"></i> Sign Out / Logout
+            </button>
+          </div>
         </div>
       `;
       mobileNavLinks.appendChild(li);

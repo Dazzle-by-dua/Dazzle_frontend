@@ -598,6 +598,15 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
   display: inline-block;
 }
 
+/* Hide top navbar customer button on mobile screens so it only appears in mobile menu drawer */
+@media (max-width: 900px) {
+  .nav-user-container,
+  .user-nav-btn {
+    display: none !important;
+  }
+}
+
+
 .nav-user-btn {
   display: inline-flex;
   align-items: center;
