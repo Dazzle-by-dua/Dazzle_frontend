@@ -225,7 +225,7 @@
             <!-- Payment State Alert Box -->
             <div id="payment-alert" style="display:none;padding:0.85rem 1rem;border-radius:8px;margin-bottom:1.25rem;font-size:0.88rem;line-height:1.4"></div>
 
-            <button type="submit" class="btn btn-gold" id="place-order-btn" style="width:100%;justify-content:center;margin-top:0.5rem;font-size:0.95rem;padding:0.95rem;font-weight:600">
+            <button type="submit" class="btn btn-gold" id="place-order-btn" style="width:100%;justify-content:center;margin-top:0.5rem;font-size:0.95rem;padding:0.95rem;font-weight:600;white-space:normal;line-height:1.35;text-align:center">
               <i class="fa fa-lock" id="place-order-icon" style="margin-right:6px"></i> <span id="place-order-btn-text">Pay Now &bull; ₹0</span>
             </button>
           </form>
@@ -552,7 +552,7 @@ function handlePaymentMethodChange(method) {
       rzpCard.style.border = '1px solid var(--border)';
       rzpCard.style.background = 'var(--white)';
     }
-    if (btnText) btnText.innerHTML = rateInfo.valid ? `Place Order &bull; Cash on Delivery (₹${total.toLocaleString()})` : 'Place Order &bull; Cash on Delivery';
+    if (btnText) btnText.innerHTML = rateInfo.valid ? `Place COD Order &bull; ₹${total.toLocaleString()}` : 'Place COD Order';
     if (icon) icon.className = 'fa fa-truck';
   }
 }
@@ -949,7 +949,7 @@ async function handlePlaceOrder(e) {
     } finally {
       if (submitBtn) submitBtn.disabled = false;
       if (icon) icon.className = 'fa fa-truck';
-      if (btnText) btnText.innerHTML = 'Place Order &bull; Cash on Delivery';
+      if (btnText) btnText.innerHTML = 'Place COD Order';
     }
   }
 }

@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap");
 :root{--ivory:#FFFDF8;--beige:#F7EFE3;--gold:#D4AF7C;--gold-hover:#B99461;--gold-light:#EDD9B3;--text-dark:#1A1A1A;--text-muted:#77736D;--text-light:#A09990;--black:#111111;--white:#FFFFFF;--border:#E8DDD0;--shadow-sm:0 2px 12px rgba(180,150,100,0.08);--shadow-md:0 8px 32px rgba(180,150,100,0.14);--shadow-lg:0 20px 60px rgba(180,150,100,0.18);--radius-sm:8px;--radius-md:16px;--radius-lg:24px;--radius-xl:40px;--transition:0.3s cubic-bezier(0.4,0,0.2,1);--nav-height:80px;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;min-height:100%;background-color:#FAF5ED;}
+html{scroll-behavior:smooth;min-height:100%;background-color:#FAF5ED;overflow-x:hidden;}
 body{font-family:"Montserrat",sans-serif;background-color:#FAF5ED;background-image:url("marble_bg.jpg");background-attachment:fixed;background-position:center center;background-size:cover;background-repeat:no-repeat;color:var(--text-dark);line-height:1.7;min-height:100vh;overflow-x:hidden;position:relative;}
 body::before{content:"";position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("marble_bg.jpg");background-position:center center;background-size:cover;background-repeat:no-repeat;z-index:-1;pointer-events:none;}
 img{max-width:100%;display:block;}a{text-decoration:none;color:inherit;}ul{list-style:none;}input,textarea,select{font-family:inherit;}
@@ -401,6 +401,8 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
 .checkout-mini-title{font-family:"Playfair Display",serif;font-size:.88rem;font-weight:600;color:var(--text-dark);line-height:1.3;}
 .checkout-mini-qty{font-size:.75rem;color:var(--text-muted);margin-top:.2rem;}
 .checkout-mini-price{font-weight:700;font-size:.9rem;color:var(--text-dark);}
+#place-order-btn{white-space:normal !important;word-break:break-word;line-height:1.35;text-align:center;}
+#place-order-btn span{white-space:normal !important;}
 
 /* Order Success Modal */
 .order-modal-backdrop{position:fixed;inset:0;background:rgba(17,17,17,.7);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .3s ease;}
@@ -527,6 +529,8 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
   .order-success-modal{padding:2rem 1.25rem;}
   .form-row{grid-template-columns:1fr;}
   .form-group{margin-bottom:0.85rem;}
+  #place-order-btn{font-size:0.86rem !important;padding:0.85rem 1rem !important;letter-spacing:0.04em !important;}
+  .payment-method-card{padding:0.85rem 0.95rem !important;}
 
   /* Orders & Wishlist */
   .orders-tabs{margin-bottom:1.15rem;padding:0.25rem 0.35rem;}
