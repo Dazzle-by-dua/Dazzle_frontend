@@ -1681,36 +1681,59 @@ function hydrateOffersPage() {
 // DAZZLE BY DUA - Customer Authentication UI Controller
 // ========================================================
 
+function getCustomerSessionData() {
+  try {
+    if (window.DazzleApi && window.DazzleApi.customer && typeof window.DazzleApi.customer.getSession === "function") {
+      const sess = window.DazzleApi.customer.getSession();
+      if (sess && sess.user) return sess;
+    }
+    const raw = sessionStorage.getItem("dazzle_customer_session") || localStorage.getItem("dazzle_customer_session");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.user) return parsed;
+    }
+  } catch (e) {
+    console.warn("Error reading customer session data:", e);
+  }
+  return null;
+}
+
 async function initCustomerAuthUI() {
   const navActions = document.querySelector(".nav-actions");
   const mobileNavLinks = document.querySelector(".mobile-nav-links");
   if (!navActions && !mobileNavLinks) return;
 
-  const isAuth = window.DazzleApi && window.DazzleApi.customer && window.DazzleApi.customer.isLoggedIn();
-  let customerUser = null;
+  // Immediate synchronous detection from storage - no lag, no placeholder icon
+  const session = getCustomerSessionData();
+  const isAuth = Boolean(session && session.user);
+  const customerUser = session ? session.user : null;
 
-  if (isAuth) {
-    const session = window.DazzleApi.customer.getSession();
-    customerUser = session ? session.user : null;
+  // Always display the customer's username immediately
+  renderAuthNavElements(isAuth, customerUser);
 
-    // Background verify session with backend /api/customer/auth/me
+  // Background non-blocking verification with backend
+  if (isAuth && window.DazzleApi && window.DazzleApi.customer) {
     window.DazzleApi.customer.me().then(profile => {
       if (profile && profile.name) {
-        // Update stored name if changed
-        const currentSess = window.DazzleApi.customer.getSession();
-        if (currentSess) {
-          currentSess.user.name = profile.name;
-          currentSess.user.email = profile.email;
-          sessionStorage.setItem("dazzle_customer_session", JSON.stringify(currentSess));
+        const cur = getCustomerSessionData();
+        if (cur && (cur.user.name !== profile.name || cur.user.email !== profile.email)) {
+          cur.user.name = profile.name;
+          cur.user.email = profile.email;
+          sessionStorage.setItem("dazzle_customer_session", JSON.stringify(cur));
+          if (localStorage.getItem("dazzle_customer_session")) {
+            localStorage.setItem("dazzle_customer_session", JSON.stringify(cur));
+          }
+          renderAuthNavElements(true, cur.user);
         }
       }
-    }).catch(() => {
-      // Session expired or invalidated on backend; re-render UI as unauthenticated
-      renderAuthNavElements(false, null);
+    }).catch(err => {
+      if (err && err.status === 401) {
+        sessionStorage.removeItem("dazzle_customer_session");
+        localStorage.removeItem("dazzle_customer_session");
+        renderAuthNavElements(false, null);
+      }
     });
   }
-
-  renderAuthNavElements(isAuth, customerUser);
 }
 
 function renderAuthNavElements(isAuth, customerUser) {

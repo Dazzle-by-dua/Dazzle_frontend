@@ -30,7 +30,7 @@
    */
   function getCustomerToken() {
     try {
-      const sessStr = sessionStorage.getItem(API_CONFIG.STORAGE_CUSTOMER_KEY);
+      const sessStr = sessionStorage.getItem(API_CONFIG.STORAGE_CUSTOMER_KEY) || localStorage.getItem(API_CONFIG.STORAGE_CUSTOMER_KEY);
       if (sessStr) {
         const sess = JSON.parse(sessStr);
         return sess.token || null;
@@ -181,6 +181,9 @@
             loginTime: new Date().toISOString()
           };
           sessionStorage.setItem(API_CONFIG.STORAGE_CUSTOMER_KEY, JSON.stringify(sessionData));
+          if (rememberMe) {
+            localStorage.setItem(API_CONFIG.STORAGE_CUSTOMER_KEY, JSON.stringify(sessionData));
+          }
         }
         return res;
       },
@@ -197,6 +200,9 @@
             loginTime: new Date().toISOString()
           };
           sessionStorage.setItem(API_CONFIG.STORAGE_CUSTOMER_KEY, JSON.stringify(sessionData));
+          if (rememberMe) {
+            localStorage.setItem(API_CONFIG.STORAGE_CUSTOMER_KEY, JSON.stringify(sessionData));
+          }
         }
         return res;
       },
@@ -259,7 +265,7 @@
 
       getSession() {
         try {
-          const s = sessionStorage.getItem(API_CONFIG.STORAGE_CUSTOMER_KEY);
+          const s = sessionStorage.getItem(API_CONFIG.STORAGE_CUSTOMER_KEY) || localStorage.getItem(API_CONFIG.STORAGE_CUSTOMER_KEY);
           return s ? JSON.parse(s) : null;
         } catch (e) {
           return null;
