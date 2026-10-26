@@ -1763,10 +1763,7 @@ function renderAuthNavElements(isAuth, customerUser) {
             <div class="nav-user-dropdown-name">${fullName}</div>
             <div class="nav-user-dropdown-email">${userEmail}</div>
           </div>
-          <a href="orders.html"><i class="fa fa-box"></i> My Orders</a>
-          <a href="wishlist.html"><i class="fa fa-heart"></i> My Wishlist</a>
-          <div class="divider"></div>
-          <button type="button" onclick="handleCustomerLogout()" style="color:#C62828;"><i class="fa fa-sign-out-alt"></i> Sign Out / Logout</button>
+          <button type="button" onclick="handleCustomerLogout()" style="color:#C62828;width:100%;text-align:left;display:flex;align-items:center;gap:0.5rem;padding:0.75rem 1rem;background:none;border:none;cursor:pointer;font-family:inherit;font-size:0.85rem;font-weight:600;transition:all var(--transition);"><i class="fa fa-sign-out-alt"></i> Sign Out / Logout</button>
         </div>
       `;
       // Insert before hamburger
