@@ -1586,8 +1586,12 @@ function hydrateHomePage() {
       reviewsSection.style.display = "";
       const rv = document.getElementById("home-reviews");
       if (rv) {
-        const approved = DazzleStore.getReviews().filter(r => r.approved !== false);
-        rv.innerHTML = approved.slice(0, 3).map(reviewCardHTML).join("");
+        if (typeof window.renderHomeReviews === "function") {
+          window.renderHomeReviews();
+        } else {
+          const approved = DazzleStore.getReviews().filter(r => r.approved !== false);
+          rv.innerHTML = approved.slice(0, 3).map(reviewCardHTML).join("");
+        }
       }
     }
   }

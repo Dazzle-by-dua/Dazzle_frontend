@@ -148,6 +148,11 @@
       <h2 class="section-title">Reviews &amp; Ratings</h2>
     </div>
     <div class="reviews-grid" id="shop-reviews"></div>
+    <div id="shop-reviews-actions" style="margin-top:1.75rem;margin-bottom:2.5rem;text-align:center;">
+      <button type="button" id="btn-load-more-shop-reviews" class="btn btn-outline" style="display:none;" onclick="loadMoreShopReviews()">
+        Show More Reviews &darr;
+      </button>
+    </div>
     <!-- Write Review Form -->
     <div class="write-review-form" id="write-review-section">
       <h3 style="font-family:'Playfair Display',serif;margin-bottom:.5rem">Write a Review</h3>
@@ -274,8 +279,11 @@ function setRating(r) {
   stars.forEach((s,i) => s.style.color = i < r ? '#D4AF7C' : '#DDD');
 }
 
+let shopReviewsVisibleCount = 3;
+
 function renderShopReviews() {
   const rv = document.getElementById('shop-reviews');
+  const loadMoreBtn = document.getElementById('btn-load-more-shop-reviews');
   if (!rv) return;
   const reviews = DazzleStore.getReviews().filter(r => r.approved !== false);
   if (reviews.length === 0) {
@@ -286,10 +294,26 @@ function renderShopReviews() {
         <p style="font-size:0.88rem;color:var(--text-muted);max-width:420px;margin:0 auto;">Be the first verified customer to share your thoughts on our pieces!</p>
       </div>
     `;
+    if (loadMoreBtn) loadMoreBtn.style.display = 'none';
   } else {
-    rv.innerHTML = reviews.map(reviewCardHTML).join('');
+    const visibleReviews = reviews.slice(0, shopReviewsVisibleCount);
+    rv.innerHTML = visibleReviews.map(reviewCardHTML).join('');
+    if (loadMoreBtn) {
+      if (reviews.length > shopReviewsVisibleCount) {
+        loadMoreBtn.style.display = 'inline-flex';
+        loadMoreBtn.innerHTML = `Show More Reviews (${reviews.length - shopReviewsVisibleCount} more) &darr;`;
+      } else {
+        loadMoreBtn.style.display = 'none';
+      }
+    }
   }
 }
+
+function loadMoreShopReviews() {
+  shopReviewsVisibleCount += 3;
+  renderShopReviews();
+}
+window.loadMoreShopReviews = loadMoreShopReviews;
 
 function checkReviewAuthUI() {
   const session = typeof getCustomerSessionData === 'function' ? getCustomerSessionData() : null;
