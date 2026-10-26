@@ -239,15 +239,15 @@
 </section>
 
 <!-- Newsletter Banner -->
-<section style="background:#1A1A1A;padding:4rem 0;text-align:center">
+<section class="newsletter-banner-section" style="background:#1A1A1A;padding:4rem 0;text-align:center">
   <div class="container">
     <span class="section-tag">Never Miss a Deal</span>
     <h2 style="color:#fff;font-family:'Playfair Display',serif;margin-bottom:.75rem">Get Exclusive Offers in Your Inbox</h2>
     <p style="color:rgba(255,255,255,.5);margin-bottom:2rem">Subscribe for early access to sales, new arrivals and member-only codes.</p>
-    <div style="display:flex;gap:.75rem;max-width:480px;margin:0 auto">
-      <input type="email" placeholder="Your email address" style="flex:1;padding:.85rem 1.25rem;border:1.5px solid rgba(255,255,255,.15);border-radius:40px;background:rgba(255,255,255,.05);color:#fff;font-family:inherit;font-size:.9rem">
-      <button class="btn btn-gold" onclick="showToast('&#10022; Subscribed! Watch your inbox.')">Subscribe</button>
-    </div>
+    <form class="newsletter-banner-form" onsubmit="event.preventDefault(); showToast('&#10022; Subscribed! Watch your inbox.');">
+      <input type="email" placeholder="Your email address" required>
+      <button type="submit" class="btn btn-gold">Subscribe</button>
+    </form>
   </div>
 </section>
 <footer>

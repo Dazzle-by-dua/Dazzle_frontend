@@ -1070,3 +1070,67 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
 .auth-footer-links a:hover {
   color: var(--gold-hover);
 }
+
+/* ==========================================================================
+   Newsletter Banner Styles
+   ========================================================================== */
+.newsletter-banner-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.newsletter-banner-form {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  align-items: stretch;
+}
+
+.newsletter-banner-form input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.newsletter-banner-form input:focus {
+  border-color: var(--gold);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.newsletter-banner-form input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.newsletter-banner-form .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 540px) {
+  .newsletter-banner-form {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .newsletter-banner-form input {
+    text-align: center;
+  }
+
+  .newsletter-banner-form .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
