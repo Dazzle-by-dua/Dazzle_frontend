@@ -263,19 +263,20 @@
 <!-- Order Success Modal -->
 <div class="order-modal-backdrop" id="order-success-modal">
   <div class="order-success-modal">
+    <button type="button" class="order-modal-close" onclick="closeOrderModal()" aria-label="Close modal">&times;</button>
     <div class="success-icon-wrap">✓</div>
-    <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:.75rem">Order Placed!</h2>
-    <p style="font-size:.95rem;color:var(--text-muted);margin-bottom:.5rem">Thank you for shopping with <strong>Dazzle by Dua</strong>.</p>
-    <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:1.5rem">Your order has been received and is being processed. You&rsquo;ll receive a confirmation shortly.</p>
-    <div style="background:var(--warm-cream);padding:.75rem 1rem;border-radius:8px;border:1px solid rgba(212,175,124,.3);margin-bottom:1.5rem">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
-        <div><strong style="color:var(--charcoal)">Order ID: </strong><span id="placed-order-id" style="font-weight:700;color:var(--gold)">#DBD-2025-001</span></div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:.5rem">Order Placed!</h2>
+    <p style="font-size:.92rem;color:var(--text-muted);margin-bottom:.35rem">Thank you for shopping with <strong>Dazzle by Dua</strong>.</p>
+    <p style="font-size:.84rem;color:var(--text-muted);margin-bottom:1.25rem">Your order has been received and is being processed. You&rsquo;ll receive a confirmation shortly.</p>
+    <div style="background:rgba(212,175,124,0.08);padding:.85rem 1rem;border-radius:8px;border:1px solid rgba(212,175,124,.35);margin-bottom:1.35rem;text-align:left;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem">
+        <div><strong style="color:var(--text-dark)">Order ID: </strong><span id="placed-order-id" style="font-weight:700;color:var(--gold)">#DBD-2025-001</span></div>
         <span id="placed-order-badge" class="badge" style="background:#e6f4ea;color:#137333;font-size:0.75rem;padding:2px 8px;border-radius:4px;font-weight:700">CONFIRMED</span>
       </div>
-      <div id="placed-order-payment-info" style="margin-top:6px;font-size:0.8rem;color:#555"></div>
+      <div id="placed-order-payment-info" style="margin-top:6px;font-size:0.8rem;color:var(--text-muted)"></div>
     </div>
-    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
-      <a href="orders.html" class="btn btn-gold">View Orders</a>
+    <div class="order-modal-actions" style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;width:100%">
+      <a href="orders.html" class="btn btn-gold">View Orders &rarr;</a>
       <a href="shop.html" class="btn btn-outline">Continue Shopping</a>
     </div>
   </div>
@@ -809,7 +810,10 @@ async function handlePlaceOrder(e) {
               }
 
               const modal = document.getElementById('order-success-modal');
-              if (modal) modal.classList.add('open');
+              if (modal) {
+                window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
+                modal.classList.add('open');
+              }
               document.body.style.overflow = 'hidden';
             } else {
               throw new Error(verifyRes?.message || 'Server signature verification failed.');
@@ -939,7 +943,10 @@ async function handlePlaceOrder(e) {
       }
 
       const modal = document.getElementById('order-success-modal');
-      if (modal) modal.classList.add('open');
+      if (modal) {
+        window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
+        modal.classList.add('open');
+      }
       clearCart();
       document.body.style.overflow = 'hidden';
 
@@ -954,12 +961,20 @@ async function handlePlaceOrder(e) {
   }
 }
 
+function closeOrderModal() {
+  const modal = document.getElementById('order-success-modal');
+  if (modal) {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+    renderCheckout();
+  }
+}
+window.closeOrderModal = closeOrderModal;
+
 // Close modal on backdrop click
 document.getElementById('order-success-modal').addEventListener('click', function(e) {
   if (e.target === this) {
-    this.classList.remove('open');
-    document.body.style.overflow = '';
-    renderCheckout();
+    closeOrderModal();
   }
 });
 
