@@ -1133,6 +1133,17 @@ function productCardHTML(p) {
   const badgesHTML = (p.badges || []).map(b => `<span class="badge badge-${b}">${b}</span>`).join("");
   const outOfStock = !p.inStock ? '<span class="badge badge-oos">Out of Stock</span>' : "";
   const detailUrl = `product-details.html?id=${p.id}`;
+
+  const actualPrice = parseFloat(p.oldPrice) || 0;
+  const sellingPrice = parseFloat(p.price) || 0;
+  let discountTagHTML = "";
+  if (actualPrice > sellingPrice && actualPrice > 0) {
+    const discountPercent = Math.round(((actualPrice - sellingPrice) / actualPrice) * 100);
+    if (discountPercent > 0) {
+      discountTagHTML = `<span class="product-discount-tag">${discountPercent}% OFF</span>`;
+    }
+  }
+
   return `
   <div class="product-card" data-id="${p.id}" onclick="handleCardClick(event, ${p.id})" style="cursor:pointer">
     <div class="product-img-wrap">
@@ -1140,8 +1151,8 @@ function productCardHTML(p) {
       <div class="product-badges">${badgesHTML}${outOfStock}</div>
       <div class="product-img-actions">
         <button type="button" class="btn-icon wish-toggle${inWish ? " active" : ""}" onclick="event.stopPropagation();handleWishToggle(this, ${p.id})" title="Wishlist">♥</button>
-        <a href="${detailUrl}" class="btn-icon" onclick="event.stopPropagation()" title="View Details">👁</a>
       </div>
+      ${discountTagHTML}
     </div>
     <div class="product-body">
       <h4 class="product-name"><a href="${detailUrl}" onclick="event.stopPropagation()">${p.name}</a></h4>
