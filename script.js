@@ -161,14 +161,7 @@ const DEFAULT_CATEGORIES = [
   { id: "rings", name: "Rings", count: 6, img: "product_ring.jpg", desc: "Understated luxury solitaire and stacking rings" }
 ];
 
-const DEFAULT_REVIEWS = [
-  { id: 1, name: "Ayesha K.", rating: 5, text: "The Flower Pendant Necklace looks even prettier in person! Very good quality and beautiful packaging.", date: "12 Jan 2025", verified: true, approved: true, product: "Flower Pendant Necklace" },
-  { id: 2, name: "Priya M.", rating: 5, text: "Absolutely love my pearl earrings. They are so delicate and elegant. Will definitely order again!", date: "5 Feb 2025", verified: true, approved: true, product: "Pearl Drop Earrings" },
-  { id: 3, name: "Nadia R.", rating: 4, text: "Beautiful bracelet, perfect gift for my sister. The champagne gold finish is exactly as shown.", date: "20 Mar 2025", verified: true, approved: true, product: "Delicate Chain Bracelet" },
-  { id: 4, name: "Sarah L.", rating: 5, text: "Dazzle by Dua is my go-to for jewellery! The quality is premium and the designs are timeless.", date: "8 Apr 2025", verified: true, approved: true, product: "Flower Pendant Necklace" },
-  { id: 5, name: "Fatima Z.", rating: 5, text: "Ordered the ring and it arrived in gorgeous packaging. The detail is exquisite — absolutely stunning!", date: "15 May 2025", verified: true, approved: true, product: "Minimal Diamond Ring" },
-  { id: 6, name: "Maha B.", rating: 4, text: "Very happy with my purchase. The earrings are lightweight and comfortable for all-day wear.", date: "2 Jun 2025", verified: true, approved: true, product: "Gold Hoop Earrings" }
-];
+const DEFAULT_REVIEWS = [];
 
 const DEFAULT_OFFERS = {
   coupons: [
@@ -446,7 +439,9 @@ window.DazzleStore = window.DazzleStore || {
         this._set(this.KEYS.CATEGORIES, cats.value);
       }
       if (revs.status === "fulfilled" && Array.isArray(revs.value)) {
-        this._set(this.KEYS.REVIEWS, revs.value);
+        const fakeNames = ["Ayesha K.", "Priya M.", "Nadia R.", "Sarah L.", "Fatima Z.", "Maha B."];
+        const realRevs = revs.value.filter(r => !fakeNames.includes(r.name));
+        this._set(this.KEYS.REVIEWS, realRevs);
       }
       if (offs.status === "fulfilled" && offs.value) {
         this._set(this.KEYS.OFFERS, offs.value);
@@ -665,21 +660,45 @@ window.DazzleStore = window.DazzleStore || {
 
   // Reviews
   getReviews() {
-    return this._get(this.KEYS.REVIEWS, DEFAULT_REVIEWS);
+    let list = this._get(this.KEYS.REVIEWS, DEFAULT_REVIEWS);
+    const fakeNames = ["Ayesha K.", "Priya M.", "Nadia R.", "Sarah L.", "Fatima Z.", "Maha B."];
+    if (Array.isArray(list) && list.some(r => fakeNames.includes(r.name))) {
+      list = list.filter(r => !fakeNames.includes(r.name));
+      this.saveReviews(list);
+    }
+    return list;
   },
   saveReviews(arr) {
     this._set(this.KEYS.REVIEWS, arr);
   },
   async addReview(r) {
-    const res = await this._api('/api/reviews', 'POST', r);
+    const newRev = {
+      id: r.id || Date.now(),
+      name: r.name || "Customer",
+      product: r.product || "General",
+      rating: Number(r.rating) || 5,
+      text: r.text || "",
+      date: r.date || new Date().toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' }),
+      verified: r.verified !== false,
+      approved: r.approved !== false
+    };
+    let list = this.getReviews().filter(item => item.id !== newRev.id);
+    list.unshift(newRev);
+    this.saveReviews(list);
+
     try {
-      const live = await fetch(`${API_BASE_URL}/api/reviews`).then(r => r.ok ? r.json() : null);
-      if (Array.isArray(live)) {
-        this.saveReviews(live);
-        return res;
+      const res = await this._api('/api/reviews', 'POST', newRev);
+      if (res && res.id) {
+        const idx = list.findIndex(item => item.id === newRev.id);
+        if (idx >= 0) {
+          list[idx] = Object.assign(newRev, res);
+          this.saveReviews(list);
+        }
       }
-    } catch (e) {}
-    return res;
+    } catch (e) {
+      console.warn("Could not sync review to backend:", e);
+    }
+    return newRev;
   },
   async updateReview(id, updates) {
     const numId = parseInt(id, 10) || id;
@@ -1190,6 +1209,7 @@ function reviewCardHTML(r) {
       </div>
     </div>
     <p class="review-text">&ldquo;${r.text}&rdquo;</p>
+    ${r.product ? `<div style="font-size:0.75rem;color:var(--gold);margin-top:0.6rem;font-weight:600;"><i class="fa fa-gem" style="margin-right:4px;"></i>${r.product}</div>` : ''}
     ${r.verified ? '<div class="review-verified">✓ Verified Purchase</div>' : ''}
   </div>`;
 }

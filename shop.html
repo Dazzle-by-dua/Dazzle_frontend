@@ -149,25 +149,57 @@
     </div>
     <div class="reviews-grid" id="shop-reviews"></div>
     <!-- Write Review Form -->
-    <div class="write-review-form">
+    <div class="write-review-form" id="write-review-section">
       <h3 style="font-family:'Playfair Display',serif;margin-bottom:.5rem">Write a Review</h3>
       <p style="margin-bottom:1.5rem">Share your experience with Dazzle by Dua</p>
-      <div class="form-row" style="margin-bottom:1rem">
-        <div class="form-group"><label class="form-label">Your Name</label><input class="form-input" type="text" placeholder="e.g. Ayesha K."></div>
-        <div class="form-group"><label class="form-label">Product</label><select class="form-select"><option>Flower Pendant Necklace</option><option>Pearl Drop Earrings</option><option>Delicate Chain Bracelet</option><option>Minimal Diamond Ring</option></select></div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Your Rating</label>
-        <div style="display:flex;gap:.5rem;font-size:1.5rem;color:#D4AF7C;margin-bottom:.5rem" id="star-select">
-          <span onclick="setRating(1)" style="cursor:pointer">&#9733;</span>
-          <span onclick="setRating(2)" style="cursor:pointer">&#9733;</span>
-          <span onclick="setRating(3)" style="cursor:pointer">&#9733;</span>
-          <span onclick="setRating(4)" style="cursor:pointer">&#9733;</span>
-          <span onclick="setRating(5)" style="cursor:pointer">&#9733;</span>
+
+      <!-- Logged In Form -->
+      <div id="review-auth-logged-in" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;background:rgba(212,175,124,0.1);border:1px solid rgba(212,175,124,0.3);border-radius:var(--radius-sm);margin-bottom:1.25rem;">
+          <div style="display:flex;align-items:center;gap:0.6rem;">
+            <i class="fa fa-user-check" style="color:var(--gold);font-size:1.1rem;"></i>
+            <span style="font-size:0.85rem;color:var(--text-dark);">Posting as <strong id="review-user-display-name">Customer</strong></span>
+          </div>
+          <span style="font-size:0.72rem;background:#E8F5E9;color:#2E7D32;padding:2px 8px;border-radius:12px;font-weight:600;border:1px solid #C8E6C9;">&#10003; Verified Member</span>
         </div>
+        <div class="form-row" style="margin-bottom:1rem">
+          <div class="form-group">
+            <label class="form-label">Your Name</label>
+            <input class="form-input" type="text" id="review-input-name" readonly style="background:rgba(0,0,0,0.03);cursor:default;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Product</label>
+            <select class="form-select" id="review-product-select"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your Rating</label>
+          <div style="display:flex;gap:.5rem;font-size:1.5rem;color:#D4AF7C;margin-bottom:.5rem" id="star-select">
+            <span onclick="setRating(1)" style="cursor:pointer">&#9733;</span>
+            <span onclick="setRating(2)" style="cursor:pointer">&#9733;</span>
+            <span onclick="setRating(3)" style="cursor:pointer">&#9733;</span>
+            <span onclick="setRating(4)" style="cursor:pointer">&#9733;</span>
+            <span onclick="setRating(5)" style="cursor:pointer">&#9733;</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your Review</label>
+          <textarea class="form-textarea" id="review-input-text" placeholder="Tell us about the craftsmanship, luster, packaging, and your overall experience..."></textarea>
+        </div>
+        <button type="button" class="btn btn-gold" id="review-submit-btn" onclick="submitReview()">Submit Review &rarr;</button>
       </div>
-      <div class="form-group"><label class="form-label">Your Review</label><textarea class="form-textarea" placeholder="Tell us about your experience..."></textarea></div>
-      <button class="btn btn-gold" onclick="submitReview()">Submit Review &rarr;</button>
+
+      <!-- Logged Out State -->
+      <div id="review-auth-logged-out" style="display:none;text-align:center;padding:2.5rem 1.5rem;background:rgba(255,255,255,0.7);border:1px dashed var(--gold);border-radius:var(--radius-md);">
+        <div style="width:52px;height:52px;border-radius:50%;background:rgba(212,175,124,0.18);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.35rem;">
+          <i class="fa fa-user-lock"></i>
+        </div>
+        <h4 style="font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--text-dark);margin-bottom:0.4rem;">Customer Sign-In Required</h4>
+        <p style="font-size:0.9rem;color:var(--text-muted);max-width:440px;margin:0 auto 1.5rem;">Only verified customers can write reviews. Please sign in to your account or register to share your feedback.</p>
+        <a href="auth.html?redirect=shop.html%23write-review-section" class="btn btn-gold">
+          <i class="fa fa-sign-in-alt"></i> Sign In to Write Review &rarr;
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -234,7 +266,6 @@
   </div>
 </footer>
 <script src="script.js"></script>
-<script src="script.js"></script>
 <script>
 let currentRating = 5;
 function setRating(r) {
@@ -242,41 +273,97 @@ function setRating(r) {
   const stars = document.querySelectorAll('#star-select span');
   stars.forEach((s,i) => s.style.color = i < r ? '#D4AF7C' : '#DDD');
 }
-function submitReview() {
-  const form = document.querySelector('.write-review-form');
-  if (!form) return;
-  const nameInput = form.querySelector('input[type="text"]');
-  const prodSelect = form.querySelector('select');
-  const textInput = form.querySelector('textarea');
-  const name = nameInput && nameInput.value.trim() ? nameInput.value.trim() : 'Anonymous';
-  const product = prodSelect ? prodSelect.value : 'General';
-  const text = textInput && textInput.value.trim() ? textInput.value.trim() : '';
 
-  if (!text) {
-    showToast('Please enter your review text.');
+function renderShopReviews() {
+  const rv = document.getElementById('shop-reviews');
+  if (!rv) return;
+  const reviews = DazzleStore.getReviews().filter(r => r.approved !== false);
+  if (reviews.length === 0) {
+    rv.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:3rem 1.5rem;background:rgba(255,255,255,0.7);border:1px dashed var(--border);border-radius:var(--radius-md);">
+        <div style="font-size:2rem;color:var(--gold);margin-bottom:0.5rem;">★ ★ ★ ★ ★</div>
+        <h4 style="font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--text-dark);margin-bottom:0.35rem;">No Reviews Yet</h4>
+        <p style="font-size:0.88rem;color:var(--text-muted);max-width:420px;margin:0 auto;">Be the first verified customer to share your thoughts on our pieces!</p>
+      </div>
+    `;
+  } else {
+    rv.innerHTML = reviews.map(reviewCardHTML).join('');
+  }
+}
+
+function checkReviewAuthUI() {
+  const session = typeof getCustomerSessionData === 'function' ? getCustomerSessionData() : null;
+  const loggedInBox = document.getElementById('review-auth-logged-in');
+  const loggedOutBox = document.getElementById('review-auth-logged-out');
+  const nameInput = document.getElementById('review-input-name');
+  const userDisplay = document.getElementById('review-user-display-name');
+
+  if (session && session.user) {
+    if (loggedInBox) loggedInBox.style.display = 'block';
+    if (loggedOutBox) loggedOutBox.style.display = 'none';
+    const userName = session.user.name || 'Valued Customer';
+    if (nameInput) nameInput.value = userName;
+    if (userDisplay) userDisplay.textContent = userName;
+  } else {
+    if (loggedInBox) loggedInBox.style.display = 'none';
+    if (loggedOutBox) loggedOutBox.style.display = 'block';
+  }
+}
+
+async function submitReview() {
+  const session = typeof getCustomerSessionData === 'function' ? getCustomerSessionData() : null;
+  if (!session || !session.user) {
+    showToast('Please sign in or register to submit a review.');
+    window.location.href = 'auth.html?redirect=shop.html%23write-review-section';
     return;
   }
 
-  DazzleStore.addReview({
-    name: name,
-    product: product,
-    rating: currentRating,
-    text: text,
-    verified: true,
-    approved: true
-  });
+  const name = session.user.name || 'Verified Customer';
+  const prodSelect = document.getElementById('review-product-select');
+  const textInput = document.getElementById('review-input-text');
+  const submitBtn = document.getElementById('review-submit-btn');
+  const product = prodSelect ? prodSelect.value : 'General';
+  const text = textInput ? textInput.value.trim() : '';
 
-  if (nameInput) nameInput.value = '';
-  if (textInput) textInput.value = '';
-  setRating(5);
-
-  const rv = document.getElementById('shop-reviews');
-  if (rv) {
-    const approved = DazzleStore.getReviews().filter(r => r.approved !== false);
-    rv.innerHTML = approved.map(reviewCardHTML).join('');
+  if (!text) {
+    showToast('Please enter your review text.');
+    if (textInput) textInput.focus();
+    return;
   }
 
-  showToast('✦ Thank you for your review!');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Submitting...';
+  }
+
+  try {
+    await DazzleStore.addReview({
+      name: name,
+      product: product,
+      rating: currentRating,
+      text: text,
+      verified: true,
+      approved: true
+    });
+
+    if (textInput) textInput.value = '';
+    setRating(5);
+    renderShopReviews();
+
+    showToast(`✦ Thank you for your review, ${name.split(' ')[0]}!`);
+    const rv = document.getElementById('shop-reviews');
+    if (rv) {
+      rv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  } catch (err) {
+    console.error('Submit review error:', err);
+    showToast('Failed to submit review. Please try again.');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'Submit Review &rarr;';
+    }
+  }
 }
 function applyFilters() {
   currentPage = 1;
@@ -407,11 +494,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Populate review form product select
-  const reviewProdSelect = document.querySelector('.write-review-form select');
+  const reviewProdSelect = document.getElementById('review-product-select') || document.querySelector('.write-review-form select');
   if (reviewProdSelect) {
     const prods = DazzleStore.getProducts();
     reviewProdSelect.innerHTML = prods.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
   }
+
+  // Check customer authentication for review form
+  checkReviewAuthUI();
 
   const params = new URLSearchParams(window.location.search);
   const catParam = params.get('category');
@@ -422,11 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('category-select')?.addEventListener('change', () => { currentPage = 1; renderShop(); });
   document.getElementById('sort-select')?.addEventListener('change', () => { currentPage = 1; renderShop(); });
   renderShop();
-  const rv = document.getElementById('shop-reviews');
-  if (rv) {
-    const approved = DazzleStore.getReviews().filter(r => r.approved !== false);
-    rv.innerHTML = approved.map(reviewCardHTML).join('');
-  }
+  renderShopReviews();
 });
 </script>
 </body>

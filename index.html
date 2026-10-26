@@ -185,7 +185,7 @@
         <div class="rating-bar-row"><span class="rating-bar-label">2 &#9733;</span><div class="rating-bar-track"><div class="rating-bar-fill" style="width:2%"></div></div><span class="rating-bar-count">4</span></div>
         <div class="rating-bar-row"><span class="rating-bar-label">1 &#9733;</span><div class="rating-bar-track"><div class="rating-bar-fill" style="width:0%"></div></div><span class="rating-bar-count">1</span></div>
       </div>
-      <a href="shop.html" class="btn btn-ghost btn-sm">Write a Review</a>
+      <a href="shop.html#write-review-section" class="btn btn-ghost btn-sm">Write a Review</a>
     </div>
     <div class="reviews-grid" id="home-reviews"></div>
   </div>
@@ -269,13 +269,19 @@
   </div>
 </footer>
 <script src="script.js"></script>
-<script src="script.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const grid = document.getElementById("new-arrivals-grid");
   if (grid) grid.innerHTML = PRODUCTS.slice(0,4).map(productCardHTML).join("");
   const rv = document.getElementById("home-reviews");
-  if (rv) rv.innerHTML = REVIEWS.slice(0,3).map(reviewCardHTML).join("");
+  if (rv) {
+    const list = DazzleStore.getReviews().filter(r => r.approved !== false);
+    if (list.length === 0) {
+      rv.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2.5rem 1rem;background:rgba(255,255,255,0.7);border:1px dashed var(--border);border-radius:var(--radius-md);"><p style="font-size:0.92rem;color:var(--text-muted);margin:0;">No customer reviews yet. Visit our <a href="shop.html#write-review-section" style="color:var(--gold);font-weight:600;">Shop</a> to be the first to review!</p></div>`;
+    } else {
+      rv.innerHTML = list.slice(0,3).map(reviewCardHTML).join("");
+    }
+  }
 });
 </script>
 </body>

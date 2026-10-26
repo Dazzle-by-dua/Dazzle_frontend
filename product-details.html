@@ -366,7 +366,14 @@ function renderProductDetails() {
   // Render Reviews
   const reviewsEl = document.getElementById("product-reviews-grid");
   if (reviewsEl) {
-    reviewsEl.innerHTML = REVIEWS.slice(0, 3).map(reviewCardHTML).join("");
+    const allRevs = DazzleStore.getReviews().filter(r => r.approved !== false);
+    const prodRevs = allRevs.filter(r => !r.product || r.product === currentProduct.name || r.product === "General");
+    const displayRevs = prodRevs.length > 0 ? prodRevs : allRevs;
+    if (displayRevs.length === 0) {
+      reviewsEl.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem 1rem;background:rgba(255,255,255,0.7);border:1px dashed var(--border);border-radius:var(--radius-md);"><p style="font-size:0.9rem;color:var(--text-muted);margin:0;">No reviews yet for this piece. <a href="shop.html#write-review-section" style="color:var(--gold);font-weight:600;">Share your experience &rarr;</a></p></div>`;
+    } else {
+      reviewsEl.innerHTML = displayRevs.slice(0, 3).map(reviewCardHTML).join("");
+    }
   }
 
   // Render Related
