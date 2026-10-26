@@ -21,8 +21,25 @@
   const API_CONFIG = {
     BASE_URL: API_BASE_URL,
     STORAGE_AUTH_KEY: "dazzle_admin_session",
+    STORAGE_CUSTOMER_KEY: "dazzle_customer_session",
     TIMEOUT_MS: 10000
   };
+
+  /**
+   * Helper to retrieve active customer session token
+   */
+  function getCustomerToken() {
+    try {
+      const sessStr = sessionStorage.getItem(API_CONFIG.STORAGE_CUSTOMER_KEY);
+      if (sessStr) {
+        const sess = JSON.parse(sessStr);
+        return sess.token || null;
+      }
+    } catch (e) {
+      console.warn("Could not read customer auth session:", e);
+    }
+    return null;
+  }
 
   /**
    * Helper to retrieve active JWT token from AdminAuth or Storage
@@ -50,14 +67,22 @@
       ...(options.headers || {})
     };
 
-    const token = getAuthToken();
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
+    const adminToken = getAuthToken();
+    const custToken = getCustomerToken();
+
+    // Attach customer token for customer endpoints or storefront user operations
+    if (endpoint.includes("/api/customer/") || (custToken && !adminToken)) {
+      if (custToken && !headers["Authorization"]) {
+        headers["Authorization"] = `Bearer ${custToken}`;
+      }
+    } else if (adminToken && !headers["Authorization"]) {
+      headers["Authorization"] = `Bearer ${adminToken}`;
     }
 
     const fetchOptions = {
       ...options,
-      headers
+      headers,
+      credentials: "include"
     };
 
     if (options.body && typeof options.body === "object" && !(options.body instanceof FormData)) {
@@ -113,6 +138,136 @@
         localStorage.removeItem(API_CONFIG.STORAGE_AUTH_KEY);
         sessionStorage.removeItem(API_CONFIG.STORAGE_AUTH_KEY);
         return await request("/api/auth/logout", { method: "POST" });
+      }
+    },
+
+    // Customer Authentication & Account Services
+    customer: {
+      async signupInitiate(name, email) {
+        return await request("/api/customer/auth/signup/initiate", {
+          method: "POST",
+          body: { name, email }
+        });
+      },
+
+      async signupResendOtp(email) {
+        return await request("/api/customer/auth/signup/resend-otp", {
+          method: "POST",
+          body: { email }
+        });
+      },
+
+      async signupVerifyOtp(email, otp) {
+        return await request("/api/customer/auth/signup/verify-otp", {
+          method: "POST",
+          body: { email, otp }
+        });
+      },
+
+      async signupComplete(email, signupToken, password, confirmPassword) {
+        const res = await request("/api/customer/auth/signup/complete", {
+          method: "POST",
+          body: {
+            email,
+            signup_token: signupToken,
+            password,
+            confirm_password: confirmPassword
+          }
+        });
+        if (res && res.token) {
+          const sessionData = {
+            user: res.user,
+            token: res.token,
+            loginTime: new Date().toISOString()
+          };
+          sessionStorage.setItem(API_CONFIG.STORAGE_CUSTOMER_KEY, JSON.stringify(sessionData));
+        }
+        return res;
+      },
+
+      async login(email, password, rememberMe = false) {
+        const res = await request("/api/customer/auth/login", {
+          method: "POST",
+          body: { email, password, remember_me: rememberMe }
+        });
+        if (res && res.token) {
+          const sessionData = {
+            user: res.user,
+            token: res.token,
+            loginTime: new Date().toISOString()
+          };
+          sessionStorage.setItem(API_CONFIG.STORAGE_CUSTOMER_KEY, JSON.stringify(sessionData));
+        }
+        return res;
+      },
+
+      async me() {
+        try {
+          return await request("/api/customer/auth/me");
+        } catch (e) {
+          sessionStorage.removeItem(API_CONFIG.STORAGE_CUSTOMER_KEY);
+          throw e;
+        }
+      },
+
+      async logout() {
+        try {
+          await request("/api/customer/auth/logout", { method: "POST" });
+        } finally {
+          sessionStorage.removeItem(API_CONFIG.STORAGE_CUSTOMER_KEY);
+        }
+        return { success: true };
+      },
+
+      async forgotPassword(email) {
+        return await request("/api/customer/auth/forgot-password", {
+          method: "POST",
+          body: { email }
+        });
+      },
+
+      async verifyResetToken(token, email) {
+        return await request(`/api/customer/auth/verify-reset-token?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`);
+      },
+
+      async resetPassword(token, email, newPassword, confirmPassword) {
+        return await request("/api/customer/auth/reset-password", {
+          method: "POST",
+          body: {
+            token,
+            email,
+            new_password: newPassword,
+            confirm_password: confirmPassword
+          }
+        });
+      },
+
+      async getOrders() {
+        return await request("/api/customer/orders");
+      },
+
+      async getProfile() {
+        return await request("/api/customer/profile");
+      },
+
+      async updateProfile(updates) {
+        return await request("/api/customer/profile", {
+          method: "PUT",
+          body: updates
+        });
+      },
+
+      getSession() {
+        try {
+          const s = sessionStorage.getItem(API_CONFIG.STORAGE_CUSTOMER_KEY);
+          return s ? JSON.parse(s) : null;
+        } catch (e) {
+          return null;
+        }
+      },
+
+      isLoggedIn() {
+        return Boolean(getCustomerToken());
       }
     },
 

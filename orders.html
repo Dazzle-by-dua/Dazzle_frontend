@@ -354,12 +354,28 @@ async function searchOrderById() {
   if (!container) return;
   container.innerHTML = `<div style="text-align:center;padding:2rem"><p style="color:#777">Fetching live order ${q} from MongoDB...</p></div>`;
   try {
-    const res = await fetch(`${API_BASE_URL}/api/orders/${encodeURIComponent(q)}`);
+    const headers = {};
+    if (window.DazzleApi && window.DazzleApi.customer) {
+      const sess = window.DazzleApi.customer.getSession();
+      if (sess && sess.token) headers["Authorization"] = `Bearer ${sess.token}`;
+    }
+    const res = await fetch(`${API_BASE_URL}/api/orders/${encodeURIComponent(q)}`, {
+      headers,
+      credentials: "include"
+    });
     if (res.ok) {
       const order = await res.json();
       DazzleStore._set(DazzleStore.KEYS.ORDERS, [order]);
       if (typeof renderOrdersPage === 'function') renderOrdersPage();
-      showToast(`✦ Order #${order.id} found: ${order.status}`);
+      showToast(`Order #${order.id} found: ${order.status}`);
+    } else if (res.status === 401 || res.status === 403) {
+      container.innerHTML = `
+        <div class="empty-state" style="padding:3rem 1rem">
+          <div class="empty-icon">&#128274;</div>
+          <h3 class="empty-title">Authentication Required</h3>
+          <p class="empty-sub">Please sign in to the customer account associated with Order #${q} to view tracking details.</p>
+          <a href="auth.html?redirect=orders.html" class="btn btn-gold btn-sm" style="display:inline-flex;margin-top:0.75rem;">Sign In to View Order &rarr;</a>
+        </div>`;
     } else {
       container.innerHTML = `
         <div class="empty-state" style="padding:3rem 1rem">

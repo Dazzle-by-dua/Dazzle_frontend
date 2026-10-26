@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Sign In & Registration — Dazzle by Dua</title>
+  <meta name="description" content="Sign in or create your Dazzle by Dua customer account to manage your orders, wishlist, and fine jewellery collection.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<!-- Announcement Bar -->
+<div class="announcement-bar">
+  Free shipping on orders above &#8377;2500 &nbsp;|&nbsp; Use code <strong>DAZZLE10</strong> for 10% off
+  <a href="offers.html">View Offers &rarr;</a>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="logo.png" alt="Dazzle by Dua Logo" class="nav-logo-img">
+      <div class="nav-logo-text">
+        <span class="nav-logo-name">Dazzle by Dua</span>
+        <span class="nav-logo-tagline">Fine Jewellery</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="shop.html" class="nav-link">Shop</a></li>
+      <li><a href="offers.html" class="nav-link">Offers</a></li>
+      <li><a href="orders.html" class="nav-link">My Orders</a></li>
+      <li><a href="wishlist.html" class="nav-link">Wishlist</a></li>
+      <li><a href="contact.html" class="nav-link">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="wishlist.html" class="nav-icon" title="Wishlist">
+        <i class="fa fa-heart"></i>
+        <span class="nav-badge wish-badge">0</span>
+      </a>
+      <a href="cart.html" class="nav-icon" title="Cart">
+        <i class="fa fa-shopping-bag"></i>
+        <span class="nav-badge cart-badge">0</span>
+      </a>
+      <button class="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu">
+  <div class="mobile-menu-header">
+    <a href="index.html" class="nav-logo">
+      <img src="logo.png" alt="Dazzle by Dua Logo" class="nav-logo-img">
+      <div class="nav-logo-text">
+        <span class="nav-logo-name">Dazzle by Dua</span>
+        <span class="nav-logo-tagline">Fine Jewellery</span>
+      </div>
+    </a>
+    <button class="mobile-menu-close">&times;</button>
+  </div>
+  <ul class="mobile-nav-links">
+    <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+    <li><a href="shop.html" class="mobile-nav-link">Shop</a></li>
+    <li><a href="offers.html" class="mobile-nav-link">Offers &amp; Combos</a></li>
+    <li><a href="orders.html" class="mobile-nav-link">My Orders</a></li>
+    <li><a href="wishlist.html" class="mobile-nav-link">Wishlist</a></li>
+    <li><a href="contact.html" class="mobile-nav-link">Contact</a></li>
+  </ul>
+</div>
+
+<!-- Main Auth Container -->
+<main class="auth-page-wrapper">
+  <div class="auth-card">
+    
+    <div class="auth-header">
+      <span class="auth-header-tag">Exclusive Access</span>
+      <h1 class="auth-title" id="auth-main-title">Customer Sign In</h1>
+      <p class="auth-subtitle" id="auth-main-subtitle">Access your orders, saved pieces &amp; exclusive benefits</p>
+    </div>
+
+    <!-- Alert / Notification Banner -->
+    <div id="auth-alert-box" class="auth-alert" style="display: none;">
+      <i id="auth-alert-icon" class="fa fa-info-circle"></i>
+      <span id="auth-alert-text"></span>
+    </div>
+
+    <!-- Mode Selector Tabs -->
+    <div class="auth-tabs" id="auth-tabs-bar">
+      <button type="button" class="auth-tab active" id="tab-login" onclick="switchAuthMode('login')">Sign In</button>
+      <button type="button" class="auth-tab" id="tab-signup" onclick="switchAuthMode('signup')">Create Account</button>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- PANEL 1: CUSTOMER LOGIN                                  -->
+    <!-- ======================================================== -->
+    <form id="form-login" onsubmit="handleLoginSubmit(event)" novalidate>
+      <div class="auth-form-group">
+        <label class="auth-label" for="login-email">Email Address</label>
+        <div class="auth-input-wrapper">
+          <input type="email" id="login-email" class="auth-input" placeholder="name@example.com" required autocomplete="email">
+        </div>
+      </div>
+
+      <div class="auth-form-group">
+        <label class="auth-label" for="login-password">Password</label>
+        <div class="auth-input-wrapper">
+          <input type="password" id="login-password" class="auth-input" placeholder="Enter your password" required autocomplete="current-password">
+          <button type="button" class="auth-pwd-toggle" onclick="togglePasswordVisibility('login-password', this)" title="Show/Hide Password">
+            <i class="fa fa-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; font-size:0.78rem;">
+        <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; color:var(--text-dark);">
+          <input type="checkbox" id="login-remember"> Remember me for 30 days
+        </label>
+        <a href="#" onclick="switchAuthMode('forgot'); return false;" style="color:var(--gold); font-weight:600; text-decoration:none;">Forgot password?</a>
+      </div>
+
+      <button type="submit" id="btn-login-submit" class="btn btn-gold btn-auth-submit">
+        <span>Sign In</span>
+      </button>
+
+      <div class="auth-footer-links">
+        Don't have an account yet? <a href="#" onclick="switchAuthMode('signup'); return false;">Create one now</a>
+      </div>
+    </form>
+
+
+    <!-- ======================================================== -->
+    <!-- PANEL 2: THREE-STAGE SIGNUP PROCESS                      -->
+    <!-- ======================================================== -->
+    <div id="panel-signup" style="display: none;">
+      
+      <!-- Stepper indicator -->
+      <div class="auth-stepper">
+        <div class="auth-step active" id="step-node-1">
+          <div class="auth-step-circle">1</div>
+          <span class="auth-step-label">Details</span>
+        </div>
+        <div class="auth-step" id="step-node-2">
+          <div class="auth-step-circle">2</div>
+          <span class="auth-step-label">Verify</span>
+        </div>
+        <div class="auth-step" id="step-node-3">
+          <div class="auth-step-circle">3</div>
+          <span class="auth-step-label">Password</span>
+        </div>
+      </div>
+
+      <!-- Stage 1 Form: Details -->
+      <form id="form-signup-stage1" onsubmit="handleSignupStage1(event)" novalidate>
+        <div class="auth-form-group">
+          <label class="auth-label" for="signup-name">Full Name</label>
+          <div class="auth-input-wrapper">
+            <input type="text" id="signup-name" class="auth-input" placeholder="e.g. Dua Fatima" required autocomplete="name">
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-label" for="signup-email">Email Address</label>
+          <div class="auth-input-wrapper">
+            <input type="email" id="signup-email" class="auth-input" placeholder="name@example.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <p style="font-size:0.75rem; color:var(--text-muted); line-height:1.5; margin-bottom:1.25rem;">
+          We will send a six-digit verification code to confirm ownership of this email address.
+        </p>
+
+        <button type="submit" id="btn-stage1-submit" class="btn btn-gold btn-auth-submit">
+          <span>Continue to Verification &rarr;</span>
+        </button>
+
+        <div class="auth-footer-links">
+          Already have an account? <a href="#" onclick="switchAuthMode('login'); return false;">Sign in</a>
+        </div>
+      </form>
+
+      <!-- Stage 2 Form: Six-Digit OTP Verification -->
+      <form id="form-signup-stage2" onsubmit="handleSignupStage2(event)" style="display:none;" novalidate>
+        <p style="font-size:0.84rem; color:var(--text-dark); margin-bottom:0.75rem; text-align:center;">
+          Please enter the six-digit code sent to <strong id="otp-target-email" style="word-break:break-all;"></strong>
+        </p>
+
+        <div class="otp-inputs-row">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*" autofocus autocomplete="one-time-code">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]*">
+        </div>
+
+        <div class="otp-resend-bar">
+          <span class="otp-countdown-badge">
+            <i class="fa fa-clock"></i> Resend code in: <span id="otp-countdown-val">01:00</span>
+          </span>
+          <button type="button" id="btn-resend-code" class="btn-resend-otp" onclick="handleResendOTP()" disabled>
+            Resend Code
+          </button>
+        </div>
+
+        <div style="margin-top:1.5rem; display:flex; gap:0.75rem;">
+          <button type="button" class="btn btn-outline" style="flex:1; justify-content:center; padding:0.85rem;" onclick="backToSignupStage1()">
+            &larr; Change
+          </button>
+          <button type="submit" id="btn-stage2-submit" class="btn btn-gold" style="flex:2; justify-content:center; padding:0.85rem;">
+            <span>Verify Code &rarr;</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Stage 3 Form: Create Password -->
+      <form id="form-signup-stage3" onsubmit="handleSignupStage3(event)" style="display:none;" novalidate>
+        <div class="auth-form-group">
+          <label class="auth-label" for="signup-password">Create Password (min. 12 characters)</label>
+          <div class="auth-input-wrapper">
+            <input type="password" id="signup-password" class="auth-input" placeholder="Create a strong password" minlength="12" required autocomplete="new-password" oninput="validatePasswordInputs()">
+            <button type="button" class="auth-pwd-toggle" onclick="togglePasswordVisibility('signup-password', this)">
+              <i class="fa fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-label" for="signup-password-confirm">Re-enter Password</label>
+          <div class="auth-input-wrapper">
+            <input type="password" id="signup-password-confirm" class="auth-input" placeholder="Re-enter password" minlength="12" required autocomplete="new-password" oninput="validatePasswordInputs()">
+            <button type="button" class="auth-pwd-toggle" onclick="togglePasswordVisibility('signup-password-confirm', this)">
+              <i class="fa fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Password Validation Checklist -->
+        <div style="background:var(--beige); padding:0.85rem 1rem; border-radius:var(--radius-sm); font-size:0.75rem; margin-bottom:1.5rem;">
+          <div id="rule-length" style="color:var(--text-muted); margin-bottom:0.25rem;">&#10007; Minimum 12 characters</div>
+          <div id="rule-match" style="color:var(--text-muted);">&#10007; Passwords must match exactly</div>
+        </div>
+
+        <button type="submit" id="btn-stage3-submit" class="btn btn-gold btn-auth-submit">
+          <span>Create Account &amp; Sign In &rarr;</span>
+        </button>
+      </form>
+
+    </div>
+
+
+    <!-- ======================================================== -->
+    <!-- PANEL 3: FORGOT PASSWORD REQUEST                         -->
+    <!-- ======================================================== -->
+    <form id="form-forgot" onsubmit="handleForgotPasswordSubmit(event)" style="display: none;" novalidate>
+      <p style="font-size:0.84rem; color:var(--text-muted); line-height:1.5; margin-bottom:1.25rem;">
+        Enter your registered email address below and we will send a secure password reset link to your inbox.
+      </p>
+
+      <div class="auth-form-group">
+        <label class="auth-label" for="forgot-email">Registered Email Address</label>
+        <div class="auth-input-wrapper">
+          <input type="email" id="forgot-email" class="auth-input" placeholder="name@example.com" required autocomplete="email">
+        </div>
+      </div>
+
+      <button type="submit" id="btn-forgot-submit" class="btn btn-gold btn-auth-submit">
+        <span>Send Reset Link &rarr;</span>
+      </button>
+
+      <div class="auth-footer-links">
+        Remember your password? <a href="#" onclick="switchAuthMode('login'); return false;">Back to Sign In</a>
+      </div>
+    </form>
+
+  </div>
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo">
+          <img src="logo.png" alt="Dazzle by Dua Logo" style="width:36px;height:36px;object-fit:contain">
+          <span class="footer-logo-name">Dazzle by Dua</span>
+        </div>
+        <p class="footer-tagline">Crafting moments of brilliance with timeless, handcrafted fine jewellery.</p>
+      </div>
+      <div>
+        <div class="footer-heading">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="index.html" class="footer-link">Home</a></li>
+          <li><a href="shop.html" class="footer-link">Shop</a></li>
+          <li><a href="offers.html" class="footer-link">Offers</a></li>
+          <li><a href="orders.html" class="footer-link">My Orders</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Customer Care</div>
+        <ul class="footer-links">
+          <li><a href="contact.html" class="footer-link">Contact Us</a></li>
+          <li><a href="#" class="footer-link">Privacy Policy</a></li>
+          <li><a href="#" class="footer-link">Terms &amp; Conditions</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Dazzle by Dua. All rights reserved.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="dazzle_api_client.js"></script>
+<script src="script.js"></script>
+
+<script>
+// Authentication Controller State
+let currentSignupState = {
+  name: "",
+  email: "",
+  signupToken: "",
+  resendCountdownTimer: null,
+  countdownSeconds: 60
+};
+
+// Check query params for mode (e.g. auth.html?mode=signup or ?mode=forgot)
+document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const mode = params.get("mode") || "login";
+  switchAuthMode(mode);
+  initOtpInputBoxes();
+
+  // If already authenticated, redirect
+  if (window.DazzleApi && window.DazzleApi.customer && window.DazzleApi.customer.isLoggedIn()) {
+    const redirectUrl = params.get("redirect") || "index.html";
+    showAuthAlert("You are already signed in. Redirecting...", "info");
+    setTimeout(() => { window.location.href = redirectUrl; }, 1200);
+  }
+});
+
+function switchAuthMode(mode) {
+  clearAuthAlert();
+  const title = document.getElementById("auth-main-title");
+  const sub = document.getElementById("auth-main-subtitle");
+  const tabsBar = document.getElementById("auth-tabs-bar");
+  const tabLogin = document.getElementById("tab-login");
+  const tabSignup = document.getElementById("tab-signup");
+  const formLogin = document.getElementById("form-login");
+  const panelSignup = document.getElementById("panel-signup");
+  const formForgot = document.getElementById("form-forgot");
+
+  if (mode === "login") {
+    title.textContent = "Customer Sign In";
+    sub.textContent = "Access your orders, saved pieces & exclusive benefits";
+    tabsBar.style.display = "flex";
+    tabLogin.classList.add("active");
+    tabSignup.classList.remove("active");
+    formLogin.style.display = "block";
+    panelSignup.style.display = "none";
+    formForgot.style.display = "none";
+  } else if (mode === "signup") {
+    title.textContent = "Create Account";
+    sub.textContent = "Join Dazzle by Dua for a seamless luxury experience";
+    tabsBar.style.display = "flex";
+    tabSignup.classList.add("active");
+    tabLogin.classList.remove("active");
+    formLogin.style.display = "none";
+    panelSignup.style.display = "block";
+    formForgot.style.display = "none";
+  } else if (mode === "forgot") {
+    title.textContent = "Reset Password";
+    sub.textContent = "Enter your email to receive recovery instructions";
+    tabsBar.style.display = "none";
+    formLogin.style.display = "none";
+    panelSignup.style.display = "none";
+    formForgot.style.display = "block";
+  }
+}
+
+function showAuthAlert(msg, type = "error") {
+  const box = document.getElementById("auth-alert-box");
+  const text = document.getElementById("auth-alert-text");
+  const icon = document.getElementById("auth-alert-icon");
+  if (!box || !text) return;
+
+  box.className = `auth-alert auth-alert-${type}`;
+  text.textContent = msg;
+
+  if (type === "error") {
+    icon.className = "fa fa-exclamation-circle";
+  } else if (type === "success") {
+    icon.className = "fa fa-check-circle";
+  } else {
+    icon.className = "fa fa-info-circle";
+  }
+  box.style.display = "flex";
+}
+
+function clearAuthAlert() {
+  const box = document.getElementById("auth-alert-box");
+  if (box) box.style.display = "none";
+}
+
+function togglePasswordVisibility(fieldId, btnEl) {
+  const input = document.getElementById(fieldId);
+  if (!input) return;
+  const isPwd = input.type === "password";
+  input.type = isPwd ? "text" : "password";
+  btnEl.innerHTML = isPwd ? '<i class="fa fa-eye-slash"></i>' : '<i class="fa fa-eye"></i>';
+}
+
+// -------------------------------------------------------------
+// Sign In Handler
+// -------------------------------------------------------------
+async function handleLoginSubmit(event) {
+  event.preventDefault();
+  clearAuthAlert();
+  const emailInput = document.getElementById("login-email");
+  const pwdInput = document.getElementById("login-password");
+  const rememberBox = document.getElementById("login-remember");
+  const btn = document.getElementById("btn-login-submit");
+
+  const email = (emailInput?.value || "").trim();
+  const password = pwdInput?.value || "";
+
+  if (!email || !password) {
+    showAuthAlert("Please provide both email and password.", "error");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span>Signing In <i class="fa fa-spinner fa-spin"></i></span>';
+
+  try {
+    const res = await DazzleApi.customer.login(email, password, rememberBox?.checked);
+    showAuthAlert("Welcome back, " + (res.user?.name || "Valued Customer") + "! Redirecting...", "success");
+
+    const params = new URLSearchParams(window.location.search);
+    const redirectUrl = params.get("redirect") || "index.html";
+    setTimeout(() => {
+      window.location.href = redirectUrl;
+    }, 1000);
+  } catch (err) {
+    showAuthAlert(err.message || "Invalid credentials. Please verify your email and password.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>Sign In</span>';
+  }
+}
+
+// -------------------------------------------------------------
+// Stage 1: Enter Details
+// -------------------------------------------------------------
+async function handleSignupStage1(event) {
+  event.preventDefault();
+  clearAuthAlert();
+  const nameInput = document.getElementById("signup-name");
+  const emailInput = document.getElementById("signup-email");
+  const btn = document.getElementById("btn-stage1-submit");
+
+  const name = (nameInput?.value || "").trim();
+  const email = (emailInput?.value || "").trim();
+
+  if (!name || name.length < 2) {
+    showAuthAlert("Please enter your full name (at least 2 characters).", "error");
+    return;
+  }
+  if (!email || !email.includes("@")) {
+    showAuthAlert("Please enter a valid email address.", "error");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span>Sending Code <i class="fa fa-spinner fa-spin"></i></span>';
+
+  try {
+    const res = await DazzleApi.customer.signupInitiate(name, email);
+    if (res.exists) {
+      showAuthAlert(res.message || "An account with this email already exists.", "info");
+      setTimeout(() => switchAuthMode("login"), 2000);
+      return;
+    }
+
+    currentSignupState.name = name;
+    currentSignupState.email = email;
+
+    // Transition to Stage 2 (OTP)
+    document.getElementById("form-signup-stage1").style.display = "none";
+    document.getElementById("form-signup-stage2").style.display = "block";
+    document.getElementById("otp-target-email").textContent = email;
+
+    updateStepper(2);
+    startOtpCountdown(res.cooldown_seconds || 60);
+    showAuthAlert("Six-digit verification code sent to " + email, "success");
+
+    // Focus first OTP box
+    const firstOtpBox = document.querySelector(".otp-box");
+    if (firstOtpBox) firstOtpBox.focus();
+  } catch (err) {
+    showAuthAlert(err.message || "Unable to send verification code. Please try again.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>Continue to Verification &rarr;</span>';
+  }
+}
+
+function backToSignupStage1() {
+  clearAuthAlert();
+  clearInterval(currentSignupState.resendCountdownTimer);
+  document.getElementById("form-signup-stage2").style.display = "none";
+  document.getElementById("form-signup-stage1").style.display = "block";
+  updateStepper(1);
+}
+
+// -------------------------------------------------------------
+// OTP Input Boxes Navigation & Handling
+// -------------------------------------------------------------
+function initOtpInputBoxes() {
+  const boxes = document.querySelectorAll(".otp-box");
+  boxes.forEach((box, idx) => {
+    box.addEventListener("input", (e) => {
+      const val = e.target.value.replace(/[^0-9]/g, "");
+      e.target.value = val;
+      if (val && idx < boxes.length - 1) {
+        boxes[idx + 1].focus();
+      }
+    });
+
+    box.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace" && !e.target.value && idx > 0) {
+        boxes[idx - 1].focus();
+      }
+    });
+
+    box.addEventListener("paste", (e) => {
+      e.preventDefault();
+      const pasteData = (e.clipboardData || window.clipboardData).getData("text").replace(/[^0-9]/g, "");
+      if (pasteData) {
+        for (let i = 0; i < boxes.length; i++) {
+          boxes[i].value = pasteData[i] || "";
+        }
+        if (pasteData.length >= 6) {
+          boxes[boxes.length - 1].focus();
+        }
+      }
+    });
+  });
+}
+
+function getEnteredOtp() {
+  const boxes = document.querySelectorAll(".otp-box");
+  let code = "";
+  boxes.forEach(b => code += b.value.trim());
+  return code;
+}
+
+function startOtpCountdown(seconds = 60) {
+  clearInterval(currentSignupState.resendCountdownTimer);
+  currentSignupState.countdownSeconds = seconds;
+  const countEl = document.getElementById("otp-countdown-val");
+  const btnResend = document.getElementById("btn-resend-code");
+  btnResend.disabled = true;
+
+  const updateDisplay = (s) => {
+    const mins = Math.floor(s / 60);
+    const secs = s % 60;
+    countEl.textContent = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  };
+
+  updateDisplay(currentSignupState.countdownSeconds);
+
+  currentSignupState.resendCountdownTimer = setInterval(() => {
+    currentSignupState.countdownSeconds--;
+    if (currentSignupState.countdownSeconds <= 0) {
+      clearInterval(currentSignupState.resendCountdownTimer);
+      countEl.textContent = "00:00";
+      btnResend.disabled = false;
+    } else {
+      updateDisplay(currentSignupState.countdownSeconds);
+    }
+  }, 1000);
+}
+
+async function handleResendOTP() {
+  clearAuthAlert();
+  const btn = document.getElementById("btn-resend-code");
+  btn.disabled = true;
+  try {
+    const res = await DazzleApi.customer.signupResendOtp(currentSignupState.email);
+    showAuthAlert("A new verification code has been sent.", "success");
+    startOtpCountdown(res.cooldown_seconds || 60);
+    // Clear boxes
+    document.querySelectorAll(".otp-box").forEach(b => b.value = "");
+    document.querySelector(".otp-box")?.focus();
+  } catch (err) {
+    showAuthAlert(err.message || "Failed to resend code. Please wait.", "error");
+    btn.disabled = false;
+  }
+}
+
+// -------------------------------------------------------------
+// Stage 2: Verify OTP
+// -------------------------------------------------------------
+async function handleSignupStage2(event) {
+  event.preventDefault();
+  clearAuthAlert();
+  const otpCode = getEnteredOtp();
+  const btn = document.getElementById("btn-stage2-submit");
+
+  if (otpCode.length !== 6) {
+    showAuthAlert("Please enter all 6 digits of your verification code.", "error");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span>Verifying <i class="fa fa-spinner fa-spin"></i></span>';
+
+  try {
+    const res = await DazzleApi.customer.signupVerifyOtp(currentSignupState.email, otpCode);
+    currentSignupState.signupToken = res.signup_token;
+    clearInterval(currentSignupState.resendCountdownTimer);
+
+    // Transition to Stage 3 (Create Password)
+    document.getElementById("form-signup-stage2").style.display = "none";
+    document.getElementById("form-signup-stage3").style.display = "block";
+    updateStepper(3);
+    showAuthAlert("Email verified! Now create a secure password.", "success");
+  } catch (err) {
+    showAuthAlert(err.message || "Invalid or expired verification code.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>Verify Code &rarr;</span>';
+  }
+}
+
+// -------------------------------------------------------------
+// Stage 3: Create Password & Finish Account
+// -------------------------------------------------------------
+function validatePasswordInputs() {
+  const p1 = document.getElementById("signup-password")?.value || "";
+  const p2 = document.getElementById("signup-password-confirm")?.value || "";
+
+  const ruleLength = document.getElementById("rule-length");
+  const ruleMatch = document.getElementById("rule-match");
+
+  if (ruleLength) {
+    const ok = p1.length >= 12;
+    ruleLength.style.color = ok ? "#2E7D32" : "var(--text-muted)";
+    ruleLength.innerHTML = (ok ? "&#10003; " : "&#10007; ") + "Minimum 12 characters (" + p1.length + "/12)";
+  }
+
+  if (ruleMatch) {
+    const ok = p1.length > 0 && p1 === p2;
+    ruleMatch.style.color = ok ? "#2E7D32" : "var(--text-muted)";
+    ruleMatch.innerHTML = (ok ? "&#10003; " : "&#10007; ") + (ok ? "Passwords match" : "Passwords must match exactly");
+  }
+}
+
+async function handleSignupStage3(event) {
+  event.preventDefault();
+  clearAuthAlert();
+  const p1 = document.getElementById("signup-password")?.value || "";
+  const p2 = document.getElementById("signup-password-confirm")?.value || "";
+  const btn = document.getElementById("btn-stage3-submit");
+
+  if (p1.length < 12) {
+    showAuthAlert("Password must be at least 12 characters long.", "error");
+    return;
+  }
+  if (p1 !== p2) {
+    showAuthAlert("Passwords do not match.", "error");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span>Creating Account <i class="fa fa-spinner fa-spin"></i></span>';
+
+  try {
+    const res = await DazzleApi.customer.signupComplete(
+      currentSignupState.email,
+      currentSignupState.signupToken,
+      p1,
+      p2
+    );
+
+    showAuthAlert("Account created successfully! Welcome to Dazzle by Dua.", "success");
+    const params = new URLSearchParams(window.location.search);
+    const redirectUrl = params.get("redirect") || "index.html";
+    setTimeout(() => {
+      window.location.href = redirectUrl;
+    }, 1200);
+  } catch (err) {
+    showAuthAlert(err.message || "Failed to create account. Please restart registration.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>Create Account &amp; Sign In &rarr;</span>';
+  }
+}
+
+function updateStepper(activeStep) {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById(`step-node-${i}`);
+    if (!el) continue;
+    el.classList.remove("active", "completed");
+    if (i < activeStep) {
+      el.classList.add("completed");
+    } else if (i === activeStep) {
+      el.classList.add("active");
+    }
+  }
+}
+
+// -------------------------------------------------------------
+// Forgot Password Request Handler
+// -------------------------------------------------------------
+async function handleForgotPasswordSubmit(event) {
+  event.preventDefault();
+  clearAuthAlert();
+  const emailInput = document.getElementById("forgot-email");
+  const btn = document.getElementById("btn-forgot-submit");
+  const email = (emailInput?.value || "").trim();
+
+  if (!email || !email.includes("@")) {
+    showAuthAlert("Please enter a valid email address.", "error");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span>Sending Instructions <i class="fa fa-spinner fa-spin"></i></span>';
+
+  try {
+    const res = await DazzleApi.customer.forgotPassword(email);
+    showAuthAlert(res.message || "If an account exists, reset instructions have been sent.", "success");
+    emailInput.value = "";
+  } catch (err) {
+    showAuthAlert(err.message || "Unable to process request. Please try again.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>Send Reset Link &rarr;</span>';
+  }
+}
+</script>
+
+</body>
+</html>

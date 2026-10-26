@@ -1676,8 +1676,181 @@ function hydrateOffersPage() {
 }
 
 // ---- Auto-Init on DOM Ready ----
+
+// ========================================================
+// DAZZLE BY DUA - Customer Authentication UI Controller
+// ========================================================
+
+async function initCustomerAuthUI() {
+  const navActions = document.querySelector(".nav-actions");
+  const mobileNavLinks = document.querySelector(".mobile-nav-links");
+  if (!navActions && !mobileNavLinks) return;
+
+  const isAuth = window.DazzleApi && window.DazzleApi.customer && window.DazzleApi.customer.isLoggedIn();
+  let customerUser = null;
+
+  if (isAuth) {
+    const session = window.DazzleApi.customer.getSession();
+    customerUser = session ? session.user : null;
+
+    // Background verify session with backend /api/customer/auth/me
+    window.DazzleApi.customer.me().then(profile => {
+      if (profile && profile.name) {
+        // Update stored name if changed
+        const currentSess = window.DazzleApi.customer.getSession();
+        if (currentSess) {
+          currentSess.user.name = profile.name;
+          currentSess.user.email = profile.email;
+          sessionStorage.setItem("dazzle_customer_session", JSON.stringify(currentSess));
+        }
+      }
+    }).catch(() => {
+      // Session expired or invalidated on backend; re-render UI as unauthenticated
+      renderAuthNavElements(false, null);
+    });
+  }
+
+  renderAuthNavElements(isAuth, customerUser);
+}
+
+function renderAuthNavElements(isAuth, customerUser) {
+  const navActions = document.querySelector(".nav-actions");
+  const mobileNavLinks = document.querySelector(".mobile-nav-links");
+
+  // Remove existing injected auth elements
+  document.querySelectorAll(".nav-user-container, .user-nav-btn, .mobile-auth-link").forEach(el => el.remove());
+
+  if (isAuth && customerUser) {
+    const fullName = customerUser.name || "Customer";
+    const firstName = fullName.split(" ")[0];
+    const userEmail = customerUser.email || "";
+
+    // 1. Desktop Nav Icon / Dropdown
+    if (navActions) {
+      const userContainer = document.createElement("div");
+      userContainer.className = "nav-user-container";
+      userContainer.innerHTML = `
+        <button type="button" class="nav-user-btn" aria-label="Customer Account">
+          <i class="fa fa-user-circle"></i>
+          <span>${firstName}</span>
+          <i class="fa fa-chevron-down" style="font-size:0.6rem;margin-left:2px;"></i>
+        </button>
+        <div class="nav-user-dropdown">
+          <div class="nav-user-dropdown-header">
+            <div class="nav-user-dropdown-name">${fullName}</div>
+            <div class="nav-user-dropdown-email">${userEmail}</div>
+          </div>
+          <a href="orders.html"><i class="fa fa-box"></i> My Orders</a>
+          <a href="wishlist.html"><i class="fa fa-heart"></i> My Wishlist</a>
+          <div class="divider"></div>
+          <button type="button" onclick="handleCustomerLogout()"><i class="fa fa-sign-out-alt"></i> Sign Out</button>
+        </div>
+      `;
+      // Insert before hamburger
+      const hamburger = navActions.querySelector(".hamburger");
+      if (hamburger) {
+        navActions.insertBefore(userContainer, hamburger);
+      } else {
+        navActions.appendChild(userContainer);
+      }
+    }
+
+    // 2. Mobile Nav Links
+    if (mobileNavLinks) {
+      const li = document.createElement("li");
+      li.className = "mobile-auth-link";
+      li.innerHTML = `
+        <div style="padding:0.75rem 1rem;border-top:1px solid var(--border);margin-top:0.75rem;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-weight:700;font-size:0.85rem;color:var(--text-dark);">Hi, ${firstName}</div>
+            <div style="font-size:0.7rem;color:var(--text-muted);">${userEmail}</div>
+          </div>
+          <button type="button" onclick="handleCustomerLogout()" class="btn btn-outline btn-sm" style="padding:0.4rem 0.8rem;font-size:0.7rem;">Sign Out</button>
+        </div>
+      `;
+      mobileNavLinks.appendChild(li);
+    }
+
+  } else {
+    // Unauthenticated State: Show Sign In link / User Icon
+    if (navActions) {
+      const authLink = document.createElement("a");
+      authLink.href = "auth.html";
+      authLink.className = "nav-icon user-nav-btn";
+      authLink.title = "Sign In / Register";
+      authLink.innerHTML = `<i class="fa fa-user"></i>`;
+      const hamburger = navActions.querySelector(".hamburger");
+      if (hamburger) {
+        navActions.insertBefore(authLink, hamburger);
+      } else {
+        navActions.appendChild(authLink);
+      }
+    }
+
+    if (mobileNavLinks) {
+      const li = document.createElement("li");
+      li.className = "mobile-auth-link";
+      li.innerHTML = `<a href="auth.html" class="mobile-nav-link" style="color:var(--gold);font-weight:600;"><i class="fa fa-user"></i> Sign In / Register</a>`;
+      mobileNavLinks.appendChild(li);
+    }
+  }
+}
+
+async function handleCustomerLogout() {
+  if (window.DazzleApi && window.DazzleApi.customer) {
+    try {
+      await window.DazzleApi.customer.logout();
+    } catch (e) {
+      console.warn("Logout error:", e);
+    }
+  }
+  showToast("You have been signed out.");
+  setTimeout(() => {
+    window.location.reload();
+  }, 600);
+}
+
+// Automatically sync orders for authenticated customer on orders.html
+async function syncAuthenticatedCustomerOrders() {
+  if (window.DazzleApi && window.DazzleApi.customer && window.DazzleApi.customer.isLoggedIn()) {
+    try {
+      const orders = await window.DazzleApi.customer.getOrders();
+      if (Array.isArray(orders) && orders.length > 0) {
+        if (window.DazzleStore && typeof window.DazzleStore._set === "function") {
+          window.DazzleStore._set(window.DazzleStore.KEYS.ORDERS, orders);
+        }
+        if (typeof renderOrdersPage === "function") {
+          renderOrdersPage();
+        }
+      }
+    } catch (e) {
+      console.warn("Could not sync customer orders:", e);
+    }
+  }
+}
+
+// Automatically prefill checkout fields for authenticated customers
+function prefillAuthenticatedCheckout() {
+  if (window.DazzleApi && window.DazzleApi.customer && window.DazzleApi.customer.isLoggedIn()) {
+    const session = window.DazzleApi.customer.getSession();
+    if (session && session.user) {
+      const nameInput = document.getElementById("ch-name");
+      const emailInput = document.getElementById("ch-email");
+      if (nameInput && !nameInput.value) {
+        nameInput.value = session.user.name || "";
+      }
+      if (emailInput && !emailInput.value) {
+        emailInput.value = session.user.email || "";
+      }
+    }
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initMobileMenu();
+  initCustomerAuthUI();
+  syncAuthenticatedCustomerOrders();
+  prefillAuthenticatedCheckout();
   initScrollNav();
   setActiveNavLink();
   initFAQ();
