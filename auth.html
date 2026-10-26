@@ -219,9 +219,9 @@
       <!-- Stage 3 Form: Create Password -->
       <form id="form-signup-stage3" onsubmit="handleSignupStage3(event)" style="display:none;" novalidate>
         <div class="auth-form-group">
-          <label class="auth-label" for="signup-password">Create Password (min. 12 characters)</label>
+          <label class="auth-label" for="signup-password">Create Password (min. 8 characters)</label>
           <div class="auth-input-wrapper">
-            <input type="password" id="signup-password" class="auth-input" placeholder="Create a strong password" minlength="12" required autocomplete="new-password" oninput="validatePasswordInputs()">
+            <input type="password" id="signup-password" class="auth-input" placeholder="Create a strong password (min. 8 characters)" minlength="8" required autocomplete="new-password" oninput="validatePasswordInputs()">
             <button type="button" class="auth-pwd-toggle" onclick="togglePasswordVisibility('signup-password', this)">
               <i class="fa fa-eye"></i>
             </button>
@@ -231,7 +231,7 @@
         <div class="auth-form-group">
           <label class="auth-label" for="signup-password-confirm">Re-enter Password</label>
           <div class="auth-input-wrapper">
-            <input type="password" id="signup-password-confirm" class="auth-input" placeholder="Re-enter password" minlength="12" required autocomplete="new-password" oninput="validatePasswordInputs()">
+            <input type="password" id="signup-password-confirm" class="auth-input" placeholder="Re-enter password" minlength="8" required autocomplete="new-password" oninput="validatePasswordInputs()">
             <button type="button" class="auth-pwd-toggle" onclick="togglePasswordVisibility('signup-password-confirm', this)">
               <i class="fa fa-eye"></i>
             </button>
@@ -240,7 +240,7 @@
 
         <!-- Password Validation Checklist -->
         <div style="background:var(--beige); padding:0.85rem 1rem; border-radius:var(--radius-sm); font-size:0.75rem; margin-bottom:1.5rem;">
-          <div id="rule-length" style="color:var(--text-muted); margin-bottom:0.25rem;">&#10007; Minimum 12 characters</div>
+          <div id="rule-length" style="color:var(--text-muted); margin-bottom:0.25rem;">&#10007; Minimum 8 characters</div>
           <div id="rule-match" style="color:var(--text-muted);">&#10007; Passwords must match exactly</div>
         </div>
 
@@ -328,19 +328,58 @@ let currentSignupState = {
 };
 
 // Check query params for mode (e.g. auth.html?mode=signup or ?mode=forgot)
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const mode = params.get("mode") || "login";
-  switchAuthMode(mode);
   initOtpInputBoxes();
 
-  // If already authenticated, redirect
-  if (window.DazzleApi && window.DazzleApi.customer && window.DazzleApi.customer.isLoggedIn()) {
-    const redirectUrl = params.get("redirect") || "index.html";
-    showAuthAlert("You are already signed in. Redirecting...", "info");
-    setTimeout(() => { window.location.href = redirectUrl; }, 1200);
+  // Handle explicit logout request via query parameter
+  if (params.get("action") === "logout" || params.get("mode") === "logout") {
+    if (window.DazzleApi && window.DazzleApi.customer) {
+      try { await window.DazzleApi.customer.logout(); } catch(e) {}
+    }
+    sessionStorage.removeItem("dazzle_customer_session");
+    showAuthAlert("You have been signed out successfully.", "success");
+    switchAuthMode("login");
+    return;
   }
+
+  // Handle post-logout banner
+  if (params.get("logged_out") === "1") {
+    showAuthAlert("You have been logged out successfully.", "info");
+  }
+
+  // If authenticated customer
+  if (window.DazzleApi && window.DazzleApi.customer && window.DazzleApi.customer.isLoggedIn()) {
+    const session = window.DazzleApi.customer.getSession();
+    const user = session ? session.user : null;
+    showCustomerAccountView(user);
+    return;
+  }
+
+  switchAuthMode(mode);
 });
+
+function showCustomerAccountView(user) {
+  clearAuthAlert();
+  document.getElementById("auth-main-title").textContent = "Customer Account";
+  document.getElementById("auth-main-subtitle").textContent = "Manage your jewellery orders, saved pieces and account security";
+  const tabsBar = document.getElementById("auth-tabs-bar");
+  if (tabsBar) tabsBar.style.display = "none";
+
+  document.getElementById("form-login").style.display = "none";
+  document.getElementById("panel-signup").style.display = "none";
+  document.getElementById("form-forgot").style.display = "none";
+
+  const panelAccount = document.getElementById("panel-account");
+  if (panelAccount) {
+    panelAccount.style.display = "block";
+    if (user) {
+      document.getElementById("account-panel-name").textContent = user.name || "Valued Customer";
+      document.getElementById("account-panel-email").textContent = user.email || "";
+    }
+  }
+}
 
 function switchAuthMode(mode) {
   clearAuthAlert();
@@ -648,9 +687,9 @@ function validatePasswordInputs() {
   const ruleMatch = document.getElementById("rule-match");
 
   if (ruleLength) {
-    const ok = p1.length >= 12;
+    const ok = p1.length >= 8;
     ruleLength.style.color = ok ? "#2E7D32" : "var(--text-muted)";
-    ruleLength.innerHTML = (ok ? "&#10003; " : "&#10007; ") + "Minimum 12 characters (" + p1.length + "/12)";
+    ruleLength.innerHTML = (ok ? "&#10003; " : "&#10007; ") + "Minimum 8 characters (" + p1.length + "/8)";
   }
 
   if (ruleMatch) {
@@ -667,8 +706,8 @@ async function handleSignupStage3(event) {
   const p2 = document.getElementById("signup-password-confirm")?.value || "";
   const btn = document.getElementById("btn-stage3-submit");
 
-  if (p1.length < 12) {
-    showAuthAlert("Password must be at least 12 characters long.", "error");
+  if (p1.length < 8) {
+    showAuthAlert("Password must be at least 8 characters long.", "error");
     return;
   }
   if (p1 !== p2) {

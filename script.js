@@ -1730,20 +1730,21 @@ function renderAuthNavElements(isAuth, customerUser) {
       const userContainer = document.createElement("div");
       userContainer.className = "nav-user-container";
       userContainer.innerHTML = `
-        <button type="button" class="nav-user-btn" aria-label="Customer Account">
+        <button type="button" class="nav-user-btn" aria-label="Customer Account" onclick="toggleNavUserDropdown(event)">
           <i class="fa fa-user-circle"></i>
           <span>${firstName}</span>
           <i class="fa fa-chevron-down" style="font-size:0.6rem;margin-left:2px;"></i>
         </button>
-        <div class="nav-user-dropdown">
+        <div class="nav-user-dropdown" id="nav-user-dropdown-menu">
           <div class="nav-user-dropdown-header">
             <div class="nav-user-dropdown-name">${fullName}</div>
             <div class="nav-user-dropdown-email">${userEmail}</div>
           </div>
           <a href="orders.html"><i class="fa fa-box"></i> My Orders</a>
           <a href="wishlist.html"><i class="fa fa-heart"></i> My Wishlist</a>
+          <a href="auth.html"><i class="fa fa-user-cog"></i> Account Settings</a>
           <div class="divider"></div>
-          <button type="button" onclick="handleCustomerLogout()"><i class="fa fa-sign-out-alt"></i> Sign Out</button>
+          <button type="button" onclick="handleCustomerLogout()" style="color:#C62828;"><i class="fa fa-sign-out-alt"></i> Sign Out / Logout</button>
         </div>
       `;
       // Insert before hamburger
@@ -1753,6 +1754,16 @@ function renderAuthNavElements(isAuth, customerUser) {
       } else {
         navActions.appendChild(userContainer);
       }
+    }
+
+    // Update orders.html customer banner if present
+    const banner = document.getElementById("customer-account-banner");
+    if (banner) {
+      banner.style.display = "flex";
+      const nameEl = document.getElementById("banner-customer-name");
+      const emailEl = document.getElementById("banner-customer-email");
+      if (nameEl) nameEl.textContent = fullName;
+      if (emailEl) emailEl.textContent = userEmail;
     }
 
     // 2. Mobile Nav Links
@@ -1804,11 +1815,16 @@ async function handleCustomerLogout() {
       console.warn("Logout error:", e);
     }
   }
-  showToast("You have been signed out.");
+  sessionStorage.removeItem("dazzle_customer_session");
+  localStorage.removeItem("dazzle_customer_session");
+  if (typeof showToast === "function") {
+    showToast("You have been signed out.");
+  }
   setTimeout(() => {
-    window.location.reload();
-  }, 600);
+    window.location.href = "auth.html?mode=login&logged_out=1";
+  }, 400);
 }
+window.handleCustomerLogout = handleCustomerLogout;
 
 // Automatically sync orders for authenticated customer on orders.html
 async function syncAuthenticatedCustomerOrders() {
@@ -1889,5 +1905,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // If on offers.html
   if (document.getElementById("current-offers")) {
     hydrateOffersPage();
+  }
+});
+
+
+function toggleNavUserDropdown(e) {
+  if (e) e.stopPropagation();
+  const menu = document.getElementById("nav-user-dropdown-menu");
+  if (menu) {
+    menu.classList.toggle("show");
+  }
+}
+
+document.addEventListener("click", () => {
+  const menu = document.getElementById("nav-user-dropdown-menu");
+  if (menu && menu.classList.contains("show")) {
+    menu.classList.remove("show");
   }
 });
