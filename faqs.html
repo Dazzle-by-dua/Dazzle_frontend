@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frequently Asked Questions — Dazzle by Dua</title>
+  <meta name="description" content="Find answers to common questions about shopping, payments, delivery charges, order tracking, returns, and customer accounts at Dazzle by Dua.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <!-- Announcement -->
+  <div class="announcement-bar">
+    Free shipping on orders above &#8377;2500 &nbsp;|&nbsp; Use code <strong>DAZZLE10</strong> for 10% off
+    <a href="offers.html">View Offers &rarr;</a>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="logo.png" alt="Dazzle by Dua Logo" class="nav-logo-img">
+        <div class="nav-logo-text">
+          <span class="nav-logo-name">Dazzle by Dua</span>
+          <span class="nav-logo-tagline">Fine Jewellery</span>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="shop.html" class="nav-link">Shop</a></li>
+        <li><a href="offers.html" class="nav-link">Offers</a></li>
+        <li><a href="orders.html" class="nav-link">My Orders</a></li>
+        <li><a href="wishlist.html" class="nav-link">Wishlist</a></li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="wishlist.html" class="nav-icon" title="Wishlist">
+          <i class="fa fa-heart"></i>
+          <span class="nav-badge wish-badge">0</span>
+        </a>
+        <a href="cart.html" class="nav-icon" title="Cart">
+          <i class="fa fa-shopping-bag"></i>
+          <span class="nav-badge cart-badge">0</span>
+        </a>
+        <button class="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu">
+    <div class="mobile-menu-header">
+      <a href="index.html" class="nav-logo">
+        <img src="logo.png" alt="Dazzle by Dua Logo" class="nav-logo-img">
+        <div class="nav-logo-text">
+          <span class="nav-logo-name">Dazzle by Dua</span>
+          <span class="nav-logo-tagline">Fine Jewellery</span>
+        </div>
+      </a>
+      <button class="mobile-menu-close">&times;</button>
+    </div>
+    <ul class="mobile-nav-links">
+      <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+      <li><a href="shop.html" class="mobile-nav-link">Shop</a></li>
+      <li><a href="offers.html" class="mobile-nav-link">Offers &amp; Combos</a></li>
+      <li><a href="orders.html" class="mobile-nav-link">My Orders</a></li>
+      <li><a href="wishlist.html" class="mobile-nav-link">Wishlist</a></li>
+      <li><a href="contact.html" class="mobile-nav-link">Contact</a></li>
+    </ul>
+  </div>
+
+  <!-- Page Hero -->
+  <div class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="index.html">Home</a><span>/</span>
+        <span>FAQs</span>
+      </nav>
+      <h1 style="font-size:2.2rem;margin-bottom:0.4rem;">Frequently Asked Questions</h1>
+      <p>Welcome to Dazzle by Dua! Find answers to common questions about shopping, payments, delivery, returns, and customer accounts.</p>
+    </div>
+  </div>
+
+  <!-- Policy Navigation Pills -->
+  <section class="policy-page-section">
+    <div class="container">
+      <nav class="policy-nav-pills" aria-label="Policy Navigation">
+        <a href="shipping.html" class="policy-nav-pill">Shipping Information</a>
+        <a href="returns.html" class="policy-nav-pill">Returns &amp; Refunds</a>
+        <a href="privacy-policy.html" class="policy-nav-pill">Privacy Policy</a>
+        <a href="terms.html" class="policy-nav-pill">Terms &amp; Conditions</a>
+        <a href="faqs.html" class="policy-nav-pill active">FAQs</a>
+      </nav>
+
+      <!-- Search Box & Expand Controls -->
+      <div class="faq-search-wrapper">
+        <i class="fa fa-search faq-search-icon"></i>
+        <input type="text" id="faq-search" class="faq-search-input" placeholder="Search questions by topic (e.g., shipping, returns, payment, tracking)..." autocomplete="off">
+      </div>
+
+      <div style="max-width:980px;margin:0 auto 1.5rem;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.85rem;color:var(--text-muted);" id="faq-count">Showing all 15 questions</span>
+        <button type="button" id="faq-toggle-all" class="btn btn-outline btn-sm" style="font-size:0.75rem;padding:0.4rem 0.9rem;">
+          Expand All
+        </button>
+      </div>
+
+      <!-- FAQ Accordion List -->
+      <div class="faq-list" id="faq-accordion-list">
+
+        <!-- Question 1 -->
+        <div class="faq-item open">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">1</span>
+              <span>How do I place an order?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>Browse our collection, select the product you like, add it to your cart, and proceed to checkout.</p>
+            <p>Enter your delivery details, review your order total, select an available payment method, and place your order.</p>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">2</span>
+              <span>What payment methods do you accept?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>Available payment methods are displayed during checkout.</p>
+            <p>Depending on availability, these may include online payments through <strong>Razorpay</strong> (Credit/Debit Cards, Net Banking, UPI, and Wallets) and <strong>Cash on Delivery (COD)</strong>.</p>
+            <p>Online payment options may vary depending on the payment provider's configuration and availability.</p>
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">3</span>
+              <span>Is online payment secure?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>Online payments are processed securely through the payment service provider available at checkout.</p>
+            <p><strong>Important:</strong> Never share your banking password, UPI PIN, card PIN, or payment OTP with anyone claiming to represent Dazzle by Dua.</p>
+          </div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">4</span>
+              <span>What are the delivery charges?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>Our planned delivery charges are:</p>
+            <ul>
+              <li><strong>Hyderabad:</strong> &#8377;50</li>
+              <li><strong>Other locations in Telangana, excluding Hyderabad:</strong> &#8377;70</li>
+              <li><strong>Rest of India:</strong> &#8377;90</li>
+            </ul>
+            <p>The applicable charge is displayed during checkout. Please check the final amount before confirming your order. We also offer <strong>Free Shipping</strong> on orders above &#8377;2,500!</p>
+          </div>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">5</span>
+              <span>How long will delivery take?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>Delivery time depends on your location, order processing, courier availability, and other operational factors.</p>
+            <p><strong>Estimated delivery time:</strong> 3 to 7 business days across India depending on your location.</p>
+            <p>If tracking is available, we will share the relevant details when your order is shipped.</p>
+          </div>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">6</span>
+              <span>Can I track my order?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>If tracking information is available, you can use the details shared with you to follow your shipment.</p>
+            <p>You can also view your order status directly on our <a href="orders.html" style="color:var(--gold-hover);text-decoration:underline;">My Orders</a> page.</p>
+            <p>For assistance with an existing order, contact our customer support team and provide your order number.</p>
+          </div>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">7</span>
+              <span>Can I cancel my order?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>Please contact us as soon as possible if you want to cancel an order.</p>
+            <p>Cancellation depends on the order's processing and dispatch status. If the order has already been shipped, cancellation may no longer be possible.</p>
+            <p>Any applicable refund will be handled according to our <a href="returns.html" style="color:var(--gold-hover);text-decoration:underline;">Returns &amp; Refunds</a> policy.</p>
+          </div>
+        </div>
+
+        <!-- Question 8 -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">8</span>
+              <span>Can I return a product?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>Returns are subject to our <a href="returns.html" style="color:var(--gold-hover);text-decoration:underline;">Returns &amp; Refunds</a> policy and applicable law.</p>
+            <p>All sales are final; we do not accept returns or exchanges for change of mind. Please review the eligibility requirements and return request period before initiating a return.</p>
+            <p>If you receive a damaged, defective, or incorrect product, contact us promptly with your order details and supporting photographs.</p>
+          </div>
+        </div>
+
+        <!-- Question 9 -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">9</span>
+              <span>How long do refunds take?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>Approved refunds are processed according to our refund procedures and the relevant payment provider's requirements.</p>
+            <p>The time taken for the amount to appear in your account may depend on your bank or payment provider.</p>
+            <p><strong>Refund processing timeframe:</strong> 5 to 7 business days following approval to your original mode of payment.</p>
+          </div>
+        </div>
+
+        <!-- Question 10 -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">10</span>
+              <span>What if I receive a damaged or incorrect item?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>Contact customer support promptly with your order number, a description of the issue, and clear photographs of the item and packaging.</p>
+            <p>Our team will review the issue and explain the appropriate next steps.</p>
+          </div>
+        </div>
+
+        <!-- Question 11 -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">11</span>
+              <span>How do I create an account?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>Open the account or login page (<a href="auth.html" style="color:var(--gold-hover);text-decoration:underline;">Sign In / Register</a>) on our website and follow the signup instructions.</p>
+            <p>If email verification is required, enter the verification code sent to your registered email address and complete the remaining steps.</p>
+          </div>
+        </div>
+
+        <!-- Question 12 -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">12</span>
+              <span>I forgot my password. What should I do?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>Open the login page and select the <strong>Forgot Password</strong> option, or visit our <a href="reset-password.html" style="color:var(--gold-hover);text-decoration:underline;">Password Reset</a> page.</p>
+            <p>Follow the instructions sent to your registered email address to reset your password.</p>
+            <p>For your security, do not share password reset links or verification codes with anyone.</p>
+          </div>
+        </div>
+
+        <!-- Question 13 -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">13</span>
+              <span>Can I place an order without creating an account?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>Guest checkout may be available, depending on the checkout options offered on our website.</p>
+            <p>Follow the checkout instructions to see which options are available to you.</p>
+          </div>
+        </div>
+
+        <!-- Question 14 -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">14</span>
+              <span>How can I contact Dazzle by Dua?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>For assistance with products, orders, payments, or returns, contact us using the official contact details provided on our website:</p>
+            <ul>
+              <li><strong>Email:</strong> <a href="mailto:duasalam021@gmail.com" style="color:var(--gold-hover);">duasalam021@gmail.com</a></li>
+              <li><strong>Phone / WhatsApp:</strong> <a href="https://wa.me/916309139498" target="_blank" rel="noopener noreferrer" style="color:var(--gold-hover);">+91 63091 39498</a></li>
+            </ul>
+            <p>When contacting us about an existing order, include your order number to help us assist you more efficiently.</p>
+          </div>
+        </div>
+
+        <!-- Question 15 -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <div class="faq-q-text">
+              <span class="faq-q-num">15</span>
+              <span>Where can I read your policies?</span>
+            </div>
+            <div class="faq-chevron"><i class="fa fa-chevron-down"></i></div>
+          </div>
+          <div class="faq-a">
+            <p>You can find detailed information on these dedicated policy pages:</p>
+            <ul>
+              <li><a href="shipping.html" style="color:var(--gold-hover);font-weight:600;text-decoration:underline;">Shipping Information</a> &mdash; Delivery charges, timelines, tracking, and courier care.</li>
+              <li><a href="returns.html" style="color:var(--gold-hover);font-weight:600;text-decoration:underline;">Returns &amp; Refunds</a> &mdash; Cancellation, damaged item procedure, and refund timelines.</li>
+              <li><a href="privacy-policy.html" style="color:var(--gold-hover);font-weight:600;text-decoration:underline;">Privacy Policy</a> &mdash; How we protect and process your personal and order data.</li>
+              <li><a href="terms.html" style="color:var(--gold-hover);font-weight:600;text-decoration:underline;">Terms &amp; Conditions</a> &mdash; Website usage, purchase terms, and customer rights.</li>
+            </ul>
+            <p>We recommend reviewing the relevant policy before placing an order.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Empty State for Search -->
+      <div id="faq-empty" class="faq-empty-state">
+        <div style="font-size:2rem;color:var(--gold);margin-bottom:0.5rem;"><i class="fa fa-search"></i></div>
+        <h4 style="font-family:'Playfair Display',serif;margin-bottom:0.25rem;">No matching questions found</h4>
+        <p style="font-size:0.88rem;color:var(--text-muted);">Try searching for a different keyword or contact our support team directly.</p>
+      </div>
+
+      <!-- Contact Box -->
+      <div style="max-width:980px;margin:3.5rem auto 0;">
+        <div class="policy-contact-box">
+          <div>
+            <h4>Still Have Questions?</h4>
+            <p>Our friendly customer support is here to help with your jewellery inquiries.</p>
+          </div>
+          <div class="policy-contact-actions">
+            <a href="https://wa.me/916309139498" target="_blank" rel="noopener noreferrer" class="btn btn-gold btn-sm">
+              <i class="fab fa-whatsapp"></i>&nbsp; WhatsApp Us
+            </a>
+            <a href="mailto:duasalam021@gmail.com" class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.4);background:transparent;">
+              <i class="fa fa-envelope"></i>&nbsp; Email Us
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div>
+          <div class="footer-brand-name">Dazzle by Dua</div>
+          <span class="footer-brand-tag">Fine Jewellery</span>
+          <p class="footer-tagline">Timeless pieces, crafted with love.<br>For your most beautiful moments.</p>
+          <div class="footer-social">
+            <a href="https://instagram.com/dazzle.by.dua" target="_blank" rel="noopener noreferrer" class="social-link" title="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-pinterest"></i></a>
+            <a href="https://wa.me/916309139498" target="_blank" rel="noopener noreferrer" class="social-link" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+          </div>
+        </div>
+        <div>
+          <div class="footer-heading">Quick Links</div>
+          <ul class="footer-links">
+            <li><a href="index.html" class="footer-link">Home</a></li>
+            <li><a href="shop.html" class="footer-link">Shop</a></li>
+            <li><a href="offers.html" class="footer-link">Offers &amp; Combos</a></li>
+            <li><a href="contact.html" class="footer-link">Contact Us</a></li>
+            <li><a href="orders.html" class="footer-link">My Orders</a></li>
+            <li><a href="wishlist.html" class="footer-link">Wishlist</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-heading">Customer Care</div>
+          <ul class="footer-links">
+            <li><a href="shipping.html" class="footer-link">Shipping Info</a></li>
+            <li><a href="returns.html" class="footer-link">Returns &amp; Refunds</a></li>
+            <li><a href="privacy-policy.html" class="footer-link">Privacy Policy</a></li>
+            <li><a href="terms.html" class="footer-link">Terms &amp; Conditions</a></li>
+            <li><a href="faqs.html" class="footer-link" style="color:var(--gold);">FAQs</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-heading">Connect With Us</div>
+          <ul class="footer-links">
+            <li><a href="https://instagram.com/dazzle.by.dua" target="_blank" rel="noopener noreferrer" class="footer-link"><i class="fab fa-instagram"></i>&nbsp; Instagram</a></li>
+            <li><a href="https://wa.me/916309139498" target="_blank" rel="noopener noreferrer" class="footer-link"><i class="fab fa-whatsapp"></i>&nbsp; WhatsApp</a></li>
+            <li><a href="mailto:duasalam021@gmail.com" class="footer-link"><i class="fa fa-envelope"></i>&nbsp; Email Us</a></li>
+          </ul>
+          <div style="margin-top:1.5rem">
+            <div class="footer-heading" style="font-size:.85rem">Newsletter</div>
+            <div style="display:flex;gap:.5rem;margin-top:.75rem">
+              <input type="email" placeholder="Your email" style="flex:1;padding:.6rem .9rem;border:1px solid rgba(255,255,255,.15);border-radius:40px;background:rgba(255,255,255,.05);color:#fff;font-size:.8rem;font-family:inherit">
+              <button class="btn btn-gold btn-sm" style="padding:.6rem 1rem">&#10003;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Dazzle by Dua. All rights reserved.</span>
+        <div class="footer-payments">
+          <span class="payment-badge">VISA</span>
+          <span class="payment-badge">MC</span>
+          <span class="payment-badge">UPI</span>
+          <span class="payment-badge">COD</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    // Search & Filter for FAQs
+    document.addEventListener("DOMContentLoaded", () => {
+      const searchInput = document.getElementById("faq-search");
+      const items = Array.from(document.querySelectorAll(".faq-item"));
+      const emptyState = document.getElementById("faq-empty");
+      const countEl = document.getElementById("faq-count");
+      const toggleAllBtn = document.getElementById("faq-toggle-all");
+
+      if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+          const q = (e.target.value || "").trim().toLowerCase();
+          let visibleCount = 0;
+
+          items.forEach(item => {
+            const text = item.textContent.toLowerCase();
+            if (!q || text.includes(q)) {
+              item.style.display = "";
+              visibleCount++;
+              if (q) item.classList.add("open"); // auto-expand matching results
+            } else {
+              item.style.display = "none";
+            }
+          });
+
+          if (emptyState) emptyState.style.display = visibleCount === 0 ? "block" : "none";
+          if (countEl) countEl.textContent = q ? `Found ${visibleCount} question${visibleCount === 1 ? '' : 's'}` : `Showing all ${items.length} questions`;
+        });
+      }
+
+      if (toggleAllBtn) {
+        let allExpanded = false;
+        toggleAllBtn.addEventListener("click", () => {
+          allExpanded = !allExpanded;
+          items.forEach(item => {
+            if (item.style.display !== "none") {
+              if (allExpanded) item.classList.add("open");
+              else item.classList.remove("open");
+            }
+          });
+          toggleAllBtn.textContent = allExpanded ? "Collapse All" : "Expand All";
+        });
+      }
+    });
+  </script>
+</body>
+</html>

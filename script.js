@@ -356,11 +356,11 @@ const DEFAULT_NAVIGATION = {
     { name: "Wishlist", href: "wishlist.html" }
   ],
   footerCare: [
-    { name: "Shipping Info", href: "contact.html" },
-    { name: "Returns & Refunds", href: "contact.html" },
-    { name: "Privacy Policy", href: "#" },
-    { name: "Terms & Conditions", href: "#" },
-    { name: "FAQs", href: "contact.html" }
+    { name: "Shipping Info", href: "shipping.html" },
+    { name: "Returns & Refunds", href: "returns.html" },
+    { name: "Privacy Policy", href: "privacy-policy.html" },
+    { name: "Terms & Conditions", href: "terms.html" },
+    { name: "FAQs", href: "faqs.html" }
   ]
 };
 
