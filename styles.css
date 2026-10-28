@@ -1162,7 +1162,7 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   margin-bottom: 3rem;
   padding: 0.5rem;
   background: rgba(255, 253, 248, 0.85);
@@ -1173,6 +1173,103 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
   max-width: fit-content;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Mobile Policy Dropdown Selector */
+.policy-dropdown-container {
+  display: none;
+  max-width: 440px;
+  margin: 0 auto 2.25rem;
+  padding: 0 0.5rem;
+}
+
+.policy-dropdown-wrapper {
+  background: var(--white);
+  border: 1.5px solid var(--gold);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 18px rgba(212, 175, 124, 0.22);
+  padding: 0.35rem 0.5rem 0.35rem 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  transition: all var(--transition);
+  position: relative;
+}
+
+.policy-dropdown-wrapper:hover,
+.policy-dropdown-wrapper:focus-within {
+  border-color: var(--gold-hover);
+  box-shadow: 0 6px 24px rgba(212, 175, 124, 0.35);
+  transform: translateY(-1px);
+}
+
+.policy-dropdown-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-hover);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.policy-dropdown-label i {
+  color: var(--gold);
+  font-size: 0.88rem;
+}
+
+.policy-select-box {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.policy-select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  border: none;
+  font-family: "Playfair Display", serif;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  padding: 0.55rem 2.25rem 0.55rem 0.35rem;
+  cursor: pointer;
+  outline: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.policy-select option {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  background: var(--white);
+  padding: 0.5rem;
+}
+
+.policy-select-icon {
+  position: absolute;
+  right: 0.75rem;
+  pointer-events: none;
+  color: var(--gold);
+  font-size: 0.85rem;
+  transition: transform var(--transition);
+}
+
+.policy-dropdown-wrapper:focus-within .policy-select-icon {
+  transform: rotate(180deg);
+  color: var(--gold-hover);
 }
 
 .policy-nav-pill {
@@ -1584,20 +1681,18 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
   }
 }
 
+@media (max-width: 768px) {
+  .policy-nav-pills {
+    display: none !important;
+  }
+  .policy-dropdown-container {
+    display: block !important;
+  }
+}
+
 @media (max-width: 600px) {
   .policy-card {
     padding: 1.75rem 1.25rem;
-  }
-  .policy-nav-pills {
-    width: 100%;
-    overflow-x: auto;
-    justify-content: flex-start;
-    padding: 0.4rem;
-    scrollbar-width: thin;
-  }
-  .policy-nav-pill {
-    padding: 0.5rem 1rem;
-    font-size: 0.78rem;
   }
   .faq-q {
     padding: 1.15rem 1.25rem;

@@ -86,6 +86,7 @@
   <!-- Policy Navigation Pills -->
   <section class="policy-page-section">
     <div class="container">
+      <!-- Desktop Policy Navigation Pills -->
       <nav class="policy-nav-pills" aria-label="Policy Navigation">
         <a href="shipping.html" class="policy-nav-pill">Shipping Information</a>
         <a href="returns.html" class="policy-nav-pill">Returns &amp; Refunds</a>
@@ -93,6 +94,26 @@
         <a href="terms.html" class="policy-nav-pill active">Terms &amp; Conditions</a>
         <a href="faqs.html" class="policy-nav-pill">FAQs</a>
       </nav>
+
+      <!-- Mobile Policy Dropdown Selector -->
+      <div class="policy-dropdown-container">
+        <div class="policy-dropdown-wrapper">
+          <div class="policy-dropdown-label">
+            <i class="fa fa-book-open"></i>
+            <span>Policy:</span>
+          </div>
+          <div class="policy-select-box">
+            <select class="policy-select" onchange="if(this.value) window.location.href=this.value" aria-label="Select Policy Page">
+              <option value="shipping.html">Shipping Information</option>
+              <option value="returns.html">Returns &amp; Refunds</option>
+              <option value="privacy-policy.html">Privacy Policy</option>
+              <option value="terms.html" selected>Terms &amp; Conditions</option>
+              <option value="faqs.html">FAQs</option>
+            </select>
+            <i class="fa fa-chevron-down policy-select-icon"></i>
+          </div>
+        </div>
+      </div>
 
       <!-- Main Policy Card -->
       <article class="policy-card">
