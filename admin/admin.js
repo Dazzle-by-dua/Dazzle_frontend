@@ -318,9 +318,10 @@ window.AdminApp = window.AdminApp || {
     }
 
     listEl.innerHTML = this.currentProductGallery.map((imgUrl, idx) => `
-      <div class="gallery-thumb-item">
+      <div class="gallery-thumb-item" style="position:relative">
         <img src="${this.formatImgUrl(imgUrl)}" alt="Gallery ${idx + 1}">
         <button type="button" class="gallery-thumb-remove" onclick="AdminApp.removeProductGalleryImage(${idx})" title="Remove this photo">&times;</button>
+        <button type="button" style="position:absolute;bottom:2px;left:2px;background:rgba(26,26,26,0.85);color:var(--gold);border:none;border-radius:2px;font-size:0.65rem;padding:2px 4px;cursor:pointer" onclick="AdminApp.setAsPrimaryProductImage(${idx})" title="Make this the main product card photo">&#9733; Main</button>
       </div>
     `).join("");
   },
@@ -344,6 +345,20 @@ window.AdminApp = window.AdminApp || {
         const data = await this.uploadToCloudinary(file, "dazzle_by_dua/products");
         this.currentProductGallery.push(data.secure_url);
         successCount++;
+
+        // Auto-update primary product image so uploaded gallery images reflect on main cards
+        const prodImgInput = document.getElementById("prod-img");
+        const prodImgPreview = document.getElementById("prod-img-preview");
+        if (prodImgInput && (!prodImgInput.value || !prodImgInput.value.startsWith("http") || prodImgInput.value === "product_flower_necklace.jpg")) {
+          prodImgInput.value = data.secure_url;
+          if (prodImgPreview) prodImgPreview.src = data.secure_url;
+          const statusEl = document.getElementById("prod-upload-status");
+          if (statusEl) {
+            statusEl.className = "upload-status success";
+            statusEl.innerHTML = `<i class="fa fa-cloud"></i> Main display image updated`;
+          }
+        }
+
         this.renderProductGallery();
       } catch (err) {
         console.error("Gallery upload error:", err);
@@ -367,6 +382,17 @@ window.AdminApp = window.AdminApp || {
       }
     }
     e.target.value = "";
+  },
+
+  setAsPrimaryProductImage(idx) {
+    if (idx >= 0 && idx < this.currentProductGallery.length) {
+      const selected = this.currentProductGallery[idx];
+      const prodImgInput = document.getElementById("prod-img");
+      const prodImgPreview = document.getElementById("prod-img-preview");
+      if (prodImgInput) prodImgInput.value = selected;
+      if (preview = prodImgPreview) preview.src = this.formatImgUrl(selected);
+      this.showToast("Set as main display image for product cards!");
+    }
   },
 
   removeProductGalleryImage(idx) {
@@ -762,6 +788,15 @@ window.AdminApp = window.AdminApp || {
     const variants = variantsRaw ? variantsRaw.split(",").map(v => v.trim()).filter(Boolean) : ["18K Champagne Gold"];
     const desc = document.getElementById("prod-desc").value.trim();
 
+    // Ensure main display image reflects gallery uploads if primary was default placeholder
+    let finalImg = img;
+    const isDefault = !finalImg || finalImg === "product_flower_necklace.jpg" || !finalImg.startsWith("http");
+    if (isDefault && this.currentProductGallery && this.currentProductGallery.length) {
+      const firstCloud = this.currentProductGallery.find(im => typeof im === "string" && im.startsWith("http"));
+      if (firstCloud) finalImg = firstCloud;
+      else if (this.currentProductGallery[0]) finalImg = this.currentProductGallery[0];
+    }
+
     const productPayload = {
       name,
       price,
@@ -769,13 +804,13 @@ window.AdminApp = window.AdminApp || {
       category,
       sku,
       inStock,
-      img,
+      img: finalImg,
       badges,
       material,
       dimensions,
       variants,
       description: desc,
-      images: (this.currentProductGallery && this.currentProductGallery.length) ? this.currentProductGallery : [img]
+      images: (this.currentProductGallery && this.currentProductGallery.length) ? this.currentProductGallery : [finalImg]
     };
 
     const submitBtn = e.target.querySelector('button[type="submit"]') || document.querySelector('#modal-product .btn-gold');

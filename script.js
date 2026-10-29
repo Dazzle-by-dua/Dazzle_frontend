@@ -1163,10 +1163,23 @@ function productCardHTML(p) {
     }
   }
 
+  // Resolve display image: prioritize uploaded gallery images over default placeholders
+  let displayImg = p.img || "";
+  const isDefaultLocal = !displayImg || displayImg === "product_flower_necklace.jpg" || displayImg === "product_pearl_earrings.jpg";
+  if ((isDefaultLocal || !displayImg.startsWith("http")) && Array.isArray(p.images) && p.images.length) {
+    const cloudImg = p.images.find(im => typeof im === "string" && (im.startsWith("http://") || im.startsWith("https://")));
+    if (cloudImg) {
+      displayImg = cloudImg;
+    } else if (p.images[0]) {
+      displayImg = p.images[0];
+    }
+  }
+  if (!displayImg) displayImg = "product_flower_necklace.jpg";
+
   return `
   <div class="product-card" data-id="${p.id}" onclick="handleCardClick(event, ${p.id})" style="cursor:pointer">
     <div class="product-img-wrap">
-      <img src="${p.img}" alt="${p.name}" loading="lazy">
+      <img src="${displayImg}" alt="${p.name}" loading="lazy">
       <div class="product-badges">${badgesHTML}${outOfStock}</div>
       <div class="product-img-actions">
         <button type="button" class="btn-icon wish-toggle${inWish ? " active" : ""}" onclick="event.stopPropagation();handleWishToggle(this, ${p.id})" title="Wishlist">♥</button>

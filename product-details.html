@@ -258,7 +258,12 @@ function renderProductDetails() {
     dimensions: currentProduct.dimensions || (PRODUCT_DETAILS[currentProduct.id] ? PRODUCT_DETAILS[currentProduct.id].dimensions : "Standard Fine Jewellery Sizing"),
     sku: currentProduct.sku || (PRODUCT_DETAILS[currentProduct.id] ? PRODUCT_DETAILS[currentProduct.id].sku : ("DBD-00" + currentProduct.id)),
     variants: (currentProduct.variants && currentProduct.variants.length) ? currentProduct.variants : (PRODUCT_DETAILS[currentProduct.id] ? PRODUCT_DETAILS[currentProduct.id].variants : ["18K Champagne Gold", "Rose Gold Vermeil", "Sterling Silver"]),
-    images: (currentProduct.images && currentProduct.images.length) ? currentProduct.images : (PRODUCT_DETAILS[currentProduct.id] ? PRODUCT_DETAILS[currentProduct.id].images : [currentProduct.img, "featured_collection.jpg", "hero_necklace.jpg"])
+    images: (() => {
+      const raw = (currentProduct.images && currentProduct.images.length) ? currentProduct.images : (PRODUCT_DETAILS[currentProduct.id] ? PRODUCT_DETAILS[currentProduct.id].images : [currentProduct.img]);
+      const cloudOnly = raw.filter(im => typeof im === "string" && (im.startsWith("http://") || im.startsWith("https://")));
+      if (cloudOnly.length > 0) return cloudOnly;
+      return raw.length ? raw : [currentProduct.img || "product_flower_necklace.jpg"];
+    })()
   };
 
   // Update Breadcrumbs & Title
