@@ -70,8 +70,8 @@
     const adminToken = getAuthToken();
     const custToken = getCustomerToken();
 
-    // Attach customer token for customer endpoints or storefront user operations
-    if (endpoint.includes("/api/customer/") || (custToken && !adminToken)) {
+    // Attach customer token for customer endpoints, review eligibility, or storefront user operations
+    if (endpoint.includes("/api/customer/") || endpoint.includes("/api/reviews/eligibility") || (custToken && !adminToken)) {
       if (custToken && !headers["Authorization"]) {
         headers["Authorization"] = `Bearer ${custToken}`;
       }
@@ -381,6 +381,9 @@
 
     // Reviews
     reviews: {
+      async checkEligibility(productId) {
+        return await request(`/api/reviews/eligibility?product_id=${encodeURIComponent(productId)}`);
+      },
       async getAll(filters = {}) {
         const params = new URLSearchParams();
         if (filters.approvedOnly) params.append("approved_only", "true");

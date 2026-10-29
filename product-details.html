@@ -119,6 +119,9 @@
         <h2 class="section-title">Customer Reviews &amp; Ratings</h2>
       </div>
       <div class="reviews-grid" id="product-reviews-grid"></div>
+
+      <!-- Write a Review Container -->
+      <div id="product-write-review-container" style="max-width:850px;margin:3.5rem auto 0;"></div>
     </div>
 
     <!-- Related Products -->
@@ -372,14 +375,20 @@ function renderProductDetails() {
   const reviewsEl = document.getElementById("product-reviews-grid");
   if (reviewsEl) {
     const allRevs = DazzleStore.getReviews().filter(r => r.approved !== false);
-    const prodRevs = allRevs.filter(r => !r.product || r.product === currentProduct.name || r.product === "General");
-    const displayRevs = prodRevs.length > 0 ? prodRevs : allRevs;
-    if (displayRevs.length === 0) {
-      reviewsEl.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem 1rem;background:rgba(255,255,255,0.7);border:1px dashed var(--border);border-radius:var(--radius-md);"><p style="font-size:0.9rem;color:var(--text-muted);margin:0;">No reviews yet for this piece. <a href="shop.html#write-review-section" style="color:var(--gold);font-weight:600;">Share your experience &rarr;</a></p></div>`;
+    const prodRevs = allRevs.filter(r => {
+      if (r.product_id != null && String(r.product_id) === String(currentProduct.id)) return true;
+      if (r.product && currentProduct.name && r.product.toLowerCase() === currentProduct.name.toLowerCase()) return true;
+      return false;
+    });
+    if (prodRevs.length === 0) {
+      reviewsEl.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2.5rem 1rem;background:rgba(255,255,255,0.7);border:1px dashed var(--border);border-radius:var(--radius-md);"><p style="font-size:0.92rem;color:var(--text-muted);margin:0;">No verified reviews published for this piece yet.</p></div>`;
     } else {
-      reviewsEl.innerHTML = displayRevs.slice(0, 3).map(reviewCardHTML).join("");
+      reviewsEl.innerHTML = prodRevs.slice(0, 6).map(reviewCardHTML).join("");
     }
   }
+
+  // Check Eligibility and Mount Write Review Form
+  checkAndRenderProductReviewForm(currentProduct);
 
   // Render Related
   const relatedEl = document.getElementById("related-products-grid");
@@ -388,6 +397,248 @@ function renderProductDetails() {
     relatedEl.innerHTML = related.map(productCardHTML).join("");
   }
 }
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+let currentProductReviewRating = 5;
+
+function setProductReviewRating(star) {
+  currentProductReviewRating = star;
+  const ratingInput = document.getElementById("product-review-rating-input");
+  if (ratingInput) ratingInput.value = star;
+
+  const starSpans = document.querySelectorAll("#product-star-select span");
+  starSpans.forEach((s, idx) => {
+    s.style.opacity = (idx < star) ? "1" : "0.3";
+  });
+}
+window.setProductReviewRating = setProductReviewRating;
+
+async function checkAndRenderProductReviewForm(product) {
+  const container = document.getElementById("product-write-review-container");
+  if (!container || !product) return;
+
+  // Session check
+  let custToken = null;
+  let custUser = null;
+  if (typeof getCustomerSessionData === "function") {
+    const sess = getCustomerSessionData();
+    if (sess && sess.token) {
+      custToken = sess.token;
+      custUser = sess.user;
+    }
+  }
+  if (!custToken && window.DazzleApi && window.DazzleApi.customer) {
+    custToken = window.DazzleApi.customer.getToken();
+    custUser = window.DazzleApi.customer.getUser();
+  }
+
+  // Case 1: Not logged in
+  if (!custToken || !custUser) {
+    container.innerHTML = `
+      <div class="write-review-form" style="text-align:center;padding:2.5rem 1.5rem;background:rgba(255,255,255,0.75);border:1px dashed var(--gold);border-radius:var(--radius-md);">
+        <div style="width:52px;height:52px;border-radius:50%;background:rgba(212,175,124,0.18);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.35rem;">
+          <i class="fa fa-user-lock"></i>
+        </div>
+        <h4 style="font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--text-dark);margin-bottom:0.4rem;">Customer Sign-In Required</h4>
+        <p style="font-size:0.9rem;color:var(--text-muted);max-width:440px;margin:0 auto 1.5rem;">Only verified customers who have purchased this piece can write a review. Please sign in to your account.</p>
+        <a href="auth.html?redirect=${encodeURIComponent('product-details.html?id=' + product.id)}" class="btn btn-gold btn-review-signin" style="display:inline-flex;align-items:center;gap:0.5rem;">
+          <i class="fa fa-sign-in-alt"></i> Sign In to Write Review &rarr;
+        </a>
+      </div>
+    `;
+    return;
+  }
+
+  // Case 2: Logged in, check authoritative backend eligibility
+  container.innerHTML = `
+    <div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:0.9rem;">
+      <i class="fa fa-spinner fa-spin" style="margin-right:8px;color:var(--gold);"></i> Checking verified order records...
+    </div>
+  `;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/reviews/eligibility?product_id=${encodeURIComponent(product.id)}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${custToken}`
+      },
+      credentials: "include"
+    });
+    const elig = await res.json();
+
+    if (elig.eligible) {
+      // Eligible -> Render review form
+      container.innerHTML = `
+        <div class="write-review-form" style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-md);padding:2.25rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;background:rgba(212,175,124,0.1);border:1px solid rgba(212,175,124,0.3);border-radius:var(--radius-sm);margin-bottom:1.5rem;flex-wrap:wrap;gap:0.5rem;">
+            <div style="display:flex;align-items:center;gap:0.6rem;">
+              <i class="fa fa-user-check" style="color:var(--gold);font-size:1.1rem;"></i>
+              <span style="font-size:0.88rem;color:var(--text-dark);">Posting as <strong id="product-review-display-name">${escapeHtml(custUser.name || 'Verified Customer')}</strong></span>
+            </div>
+            <span style="font-size:0.75rem;background:#E8F5E9;color:#2E7D32;padding:3px 10px;border-radius:12px;font-weight:600;border:1px solid #C8E6C9;">
+              &#10003; Verified Buyer
+            </span>
+          </div>
+
+          <h3 style="font-family:'Playfair Display',serif;margin-bottom:0.35rem;font-size:1.35rem;">Write a Review</h3>
+          <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.5rem;">Share your experience with <strong>${escapeHtml(product.name)}</strong>. Your review will be published after quick admin approval.</p>
+
+          <form id="product-review-form" onsubmit="handleProductReviewSubmit(event, '${escapeHtml(String(product.id))}', '${escapeHtml(product.name)}')">
+            <div class="form-group" style="margin-bottom:1.25rem;">
+              <label class="form-label" style="font-weight:600;display:block;margin-bottom:0.4rem;">Your Rating</label>
+              <div id="product-star-select" style="display:flex;gap:0.4rem;font-size:1.75rem;color:#D4AF7C;cursor:pointer;user-select:none;">
+                <span onclick="setProductReviewRating(1)">&#9733;</span>
+                <span onclick="setProductReviewRating(2)">&#9733;</span>
+                <span onclick="setProductReviewRating(3)">&#9733;</span>
+                <span onclick="setProductReviewRating(4)">&#9733;</span>
+                <span onclick="setProductReviewRating(5)">&#9733;</span>
+              </div>
+              <input type="hidden" id="product-review-rating-input" value="5">
+            </div>
+
+            <div class="form-group" style="margin-bottom:1.5rem;">
+              <label class="form-label" for="product-review-text" style="font-weight:600;display:block;margin-bottom:0.4rem;">Your Review</label>
+              <textarea class="form-textarea" id="product-review-text" rows="4" placeholder="Tell us about the craftsmanship, luster, packaging, and your overall experience..." required style="width:100%;resize:vertical;"></textarea>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+              <button type="submit" id="product-review-submit-btn" class="btn btn-gold">
+                <i class="fa fa-paper-plane"></i> Submit Review &rarr;
+              </button>
+            </div>
+          </form>
+        </div>
+      `;
+      setProductReviewRating(5);
+    } else if (elig.reason === "already_reviewed") {
+      // Customer has already reviewed
+      container.innerHTML = `
+        <div class="write-review-form" style="text-align:center;padding:2.5rem 1.5rem;background:rgba(255,255,255,0.85);border:1px solid rgba(46,125,50,0.3);border-radius:var(--radius-md);">
+          <div style="width:52px;height:52px;border-radius:50%;background:#E8F5E9;color:#2E7D32;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.35rem;">
+            <i class="fa fa-check"></i>
+          </div>
+          <h4 style="font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--text-dark);margin-bottom:0.4rem;">Thank You for Your Feedback!</h4>
+          <p style="font-size:0.9rem;color:var(--text-muted);max-width:440px;margin:0 auto;">You have already shared a review for this piece. Verified customer reviews help maintain authentic feedback.</p>
+          ${elig.existing_review && elig.existing_review.approved === false ? `<div style="margin-top:0.85rem;display:inline-block;padding:0.4rem 0.9rem;background:#FFF9C4;color:#F57F17;border-radius:16px;font-size:0.8rem;font-weight:600;"><i class="fa fa-clock"></i> Pending Admin Approval</div>` : ''}
+        </div>
+      `;
+    } else {
+      // Ineligible: hasn't purchased this product
+      container.innerHTML = `
+        <div class="write-review-form" style="text-align:center;padding:2.5rem 1.5rem;background:rgba(255,255,255,0.75);border:1px dashed rgba(212,175,124,0.6);border-radius:var(--radius-md);">
+          <div style="width:52px;height:52px;border-radius:50%;background:rgba(212,175,124,0.15);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.35rem;">
+            <i class="fa fa-shopping-bag"></i>
+          </div>
+          <h4 style="font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--text-dark);margin-bottom:0.4rem;">Verified Purchase Required</h4>
+          <p style="font-size:0.92rem;color:var(--text-muted);max-width:480px;margin:0 auto;">Only customers who have purchased this product can write a review.</p>
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.6rem;opacity:0.85;">(Signed in as <strong>${escapeHtml(custUser.name || custUser.email)}</strong>)</div>
+        </div>
+      `;
+    }
+  } catch (err) {
+    console.error("Eligibility check error:", err);
+    container.innerHTML = `
+      <div class="write-review-form" style="text-align:center;padding:2rem 1rem;color:var(--text-muted);font-size:0.88rem;">
+        Only customers who have purchased this product can write a review.
+      </div>
+    `;
+  }
+}
+window.checkAndRenderProductReviewForm = checkAndRenderProductReviewForm;
+
+async function handleProductReviewSubmit(e, productId, productName) {
+  e.preventDefault();
+  const textInput = document.getElementById("product-review-text");
+  const submitBtn = document.getElementById("product-review-submit-btn");
+  const text = textInput ? textInput.value.trim() : "";
+  const rating = currentProductReviewRating || 5;
+
+  if (!text) {
+    if (typeof showToast === "function") showToast("Please write a few words about your experience.", "error");
+    if (textInput) textInput.focus();
+    return;
+  }
+
+  let custToken = null;
+  if (typeof getCustomerSessionData === "function") {
+    const sess = getCustomerSessionData();
+    if (sess && sess.token) custToken = sess.token;
+  }
+  if (!custToken && window.DazzleApi && window.DazzleApi.customer) {
+    custToken = window.DazzleApi.customer.getToken();
+  }
+
+  if (!custToken) {
+    if (typeof showToast === "function") showToast("Please sign in to write a review.", "error");
+    return;
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Submitting...';
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/reviews`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${custToken}`
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        product_id: productId,
+        product: productName,
+        rating: rating,
+        text: text
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.detail || data.message || "Failed to submit review.");
+    }
+
+    if (typeof showToast === "function") {
+      showToast("Thank you! Review submitted and pending admin approval.", "success");
+    }
+
+    const container = document.getElementById("product-write-review-container");
+    if (container) {
+      container.innerHTML = `
+        <div class="write-review-form" style="text-align:center;padding:2.5rem 1.5rem;background:#F9FBF9;border:1px solid #C8E6C9;border-radius:var(--radius-md);">
+          <div style="width:52px;height:52px;border-radius:50%;background:#E8F5E9;color:#2E7D32;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.35rem;">
+            <i class="fa fa-check-circle"></i>
+          </div>
+          <h4 style="font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--text-dark);margin-bottom:0.4rem;">Thank You for Your Review!</h4>
+          <p style="font-size:0.92rem;color:var(--text-muted);max-width:480px;margin:0 auto 0.75rem;">Your review has been submitted successfully and will appear on this page once approved by our team.</p>
+          <span style="display:inline-block;padding:0.35rem 0.85rem;background:#FFF9C4;color:#F57F17;border-radius:14px;font-size:0.78rem;font-weight:600;">
+            <i class="fa fa-clock"></i> Pending Admin Approval
+          </span>
+        </div>
+      `;
+    }
+  } catch (err) {
+    console.error("Submit review error:", err);
+    if (typeof showToast === "function") {
+      showToast(err.message || "Could not submit review.", "error");
+    }
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fa fa-paper-plane"></i> Submit Review &rarr;';
+    }
+  }
+}
+window.handleProductReviewSubmit = handleProductReviewSubmit;
 
 document.addEventListener("DOMContentLoaded", () => {
   renderProductDetails();

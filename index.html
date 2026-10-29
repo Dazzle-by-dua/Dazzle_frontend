@@ -177,9 +177,6 @@
       <button type="button" id="btn-load-more-reviews" class="btn btn-outline" style="display:none;" onclick="loadMoreHomeReviews()">
         Show More Reviews &darr;
       </button>
-      <a href="shop.html#write-review-section" class="btn btn-gold">
-        <i class="fa fa-pen"></i> Write a Review &rarr;
-      </a>
     </div>
   </div>
 </section>
@@ -272,7 +269,7 @@ function renderHomeReviews() {
   const allReviews = DazzleStore.getReviews().filter(r => r.approved !== false);
 
   if (allReviews.length === 0) {
-    rv.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem 1.5rem;background:rgba(255,255,255,0.7);border:1px dashed var(--border);border-radius:var(--radius-md);"><div style="font-size:2rem;color:var(--gold);margin-bottom:0.5rem;">★ ★ ★ ★ ★</div><h4 style="font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--text-dark);margin-bottom:0.35rem;">No Reviews Yet</h4><p style="font-size:0.88rem;color:var(--text-muted);max-width:420px;margin:0 auto 1.25rem;">Be the first verified customer to share your thoughts on our pieces!</p><a href="shop.html#write-review-section" class="btn btn-gold btn-sm"><i class="fa fa-pen"></i> Write the First Review &rarr;</a></div>`;
+    rv.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem 1.5rem;background:rgba(255,255,255,0.7);border:1px dashed var(--border);border-radius:var(--radius-md);"><div style="font-size:2rem;color:var(--gold);margin-bottom:0.5rem;">★ ★ ★ ★ ★</div><h4 style="font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--text-dark);margin-bottom:0.35rem;">No Reviews Yet</h4><p style="font-size:0.88rem;color:var(--text-muted);max-width:420px;margin:0 auto 1.25rem;">Our verified customer testimonials and ratings will appear here.</p></div>`;
     if (loadMoreBtn) loadMoreBtn.style.display = "none";
     return;
   }
