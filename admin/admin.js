@@ -197,23 +197,63 @@ window.AdminApp = window.AdminApp || {
   },
 
   async uploadToCloudinary(file, folder = "dazzle_by_dua") {
+    if (!file) throw new Error("No file selected.");
+
+    // Validate image MIME type
+    if (file.type && !file.type.startsWith("image/")) {
+      throw new Error(`File "${file.name}" is not an image (${file.type}). Allowed formats: JPEG, PNG, WEBP, GIF, SVG, AVIF.`);
+    }
+
+    // Validate size (10 MB max)
+    const MAX_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      throw new Error(`"${file.name}" exceeds the 10 MB limit (${(file.size / (1024 * 1024)).toFixed(1)} MB). Please select a smaller image.`);
+    }
+
+    // Verify admin authentication session
     const token = (typeof AdminAuth !== 'undefined' && AdminAuth.getToken) ? AdminAuth.getToken() : null;
+    if (!token) {
+      throw new Error("Admin session not found or expired. Please sign in to upload images.");
+    }
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("folder", folder);
 
-    const headers = {};
-    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const headers = {
+      "Authorization": `Bearer ${token}`
+    };
 
-    const res = await fetch(`${API_BASE_URL}/api/upload/image`, {
-      method: "POST",
-      headers: headers,
-      body: formData
-    });
+    let res;
+    try {
+      res = await fetch(`${API_BASE_URL}/api/upload/image`, {
+        method: "POST",
+        headers: headers,
+        body: formData
+      });
+    } catch (netErr) {
+      console.error("Network / CORS error during upload:", netErr);
+      throw new Error(`Cannot reach backend at ${API_BASE_URL}. Verify network connection and server status.`);
+    }
 
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.detail || "Cloudinary upload failed. Check backend credentials.");
+      let detail = "";
+      try {
+        const errJson = await res.json();
+        detail = errJson.detail || errJson.message || "";
+      } catch (e) {
+        detail = await res.text().catch(() => "");
+      }
+
+      if (res.status === 401) {
+        throw new Error("Admin session has expired. Please sign in again.");
+      } else if (res.status === 413) {
+        throw new Error(`File is too large for the server (limit: 10 MB).`);
+      } else if (res.status === 502 || res.status === 504) {
+        throw new Error(detail || "Cloudinary gateway connection timed out. Please try again.");
+      } else {
+        throw new Error(detail || `Image upload failed (HTTP ${res.status}).`);
+      }
     }
 
     return await res.json();
@@ -292,10 +332,13 @@ window.AdminApp = window.AdminApp || {
     const statusEl = document.getElementById("prod-gallery-status");
     if (statusEl) {
       statusEl.className = "upload-status loading";
-      statusEl.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Uploading ${files.length} image(s) to Cloudinary...`;
+      statusEl.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Uploading ${files.length} secondary image(s) to Cloudinary...`;
     }
 
     let successCount = 0;
+    const errors = [];
+    if (!this.currentProductGallery) this.currentProductGallery = [];
+
     for (const file of files) {
       try {
         const data = await this.uploadToCloudinary(file, "dazzle_by_dua/products");
@@ -304,15 +347,25 @@ window.AdminApp = window.AdminApp || {
         this.renderProductGallery();
       } catch (err) {
         console.error("Gallery upload error:", err);
-        this.showToast(`Failed to upload ${file.name}: ${err.message}`, "error");
+        errors.push(`${file.name}: ${err.message}`);
+        this.showToast(`Upload failed (${file.name}): ${err.message}`, "error");
       }
     }
 
     if (statusEl) {
-      statusEl.className = "upload-status success";
-      statusEl.innerHTML = `<i class="fa fa-check-circle"></i> Added ${successCount} image(s) to gallery.`;
+      if (successCount > 0 && errors.length === 0) {
+        statusEl.className = "upload-status success";
+        statusEl.innerHTML = `<i class="fa fa-check-circle"></i> Added ${successCount} secondary image(s) to gallery.`;
+        this.showToast(`Added ${successCount} gallery image(s).`);
+      } else if (successCount > 0 && errors.length > 0) {
+        statusEl.className = "upload-status error";
+        statusEl.innerHTML = `<i class="fa fa-exclamation-triangle"></i> Added ${successCount} photo(s), ${errors.length} failed.`;
+        this.showToast(`Added ${successCount} photo(s), but ${errors.length} failed.`, "error");
+      } else {
+        statusEl.className = "upload-status error";
+        statusEl.innerHTML = `<i class="fa fa-exclamation-circle"></i> Upload failed: ${errors[0] || 'Unknown error'}`;
+      }
     }
-    this.showToast(`✦ Added ${successCount} gallery image(s).`);
     e.target.value = "";
   },
 
@@ -631,7 +684,7 @@ window.AdminApp = window.AdminApp || {
     document.getElementById("prod-img").value = "product_flower_necklace.jpg";
 
     // Initialize gallery list
-    this.currentProductGallery = ["product_flower_necklace.jpg", "featured_collection.jpg"];
+    this.currentProductGallery = [];
     this.renderProductGallery();
 
     const statusEl = document.getElementById("prod-upload-status");
