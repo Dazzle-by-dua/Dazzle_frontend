@@ -848,7 +848,7 @@ window.DazzleStore = window.DazzleStore || {
   async updateOrderStatus(id, status) {
     const res = await this._api(`/api/orders/${id}/status`, 'PATCH', { status });
     try {
-      const live = await fetch(`${API_BASE_URL}/api/orders`).then(r => r.ok ? r.json() : null);
+      const live = await this._api('/api/orders', 'GET');
       if (Array.isArray(live)) {
         this.saveOrders(live);
         return res;
@@ -858,6 +858,7 @@ window.DazzleStore = window.DazzleStore || {
     const order = list.find(o => o.id === id);
     if (order) {
       order.status = (res && res.status) ? res.status : status;
+      if (res && res.paymentStatus) order.paymentStatus = res.paymentStatus;
       this.saveOrders(list);
     }
     return res;
@@ -1402,9 +1403,12 @@ function renderOrdersPage() {
               ${order.razorpay_payment_id ? `<div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;font-family:monospace">Payment ID: ${order.razorpay_payment_id}</div>` : ''}
             </div>
             <div class="order-actions">
-              <button class="btn btn-outline btn-sm" onclick="showToast('✦ Invoice downloaded for Order #${order.id}')">Invoice</button>
-              <button class="btn btn-ghost btn-sm" onclick="showToast('✦ Thank you for your feedback!')">Rate & Review</button>
-              <button class="btn btn-gold btn-sm" onclick="showToast('✦ Items added to cart!')">Reorder</button>
+              <button class="btn btn-outline btn-sm" onclick="showToast('Invoice downloaded for Order #' + order.id)">Invoice</button>
+              ${((order.status || '').toLowerCase() === 'delivered')
+                ? `<a href="product-details.html?id=${(order.items && order.items[0]) ? (order.items[0].id || 1) : 1}" class="btn btn-gold btn-sm" style="display:inline-flex;align-items:center;gap:4px;"><i class="fa fa-pen"></i> Write Review &rarr;</a>`
+                : `<button class="btn btn-ghost btn-sm" onclick="showToast('Review writing becomes available once your piece is delivered.')">Rate & Review</button>`
+              }
+              <button class="btn btn-gold btn-sm" onclick="showToast('Items added to cart!')">Reorder</button>
             </div>
           </div>
         </div>

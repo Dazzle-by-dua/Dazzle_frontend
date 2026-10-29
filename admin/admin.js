@@ -1121,12 +1121,10 @@ window.AdminApp = window.AdminApp || {
     // Status button action triggers
     const statusBtns = document.getElementById("drawer-status-actions");
     if (statusBtns) {
-      statusBtns.innerHTML = `
-        <button class="btn btn-outline btn-sm" onclick="AdminApp.changeOrderStatus('${o.id}', 'Processing')">Processing</button>
-        <button class="btn btn-outline btn-sm" onclick="AdminApp.changeOrderStatus('${o.id}', 'Packed')">Packed</button>
-        <button class="btn btn-outline btn-sm" onclick="AdminApp.changeOrderStatus('${o.id}', 'Shipped')">Shipped</button>
-        <button class="btn btn-gold btn-sm" onclick="AdminApp.changeOrderStatus('${o.id}', 'Delivered')">Delivered</button>
-      `;
+      const statuses = ["Processing", "Packed", "Shipped", "Delivered"];
+      statusBtns.innerHTML = statuses.map(st => `
+        <button class="btn ${(o.status || '').toLowerCase() === st.toLowerCase() ? 'btn-gold' : 'btn-outline'} btn-sm" onclick="AdminApp.changeOrderStatus('${o.id}', '${st}')">${st}</button>
+      `).join(" ");
     }
 
     document.getElementById("drawer-order").classList.add("open");
