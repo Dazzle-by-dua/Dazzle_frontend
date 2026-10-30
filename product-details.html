@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -466,7 +466,10 @@ async function checkAndRenderProductReviewForm(product) {
   `;
 
   try {
-    const res = await fetch(`${API_BASE_URL}/api/reviews/eligibility?product_id=${encodeURIComponent(product.id)}`, {
+    const _eligUrlParams = new URLSearchParams(window.location.search);
+    const _eligOrderId = _eligUrlParams.get('order_id');
+    const _eligUrl = `${API_BASE_URL}/api/reviews/eligibility?product_id=${encodeURIComponent(product.id)}` + (_eligOrderId ? `&order_id=${encodeURIComponent(_eligOrderId)}` : '');
+    const res = await fetch(_eligUrl, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${custToken}`
@@ -710,3 +713,4 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+

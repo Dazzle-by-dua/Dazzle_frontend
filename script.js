@@ -1,4 +1,4 @@
-/* ========================================================
+﻿/* ========================================================
    DAZZLE BY DUA - Centralized Store & Shared JS
    Centralized Data Layer for Store & Admin Panel
    ======================================================== */
@@ -1405,7 +1405,7 @@ function renderOrdersPage() {
             <div class="order-actions">
               <button class="btn btn-outline btn-sm" onclick="showToast('Invoice downloaded for Order #' + order.id)">Invoice</button>
               ${((order.status || '').toLowerCase() === 'delivered')
-                ? `<a href="product-details.html?id=${(order.items && order.items[0]) ? (order.items[0].id || 1) : 1}" class="btn btn-gold btn-sm" style="display:inline-flex;align-items:center;gap:4px;"><i class="fa fa-pen"></i> Write Review &rarr;</a>`
+                ? `<a href="product-details.html?id=${(order.items && order.items[0]) ? (order.items[0].id || 1) : 1}&order_id=${encodeURIComponent(order.id || '')}" class="btn btn-gold btn-sm" style="display:inline-flex;align-items:center;gap:4px;"><i class="fa fa-pen"></i> Write Review &rarr;</a>`
                 : `<button class="btn btn-ghost btn-sm" onclick="showToast('Review writing becomes available once your piece is delivered.')">Rate & Review</button>`
               }
               <button class="btn btn-gold btn-sm" onclick="showToast('Items added to cart!')">Reorder</button>
@@ -2001,3 +2001,4 @@ document.addEventListener("click", () => {
     menu.classList.remove("show");
   }
 });
+
