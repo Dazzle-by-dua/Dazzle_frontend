@@ -666,7 +666,8 @@ async function handleProductReviewSubmit(e, productId, productName) {
         product_id: productId,
         product: productName,
         rating: rating,
-        text: text
+        text: text,
+        order_id: (new URLSearchParams(window.location.search)).get('order_id') || undefined
       })
     });
 
