@@ -493,7 +493,7 @@ async function checkAndRenderProductReviewForm(product) {
           </div>
 
           <h3 style="font-family:'Playfair Display',serif;margin-bottom:0.35rem;font-size:1.35rem;">Write a Review</h3>
-          <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.5rem;">Share your experience with <strong>${escapeHtml(product.name)}</strong>. Your review will be published after quick admin approval.</p>
+          <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.5rem;">Share your experience with <strong>${escapeHtml(product.name)}</strong>. Your review will be published immediately.</p>
 
           <form id="product-review-form" onsubmit="handleProductReviewSubmit(event, '${escapeHtml(String(product.id))}', '${escapeHtml(product.name)}')">
             <div class="form-group" style="margin-bottom:1.25rem;">
@@ -544,7 +544,7 @@ async function checkAndRenderProductReviewForm(product) {
             <div>
               ${isApproved
                 ? `<span style="font-size:0.75rem;background:#E8F5E9;color:#2E7D32;padding:3px 10px;border-radius:12px;font-weight:600;border:1px solid #C8E6C9;"><i class="fa fa-check-circle"></i> Published</span>`
-                : `<span style="font-size:0.75rem;background:#FFF9C4;color:#F57F17;padding:3px 10px;border-radius:12px;font-weight:600;border:1px solid #FFF176;"><i class="fa fa-clock"></i> Pending Moderation</span>`
+                : `<span style="font-size:0.75rem;background:#E8F5E9;color:#2E7D32;padding:3px 10px;border-radius:12px;font-weight:600;border:1px solid #C8E6C9;"><i class="fa fa-check-circle"></i> Published</span>`
               }
             </div>
           </div>
@@ -688,9 +688,9 @@ async function handleProductReviewSubmit(e, productId, productName) {
             <i class="fa fa-check-circle"></i>
           </div>
           <h4 style="font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--text-dark);margin-bottom:0.4rem;">Thank You for Your Review!</h4>
-          <p style="font-size:0.92rem;color:var(--text-muted);max-width:480px;margin:0 auto 0.75rem;">Your review has been submitted successfully and will appear on this page once approved by our team.</p>
-          <span style="display:inline-block;padding:0.35rem 0.85rem;background:#FFF9C4;color:#F57F17;border-radius:14px;font-size:0.78rem;font-weight:600;">
-            <i class="fa fa-clock"></i> Pending Admin Approval
+          <p style="font-size:0.92rem;color:var(--text-muted);max-width:480px;margin:0 auto 0.75rem;">Your review has been published successfully.</p>
+          <span style="display:inline-block;padding:0.35rem 0.85rem;background:#E8F5E9;color:#2E7D32;border-radius:14px;font-size:0.78rem;font-weight:600;">
+            <i class="fa fa-check-circle"></i> Published
           </span>
         </div>
       `;
