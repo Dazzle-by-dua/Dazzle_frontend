@@ -38,6 +38,45 @@ window.AdminApp = window.AdminApp || {
         this.updateSidebarBadges();
       });
     }
+
+    // Poll for new orders every 30 seconds so admin dashboard stays live
+    this._startOrderPolling();
+  },
+
+  _startOrderPolling() {
+    if (this._orderPollInterval) clearInterval(this._orderPollInterval);
+    this._orderPollInterval = setInterval(async () => {
+      try {
+        const authHeader = window.DazzleStore._getAuthHeader();
+        if (!authHeader || !authHeader.Authorization) return;
+        const res = await fetch(window.DazzleStore.API_BASE_URL + '/api/orders', {
+          headers: { ...authHeader, 'Content-Type': 'application/json' }
+        });
+        if (!res.ok) return;
+        const orders = await res.json();
+        if (Array.isArray(orders)) {
+          const current = window.DazzleStore.getOrders();
+          const currentIds = new Set(current.map(o => o.id));
+          const hasNew = orders.some(o => !currentIds.has(o.id));
+          window.DazzleStore._set(window.DazzleStore.KEYS.ORDERS, orders);
+          // Only re-render if there are new orders or current view is orders
+          if (hasNew || window.location.hash === '#orders') {
+            this.renderCurrentView();
+            this.updateSidebarBadges();
+            if (hasNew) {
+              const badge = document.getElementById('orders-sidebar-badge');
+              if (badge) {
+                badge.style.animation = 'none';
+                badge.offsetHeight; // reflow
+                badge.style.animation = 'pulse 0.6s ease 3';
+              }
+            }
+          }
+        }
+      } catch (e) {
+        // silently ignore polling errors
+      }
+    }, 30000); // every 30 seconds
   },
 
   // ---- Routing & Navigation ----

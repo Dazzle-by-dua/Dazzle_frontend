@@ -371,9 +371,18 @@ window.DazzleStore = window.DazzleStore || {
 
   _getAuthHeader() {
     try {
-      const sessStr = localStorage.getItem("dazzle_admin_session") || sessionStorage.getItem("dazzle_admin_session");
-      if (sessStr) {
-        const sess = JSON.parse(sessStr);
+      // Try admin token first
+      const adminSess = localStorage.getItem("dazzle_admin_session") || sessionStorage.getItem("dazzle_admin_session");
+      if (adminSess) {
+        const sess = JSON.parse(adminSess);
+        if (sess && sess.token) {
+          return { "Authorization": `Bearer ${sess.token}` };
+        }
+      }
+      // Fall back to customer token (so customer orders are linked to their account)
+      const custSess = sessionStorage.getItem("dazzle_customer_session") || localStorage.getItem("dazzle_customer_session");
+      if (custSess) {
+        const sess = JSON.parse(custSess);
         if (sess && sess.token) {
           return { "Authorization": `Bearer ${sess.token}` };
         }

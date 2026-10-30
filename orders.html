@@ -356,7 +356,7 @@
     </div>
   </div>
 </footer>
-<script src="script.js"></script>
+<script src="dazzle_api_client.js"></script>
 <script src="script.js"></script>
 <script>
 async function searchOrderById() {
@@ -407,7 +407,23 @@ async function searchOrderById() {
     if (typeof renderOrdersPage === 'function') renderOrdersPage();
   }
 }
-document.addEventListener('DOMContentLoaded', initOrderTabs);
+document.addEventListener('DOMContentLoaded', async function() {
+  initOrderTabs();
+  // Fetch live orders from backend for logged-in customers (cross-device)
+  if (window.DazzleApi && window.DazzleApi.customer && window.DazzleApi.customer.isLoggedIn()) {
+    try {
+      const orders = await window.DazzleApi.customer.getOrders();
+      if (Array.isArray(orders)) {
+        if (window.DazzleStore && typeof window.DazzleStore._set === 'function') {
+          window.DazzleStore._set(window.DazzleStore.KEYS.ORDERS, orders);
+        }
+        if (typeof renderOrdersPage === 'function') renderOrdersPage();
+      }
+    } catch (e) {
+      console.warn('Could not fetch customer orders from backend:', e);
+    }
+  }
+});
 </script>
 </body>
 </html>
