@@ -194,7 +194,7 @@
 
             <div class="payment-methods-grid" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1.25rem">
               <!-- Online (Razorpay) -->
-              <label class="payment-method-card active" id="pay-card-razorpay" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border:2px solid var(--gold);border-radius:8px;cursor:pointer;background:rgba(197,168,128,0.06);transition:all 0.2s ease">
+              <label class="payment-method-card active" id="pay-card-razorpay" onclick="handlePaymentMethodChange('razorpay')" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border:2px solid var(--gold);border-radius:8px;cursor:pointer;background:rgba(197,168,128,0.06);transition:all 0.2s ease">
                 <div style="display:flex;align-items:center;gap:0.75rem">
                   <input type="radio" name="payment_choice" id="pay-choice-razorpay" value="razorpay" checked onchange="handlePaymentMethodChange('razorpay')" style="accent-color:var(--gold);width:18px;height:18px">
                   <div>
@@ -210,7 +210,7 @@
               </label>
 
               <!-- Cash on Delivery -->
-              <label class="payment-method-card" id="pay-card-cod" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--white);transition:all 0.2s ease">
+              <label class="payment-method-card" id="pay-card-cod" onclick="handlePaymentMethodChange('cod')" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--white);transition:all 0.2s ease">
                 <div style="display:flex;align-items:center;gap:0.75rem">
                   <input type="radio" name="payment_choice" id="pay-choice-cod" value="cod" onchange="handlePaymentMethodChange('cod')" style="accent-color:var(--gold);width:18px;height:18px">
                   <div>
@@ -344,7 +344,7 @@
     </div>
   </div>
 </footer>
-<script src="script.js"></script>
+<script src="dazzle_api_client.js"></script>
 <script src="script.js"></script>
 <script>
 let selectedPaymentMethod = 'razorpay';
@@ -523,6 +523,10 @@ function handlePaymentMethodChange(method) {
   selectedPaymentMethod = method;
   const rzpCard = document.getElementById('pay-card-razorpay');
   const codCard = document.getElementById('pay-card-cod');
+  const rzpRadio = document.getElementById('pay-choice-razorpay');
+  const codRadio = document.getElementById('pay-choice-cod');
+  if (rzpRadio) rzpRadio.checked = (method === 'razorpay');
+  if (codRadio) codRadio.checked = (method === 'cod');
   const btnText = document.getElementById('place-order-btn-text');
   const icon = document.getElementById('place-order-icon');
 
@@ -979,6 +983,21 @@ document.getElementById('order-success-modal').addEventListener('click', functio
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+  try {
+    const custSess = sessionStorage.getItem("dazzle_customer_session") || localStorage.getItem("dazzle_customer_session");
+    if (custSess) {
+      const sess = JSON.parse(custSess);
+      const user = sess.customer || sess.user || sess;
+      if (user) {
+        const nameEl = document.getElementById('ch-name');
+        const emailEl = document.getElementById('ch-email');
+        const phoneEl = document.getElementById('ch-mobile');
+        if (nameEl && !nameEl.value && user.name) nameEl.value = user.name;
+        if (emailEl && !emailEl.value && user.email) emailEl.value = user.email;
+        if (phoneEl && !phoneEl.value && user.phone) phoneEl.value = user.phone;
+      }
+    }
+  } catch (e) {}
   renderCheckout();
   const cityInput = document.getElementById('ch-city');
   const stateInput = document.getElementById('ch-state');
