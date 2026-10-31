@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    DAZZLE BY DUA ? Production API Client & DazzleStore Bridge
    Seamless drop-in replacement / API connector for DazzleStore
    Enables 100% Admin -> API -> Database -> Storefront synchronization
@@ -246,6 +246,10 @@
             confirm_password: confirmPassword
           }
         });
+      },
+
+      async getMyOrders() {
+        return await request("/api/customer/orders");
       },
 
       async getOrders() {

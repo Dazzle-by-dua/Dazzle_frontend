@@ -1791,6 +1791,11 @@ async function initCustomerAuthUI() {
       if (err && err.status === 401) {
         sessionStorage.removeItem("dazzle_customer_session");
         localStorage.removeItem("dazzle_customer_session");
+  localStorage.removeItem("dazzle_orders");
+  localStorage.removeItem("dazzle_my_orders");
+  if (window.DazzleStore && typeof window.DazzleStore._set === "function") {
+    window.DazzleStore._set(window.DazzleStore.KEYS.ORDERS, []);
+  }
         renderAuthNavElements(false, null);
       }
     });
@@ -1904,6 +1909,11 @@ async function handleCustomerLogout() {
   }
   sessionStorage.removeItem("dazzle_customer_session");
   localStorage.removeItem("dazzle_customer_session");
+  localStorage.removeItem("dazzle_orders");
+  localStorage.removeItem("dazzle_my_orders");
+  if (window.DazzleStore && typeof window.DazzleStore._set === "function") {
+    window.DazzleStore._set(window.DazzleStore.KEYS.ORDERS, []);
+  }
   if (typeof showToast === "function") {
     showToast("You have been signed out.");
   }
@@ -1918,7 +1928,7 @@ async function syncAuthenticatedCustomerOrders() {
   if (window.DazzleApi && window.DazzleApi.customer && window.DazzleApi.customer.isLoggedIn()) {
     try {
       const orders = await window.DazzleApi.customer.getOrders();
-      if (Array.isArray(orders) && orders.length > 0) {
+      if (Array.isArray(orders)) {
         if (window.DazzleStore && typeof window.DazzleStore._set === "function") {
           window.DazzleStore._set(window.DazzleStore.KEYS.ORDERS, orders);
         }
