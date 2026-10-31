@@ -782,6 +782,11 @@ async function handlePlaceOrder(e) {
 
             if (verifyRes && verifyRes.success) {
               clearCart();
+              if (verifyRes.order && window.DazzleStore) {
+                const cur = DazzleStore.getOrders().filter(o => o.id !== verifyRes.order.id);
+                cur.unshift(verifyRes.order);
+                DazzleStore.saveOrders(cur);
+              }
 
               try {
                 const myOrders = JSON.parse(localStorage.getItem('dazzle_my_orders') || '[]');
@@ -915,6 +920,11 @@ async function handlePlaceOrder(e) {
       });
 
       const finalId = (newOrder && newOrder.id) ? newOrder.id : orderId;
+      if (newOrder && newOrder.id && window.DazzleStore) {
+        const cur = DazzleStore.getOrders().filter(o => o.id !== newOrder.id);
+        cur.unshift(newOrder);
+        DazzleStore.saveOrders(cur);
+      }
 
       try {
         const myOrders = JSON.parse(localStorage.getItem('dazzle_my_orders') || '[]');

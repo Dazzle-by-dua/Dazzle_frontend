@@ -70,13 +70,16 @@
     const adminToken = getAuthToken();
     const custToken = getCustomerToken();
 
-    // Attach customer token for customer endpoints, review eligibility, or storefront user operations
-    if (endpoint.includes("/api/customer/") || endpoint.includes("/api/reviews/eligibility") || (custToken && !adminToken)) {
-      if (custToken && !headers["Authorization"]) {
+    // Attach customer token for customer endpoints, storefront orders, review eligibility, or storefront user operations
+    const isAdminPath = typeof window !== "undefined" && window.location && window.location.pathname.includes("/admin");
+    if (custToken && (!isAdminPath || endpoint.includes("/api/customer/"))) {
+      if (!headers["Authorization"]) {
         headers["Authorization"] = `Bearer ${custToken}`;
       }
     } else if (adminToken && !headers["Authorization"]) {
       headers["Authorization"] = `Bearer ${adminToken}`;
+    } else if (custToken && !headers["Authorization"]) {
+      headers["Authorization"] = `Bearer ${custToken}`;
     }
 
     const fetchOptions = {

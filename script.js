@@ -371,16 +371,23 @@ window.DazzleStore = window.DazzleStore || {
 
   _getAuthHeader() {
     try {
-      // Try admin token first
+      const isAdminPath = typeof window !== "undefined" && window.location && window.location.pathname.includes("/admin");
+      const custSess = sessionStorage.getItem("dazzle_customer_session") || localStorage.getItem("dazzle_customer_session");
       const adminSess = localStorage.getItem("dazzle_admin_session") || sessionStorage.getItem("dazzle_admin_session");
+
+      // On storefront pages, prioritize customer token so customer orders are linked to their account
+      if (custSess && !isAdminPath) {
+        const sess = JSON.parse(custSess);
+        if (sess && sess.token) {
+          return { "Authorization": `Bearer ${sess.token}` };
+        }
+      }
       if (adminSess) {
         const sess = JSON.parse(adminSess);
         if (sess && sess.token) {
           return { "Authorization": `Bearer ${sess.token}` };
         }
       }
-      // Fall back to customer token (so customer orders are linked to their account)
-      const custSess = sessionStorage.getItem("dazzle_customer_session") || localStorage.getItem("dazzle_customer_session");
       if (custSess) {
         const sess = JSON.parse(custSess);
         if (sess && sess.token) {
@@ -395,6 +402,7 @@ window.DazzleStore = window.DazzleStore || {
     const authHeaders = this._getAuthHeader();
     const options = {
       method,
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         ...authHeaders
@@ -438,7 +446,7 @@ window.DazzleStore = window.DazzleStore || {
         fetch(`${API_BASE_URL}/api/settings`).then(r => r.ok ? r.json() : null),
         fetch(`${API_BASE_URL}/api/navigation`).then(r => r.ok ? r.json() : null),
         fetch(`${API_BASE_URL}/api/pages`).then(r => r.ok ? r.json() : null),
-        fetch(`${API_BASE_URL}/api/orders`).then(r => r.ok ? r.json() : null),
+        Promise.resolve(null), // /api/orders is admin-only; customer orders use GET /api/customer/orders instead
       ]);
 
       if (prods.status === "fulfilled" && Array.isArray(prods.value)) {
@@ -1412,7 +1420,7 @@ function renderOrdersPage() {
               ${order.razorpay_payment_id ? `<div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;font-family:monospace">Payment ID: ${order.razorpay_payment_id}</div>` : ''}
             </div>
             <div class="order-actions">
-              <button class="btn btn-outline btn-sm" onclick="showToast('Invoice downloaded for Order #' + order.id)">Invoice</button>
+              <button class="btn btn-outline btn-sm" onclick="showToast('Invoice downloaded for Order #' + '${order.id}')">Invoice</button>
               ${((order.status || '').toLowerCase() === 'delivered')
                 ? `<a href="product-details.html?id=${(order.items && order.items[0]) ? (order.items[0].id || 1) : 1}&order_id=${encodeURIComponent(order.id || '')}" class="btn btn-gold btn-sm" style="display:inline-flex;align-items:center;gap:4px;"><i class="fa fa-pen"></i> Write Review &rarr;</a>`
                 : `<button class="btn btn-ghost btn-sm" onclick="showToast('Review writing becomes available once your piece is delivered.')">Rate & Review</button>`
@@ -1988,7 +1996,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (typeof renderProductDetails === "function") renderProductDetails();
       if (typeof renderCheckout === "function") renderCheckout();
       if (typeof renderCart === "function") renderCart();
-      if (typeof renderOrdersPage === "function") renderOrdersPage();
+      // Orders page is handled by syncAuthenticatedCustomerOrders() which uses /api/customer/orders
       if (typeof populateShopFilters === "function") populateShopFilters();
     });
   }
