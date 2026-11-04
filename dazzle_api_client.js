@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    DAZZLE BY DUA ? Production API Client & DazzleStore Bridge
    Seamless drop-in replacement / API connector for DazzleStore
    Enables 100% Admin -> API -> Database -> Storefront synchronization
@@ -167,7 +167,7 @@
         });
       },
 
-      async signupComplete(email, signupToken, password, confirmPassword) {
+      async signupComplete(email, signupToken, password, confirmPassword, rememberMe = false) {
         const res = await request("/api/customer/auth/signup/complete", {
           method: "POST",
           body: {
@@ -186,6 +186,8 @@
           sessionStorage.setItem(API_CONFIG.STORAGE_CUSTOMER_KEY, JSON.stringify(sessionData));
           if (rememberMe) {
             localStorage.setItem(API_CONFIG.STORAGE_CUSTOMER_KEY, JSON.stringify(sessionData));
+          } else {
+            localStorage.removeItem(API_CONFIG.STORAGE_CUSTOMER_KEY);
           }
         }
         return res;
@@ -205,6 +207,8 @@
           sessionStorage.setItem(API_CONFIG.STORAGE_CUSTOMER_KEY, JSON.stringify(sessionData));
           if (rememberMe) {
             localStorage.setItem(API_CONFIG.STORAGE_CUSTOMER_KEY, JSON.stringify(sessionData));
+          } else {
+            localStorage.removeItem(API_CONFIG.STORAGE_CUSTOMER_KEY);
           }
         }
         return res;
@@ -215,6 +219,7 @@
           return await request("/api/customer/auth/me");
         } catch (e) {
           sessionStorage.removeItem(API_CONFIG.STORAGE_CUSTOMER_KEY);
+          localStorage.removeItem(API_CONFIG.STORAGE_CUSTOMER_KEY);
           throw e;
         }
       },
@@ -224,6 +229,7 @@
           await request("/api/customer/auth/logout", { method: "POST" });
         } finally {
           sessionStorage.removeItem(API_CONFIG.STORAGE_CUSTOMER_KEY);
+          localStorage.removeItem(API_CONFIG.STORAGE_CUSTOMER_KEY);
         }
         return { success: true };
       },

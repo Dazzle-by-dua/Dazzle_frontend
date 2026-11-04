@@ -245,6 +245,12 @@
           <div id="rule-match" style="color:var(--text-muted);">&#10007; Passwords must match exactly</div>
         </div>
 
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; font-size:0.78rem;">
+          <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; color:var(--text-dark);">
+            <input type="checkbox" id="signup-remember" checked> Keep me signed in
+          </label>
+        </div>
+
         <button type="submit" id="btn-stage3-submit" class="btn btn-gold btn-auth-submit">
           <span>Create Account &amp; Sign In &rarr;</span>
         </button>
@@ -708,6 +714,8 @@ async function handleSignupStage3(event) {
   clearAuthAlert();
   const p1 = document.getElementById("signup-password")?.value || "";
   const p2 = document.getElementById("signup-password-confirm")?.value || "";
+  const rememberBox = document.getElementById("signup-remember");
+  const rememberMe = rememberBox ? !!rememberBox.checked : true;
   const btn = document.getElementById("btn-stage3-submit");
 
   if (p1.length < 8) {
@@ -719,16 +727,28 @@ async function handleSignupStage3(event) {
     return;
   }
 
+  // Prevent duplicate concurrent submissions
+  if (btn.disabled) return;
   btn.disabled = true;
   btn.innerHTML = '<span>Creating Account <i class="fa fa-spinner fa-spin"></i></span>';
+
+  let registrationCompleted = false;
 
   try {
     const res = await DazzleApi.customer.signupComplete(
       currentSignupState.email,
       currentSignupState.signupToken,
       p1,
-      p2
+      p2,
+      rememberMe
     );
+
+    registrationCompleted = true;
+
+    // Immediately synchronize navigation bar customer state
+    if (typeof initCustomerAuthUI === "function") {
+      try { initCustomerAuthUI(); } catch (e) { /* non-blocking */ }
+    }
 
     showAuthAlert("Account created successfully! Welcome to Dazzle by Dua.", "success");
     const params = new URLSearchParams(window.location.search);
@@ -737,8 +757,30 @@ async function handleSignupStage3(event) {
       window.location.href = redirectUrl;
     }, 1200);
   } catch (err) {
-    showAuthAlert(err.message || "Failed to create account. Please restart registration.", "error");
-  } finally {
+    // If the account was already successfully registered or customer session is active, avoid false error
+    if (registrationCompleted || (window.DazzleApi && window.DazzleApi.customer && window.DazzleApi.customer.isLoggedIn())) {
+      showAuthAlert("Account created successfully! Redirecting...", "success");
+      const params = new URLSearchParams(window.location.search);
+      const redirectUrl = params.get("redirect") || "index.html";
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 1200);
+      return;
+    }
+
+    // If backend reports account already exists and customer token is active
+    const errMsg = err.message || "";
+    if (errMsg.toLowerCase().includes("already exists") && window.DazzleApi && window.DazzleApi.customer && window.DazzleApi.customer.isLoggedIn()) {
+      showAuthAlert("Welcome back! Redirecting...", "success");
+      const params = new URLSearchParams(window.location.search);
+      const redirectUrl = params.get("redirect") || "index.html";
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 1200);
+      return;
+    }
+
+    showAuthAlert(errMsg || "Failed to create account. Please restart registration.", "error");
     btn.disabled = false;
     btn.innerHTML = '<span>Create Account &amp; Sign In &rarr;</span>';
   }
