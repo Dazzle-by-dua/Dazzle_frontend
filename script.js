@@ -1,4 +1,4 @@
-﻿/* ========================================================
+/* ========================================================
    DAZZLE BY DUA - Centralized Store & Shared JS
    Centralized Data Layer for Store & Admin Panel
    ======================================================== */
@@ -167,7 +167,8 @@ const DEFAULT_OFFERS = {
   coupons: [
     { id: "c1", code: "DAZZLE10", title: "Welcome Privilege", discount: 10, type: "percent", minOrder: 1500, expiry: "2026-12-31", desc: "Receive 10% off your entire first purchase across all collections.", badge: "First Order", active: true },
     { id: "c2", code: "COMBO20", title: "Selected Combos", discount: 20, type: "percent", minOrder: 5000, expiry: "2026-12-31", desc: "Save 20% when you buy paired jewellery sets and matching duo sets.", badge: "Combo Deal", active: true },
-    { id: "c3", code: "FREESHIP", title: "Complimentary Express", discount: 0, type: "free_shipping", minOrder: 2500, expiry: "2026-12-31", desc: "Complimentary express shipping across India with signature luxury box.", badge: "Complimentary", active: true }
+    { id: "c3", code: "FREESHIP", title: "Complimentary Express", discount: 0, type: "free_shipping", minOrder: 2500, expiry: "2026-12-31", desc: "Complimentary express shipping across India with signature luxury box.", badge: "Complimentary", active: true },
+    { id: "c_freedel", code: "FREEDEL", title: "Free Delivery", discount: 0, type: "free_delivery", minOrder: 0, expiry: "2030-12-31", desc: "Enjoy 100% complimentary delivery on your entire order.", badge: "Free Delivery", active: true }
   ],
   combos: [
     {
@@ -803,6 +804,12 @@ window.DazzleStore = window.DazzleStore || {
       if (live) this.saveOffers(live);
     } catch (e) {}
     return true;
+  },
+  async validateCoupon(payload, orderTotal) {
+    const body = (typeof payload === 'object' && payload !== null)
+      ? payload
+      : { code: payload, orderTotal: orderTotal || 0 };
+    return await this._api('/api/offers/coupons/validate', 'POST', body);
   },
 
   // Homepage

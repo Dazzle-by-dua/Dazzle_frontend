@@ -435,10 +435,13 @@
       async deleteCoupon(id) {
         return await request(`/api/offers/coupons/${id}`, { method: "DELETE" });
       },
-      async validateCoupon(code, orderTotal) {
+      async validateCoupon(payload, orderTotal) {
+        const body = (typeof payload === 'object' && payload !== null)
+          ? payload
+          : { code: payload, orderTotal: orderTotal || 0 };
         return await request("/api/offers/coupons/validate", {
           method: "POST",
-          body: { code, orderTotal }
+          body
         });
       },
       async getCombos() {

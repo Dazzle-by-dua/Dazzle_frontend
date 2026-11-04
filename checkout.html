@@ -246,6 +246,41 @@
             <span class="summary-label">Delivery Charges</span>
             <span class="summary-val-accent" id="ch-delivery">Calculated at checkout</span>
           </div>
+          <div class="summary-line" id="summary-discount-row" style="display:none;color:#137333;">
+            <span class="summary-label" style="color:#137333;"><i class="fa fa-tag" style="margin-right:4px"></i>Coupon Discount (<span id="summary-coupon-name">FREEDEL</span>)</span>
+            <span class="summary-val" id="ch-discount" style="color:#137333;font-weight:700;">-₹0</span>
+          </div>
+
+          <!-- Apply Coupon Section -->
+          <div class="checkout-coupon-section" style="margin:1rem 0;padding:0.85rem;border-radius:8px;background:rgba(212,175,124,0.06);border:1px dashed rgba(212,175,124,0.45);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+              <span style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gold-dark, #8b6b23);">
+                <i class="fa fa-tag" style="margin-right:4px;"></i> Apply Coupon
+              </span>
+              <button type="button" style="background:none;border:none;font-size:0.72rem;color:var(--gold-dark, #8b6b23);cursor:pointer;text-decoration:underline;padding:0;" onclick="quickFillCoupon('FREEDEL')">
+                Try <strong>FREEDEL</strong>
+              </button>
+            </div>
+
+            <!-- Coupon Input & Apply Button -->
+            <div id="coupon-input-group" style="display:flex;gap:0.5rem;">
+              <input type="text" id="coupon-code-input" placeholder="Enter coupon code" style="flex:1;padding:0.55rem 0.75rem;font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;border:1px solid var(--border, #e5e5e5);border-radius:6px;background:#fff;" autocomplete="off" />
+              <button type="button" id="apply-coupon-btn" class="btn btn-gold" style="padding:0.55rem 1rem;font-size:0.82rem;white-space:nowrap;font-weight:600;" onclick="handleApplyCoupon()">Apply</button>
+            </div>
+
+            <!-- Applied Coupon Status Box -->
+            <div id="coupon-applied-box" style="display:none;align-items:center;justify-content:space-between;padding:0.6rem 0.75rem;background:#f3faf5;border:1px solid #b7ebd0;border-radius:6px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="background:#137333;color:#fff;font-size:0.72rem;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:0.5px;" id="applied-coupon-code-badge">FREEDEL</span>
+                <span style="font-size:0.82rem;color:#137333;font-weight:600;" id="applied-coupon-desc">Free Delivery Applied</span>
+              </div>
+              <button type="button" onclick="handleRemoveCoupon()" style="background:none;border:none;color:#9b1c1c;font-size:0.78rem;font-weight:600;cursor:pointer;text-decoration:underline;padding:2px 4px;">Remove</button>
+            </div>
+
+            <!-- Coupon Feedback Message -->
+            <div id="coupon-alert" style="display:none;margin-top:0.5rem;font-size:0.8rem;padding:0.45rem 0.65rem;border-radius:5px;line-height:1.35;"></div>
+          </div>
+
           <div class="summary-total-line">
             <span class="summary-total-label">Total</span>
             <span class="summary-total-val" id="ch-total">₹0</span>
@@ -521,6 +556,161 @@ function calculateDeliveryRate(cityStr, stateStr) {
   };
 }
 
+// ==========================================
+// COUPON STATE MANAGEMENT
+// ==========================================
+let appliedCoupon = null;
+
+function quickFillCoupon(code) {
+  const input = document.getElementById('coupon-code-input');
+  if (input) {
+    input.value = code;
+    input.focus();
+  }
+}
+
+function showCouponAlert(msg, type = 'danger') {
+  const alertEl = document.getElementById('coupon-alert');
+  if (!alertEl) return;
+  alertEl.style.display = 'block';
+  if (type === 'success') {
+    alertEl.style.background = '#e6f4ea';
+    alertEl.style.border = '1px solid #a8dab5';
+    alertEl.style.color = '#137333';
+    alertEl.innerHTML = `<i class="fa fa-check-circle" style="margin-right:4px"></i> ${msg}`;
+  } else {
+    alertEl.style.background = '#fde8e8';
+    alertEl.style.border = '1px solid #f98080';
+    alertEl.style.color = '#9b1c1c';
+    alertEl.innerHTML = `<i class="fa fa-exclamation-circle" style="margin-right:4px"></i> ${msg}`;
+  }
+}
+
+function updateCouponUI(isApplied, msg) {
+  const inputGroup = document.getElementById('coupon-input-group');
+  const appliedBox = document.getElementById('coupon-applied-box');
+  const badgeEl = document.getElementById('applied-coupon-code-badge');
+  const descEl = document.getElementById('applied-coupon-desc');
+
+  if (isApplied && appliedCoupon) {
+    if (inputGroup) inputGroup.style.display = 'none';
+    if (appliedBox) {
+      appliedBox.style.display = 'flex';
+      if (badgeEl) badgeEl.textContent = appliedCoupon.code;
+      if (descEl) {
+        if (appliedCoupon.code === 'FREEDEL' || appliedCoupon.freeShipping) {
+          descEl.textContent = '100% Free Delivery';
+        } else if (appliedCoupon.discountAmount > 0) {
+          descEl.textContent = `₹${appliedCoupon.discountAmount.toLocaleString()} Saved`;
+        } else {
+          descEl.textContent = 'Coupon Applied';
+        }
+      }
+    }
+    if (msg) showCouponAlert(msg, 'success');
+  } else {
+    if (inputGroup) inputGroup.style.display = 'flex';
+    if (appliedBox) appliedBox.style.display = 'none';
+  }
+}
+
+async function handleApplyCoupon() {
+  const input = document.getElementById('coupon-code-input');
+  const applyBtn = document.getElementById('apply-coupon-btn');
+  const rawCode = input ? input.value : '';
+  const code = (rawCode || '').trim().toUpperCase();
+
+  if (!code) {
+    showCouponAlert('Please enter a coupon code.', 'danger');
+    return;
+  }
+
+  const subtotal = getCartSubtotal();
+  const city = document.getElementById('ch-city')?.value?.trim() || '';
+  const stateVal = document.getElementById('ch-state')?.value?.trim() || '';
+  const rateInfo = calculateDeliveryRate(city, stateVal);
+  const deliveryFee = rateInfo.valid ? rateInfo.fee : 0;
+
+  if (applyBtn) {
+    applyBtn.disabled = true;
+    applyBtn.textContent = 'Applying...';
+  }
+
+  try {
+    let res = null;
+    if (window.DazzleStore && typeof window.DazzleStore.validateCoupon === 'function') {
+      res = await window.DazzleStore.validateCoupon({
+        code: code,
+        orderTotal: subtotal,
+        deliveryFee: deliveryFee,
+        city: city,
+        state: stateVal
+      });
+    } else {
+      const baseUrl = (typeof API_BASE_URL !== 'undefined') ? API_BASE_URL : 'https://dazzle-backend-69un.onrender.com';
+      const response = await fetch(`${baseUrl}/api/offers/coupons/validate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: code,
+          orderTotal: subtotal,
+          deliveryFee: deliveryFee,
+          city: city,
+          state: stateVal
+        })
+      });
+      res = await response.json();
+    }
+
+    if (res && res.valid) {
+      appliedCoupon = {
+        code: code,
+        type: res.discountType || res.coupon?.type || (code === 'FREEDEL' ? 'free_delivery' : 'percent'),
+        discountAmount: Number(res.discountAmount || 0),
+        deliveryDiscount: Number(res.deliveryDiscount || 0),
+        freeShipping: Boolean(res.freeShipping || code === 'FREEDEL'),
+        minOrder: Number(res.coupon?.minOrder || 0),
+        message: res.message
+      };
+      try {
+        sessionStorage.setItem('dazzle_checkout_coupon', code);
+      } catch (e) {}
+
+      updateCouponUI(true, res.message || `Coupon '${code}' applied! Free delivery.`);
+      renderCheckout();
+    } else {
+      appliedCoupon = null;
+      try {
+        sessionStorage.removeItem('dazzle_checkout_coupon');
+      } catch (e) {}
+      updateCouponUI(false);
+      showCouponAlert(res?.message || `Invalid or expired coupon code '${code}'.`, 'danger');
+      renderCheckout();
+    }
+  } catch (err) {
+    console.error('Coupon validation error:', err);
+    showCouponAlert('Failed to validate coupon. Please check connection and try again.', 'danger');
+  } finally {
+    if (applyBtn) {
+      applyBtn.disabled = false;
+      applyBtn.textContent = 'Apply';
+    }
+  }
+}
+
+function handleRemoveCoupon() {
+  appliedCoupon = null;
+  try {
+    sessionStorage.removeItem('dazzle_checkout_coupon');
+  } catch (e) {}
+  const input = document.getElementById('coupon-code-input');
+  if (input) input.value = '';
+  updateCouponUI(false);
+  const alertEl = document.getElementById('coupon-alert');
+  if (alertEl) alertEl.style.display = 'none';
+  renderCheckout();
+}
+
 function handlePaymentMethodChange(method) {
   selectedPaymentMethod = method;
   const rzpCard = document.getElementById('pay-card-razorpay');
@@ -536,8 +726,15 @@ function handlePaymentMethodChange(method) {
   const city = document.getElementById('ch-city')?.value?.trim() || '';
   const stateVal = document.getElementById('ch-state')?.value?.trim() || '';
   const rateInfo = calculateDeliveryRate(city, stateVal);
-  const delivery = rateInfo.valid ? rateInfo.fee : 0;
-  const total = subtotal + delivery;
+
+  const origDelivery = rateInfo.valid ? rateInfo.fee : 0;
+  const isFreeDel = Boolean(appliedCoupon && (appliedCoupon.code === 'FREEDEL' || appliedCoupon.freeShipping));
+  const effectiveDelivery = isFreeDel ? 0 : origDelivery;
+  let prodDiscount = 0;
+  if (appliedCoupon && !isFreeDel) {
+    prodDiscount = appliedCoupon.discountAmount || 0;
+  }
+  const total = Math.max(0, subtotal - prodDiscount + (rateInfo.valid ? effectiveDelivery : 0));
 
   if (method === 'razorpay') {
     if (rzpCard) {
@@ -548,7 +745,13 @@ function handlePaymentMethodChange(method) {
       codCard.style.border = '1px solid var(--border)';
       codCard.style.background = 'var(--white)';
     }
-    if (btnText) btnText.innerHTML = rateInfo.valid ? `Pay Now &bull; ₹${total.toLocaleString()}` : `Pay Now &bull; ₹${subtotal.toLocaleString()} + Delivery`;
+    if (btnText) {
+      if (rateInfo.valid || isFreeDel) {
+        btnText.innerHTML = `Pay Now &bull; ₹${total.toLocaleString()}`;
+      } else {
+        btnText.innerHTML = `Pay Now &bull; ₹${subtotal.toLocaleString()} + Delivery`;
+      }
+    }
     if (icon) icon.className = 'fa fa-lock';
   } else {
     if (codCard) {
@@ -559,7 +762,13 @@ function handlePaymentMethodChange(method) {
       rzpCard.style.border = '1px solid var(--border)';
       rzpCard.style.background = 'var(--white)';
     }
-    if (btnText) btnText.innerHTML = rateInfo.valid ? `Place COD Order &bull; ₹${total.toLocaleString()}` : 'Place COD Order';
+    if (btnText) {
+      if (rateInfo.valid || isFreeDel) {
+        btnText.innerHTML = `Place COD Order &bull; ₹${total.toLocaleString()}`;
+      } else {
+        btnText.innerHTML = 'Place COD Order';
+      }
+    }
     if (icon) icon.className = 'fa fa-truck';
   }
 }
@@ -631,20 +840,66 @@ function renderCheckout() {
   const stateVal = document.getElementById('ch-state')?.value?.trim() || '';
   const rateInfo = calculateDeliveryRate(city, stateVal);
 
-  const delivery = rateInfo.valid ? rateInfo.fee : 0;
-  const total = subtotal + delivery;
+  const origDelivery = rateInfo.valid ? rateInfo.fee : 0;
+  const isFreeDel = Boolean(appliedCoupon && (appliedCoupon.code === 'FREEDEL' || appliedCoupon.freeShipping));
+  const effectiveDelivery = isFreeDel ? 0 : origDelivery;
+
+  // Coupon evaluation & subtotal minOrder checks
+  if (appliedCoupon && appliedCoupon.minOrder && subtotal < appliedCoupon.minOrder) {
+    appliedCoupon = null;
+    try { sessionStorage.removeItem('dazzle_checkout_coupon'); } catch(e){}
+    updateCouponUI(false);
+    showCouponAlert('Cart subtotal is below minimum required for coupon. Coupon removed.', 'danger');
+  }
+
+  let prodDiscount = 0;
+  if (appliedCoupon && !isFreeDel) {
+    prodDiscount = appliedCoupon.discountAmount || 0;
+  }
+
+  const effectiveTotal = rateInfo.valid
+    ? Math.max(0, subtotal - prodDiscount + effectiveDelivery)
+    : Math.max(0, subtotal - prodDiscount);
 
   subtotalEl.textContent = '₹' + subtotal.toLocaleString();
 
+  const discountRow = document.getElementById('summary-discount-row');
+  const discountValEl = document.getElementById('ch-discount');
+  const couponNameEl = document.getElementById('summary-coupon-name');
+
   if (deliveryEl) {
     if (rateInfo.valid) {
-      deliveryEl.textContent = '₹' + rateInfo.fee.toLocaleString();
-      deliveryEl.style.color = 'var(--text-dark)';
-      deliveryEl.style.fontWeight = '600';
+      if (isFreeDel) {
+        deliveryEl.innerHTML = `<span style="text-decoration:line-through;color:#888;font-weight:400;margin-right:6px">₹${origDelivery.toLocaleString()}</span> <span style="color:#137333;font-weight:700">₹0 (Free)</span>`;
+      } else {
+        deliveryEl.textContent = '₹' + origDelivery.toLocaleString();
+        deliveryEl.style.color = 'var(--text-dark)';
+        deliveryEl.style.fontWeight = '600';
+      }
     } else {
-      deliveryEl.textContent = 'Enter City & State';
-      deliveryEl.style.color = '#888';
-      deliveryEl.style.fontWeight = '400';
+      if (isFreeDel) {
+        deliveryEl.innerHTML = `<span style="color:#137333;font-weight:600">₹0 (FREEDEL applied)</span>`;
+      } else {
+        deliveryEl.textContent = 'Enter City & State';
+        deliveryEl.style.color = '#888';
+        deliveryEl.style.fontWeight = '400';
+      }
+    }
+  }
+
+  if (discountRow) {
+    if (appliedCoupon) {
+      discountRow.style.display = 'flex';
+      if (couponNameEl) couponNameEl.textContent = appliedCoupon.code;
+      if (isFreeDel) {
+        if (discountValEl) {
+          discountValEl.textContent = rateInfo.valid ? `-₹${origDelivery.toLocaleString()}` : '-₹0 (Free Delivery)';
+        }
+      } else {
+        if (discountValEl) discountValEl.textContent = `-₹${prodDiscount.toLocaleString()}`;
+      }
+    } else {
+      discountRow.style.display = 'none';
     }
   }
 
@@ -652,10 +907,17 @@ function renderCheckout() {
     if (rateInfo.valid) {
       badgeEl.style.display = 'flex';
       badgeEl.style.alignItems = 'center';
-      badgeEl.style.background = '#f3faf5';
-      badgeEl.style.border = '1px solid #b7ebd0';
-      badgeEl.style.color = '#0f5132';
-      badgeEl.innerHTML = `<i class="fa fa-truck" style="margin-right:6px;color:#137333"></i> <span><strong>${rateInfo.label}</strong> (Fixed rate)</span>`;
+      if (isFreeDel) {
+        badgeEl.style.background = '#e6f4ea';
+        badgeEl.style.border = '1px solid #a8dab5';
+        badgeEl.style.color = '#137333';
+        badgeEl.innerHTML = `<i class="fa fa-gift" style="margin-right:6px;color:#137333"></i> <span><strong>${rateInfo.label}</strong> (100% Free with coupon <strong>FREEDEL</strong>)</span>`;
+      } else {
+        badgeEl.style.background = '#f3faf5';
+        badgeEl.style.border = '1px solid #b7ebd0';
+        badgeEl.style.color = '#0f5132';
+        badgeEl.innerHTML = `<i class="fa fa-truck" style="margin-right:6px;color:#137333"></i> <span><strong>${rateInfo.label}</strong> (Fixed rate)</span>`;
+      }
     } else if (city || stateVal) {
       badgeEl.style.display = 'flex';
       badgeEl.style.alignItems = 'center';
@@ -670,9 +932,13 @@ function renderCheckout() {
   }
 
   if (rateInfo.valid) {
-    totalEl.textContent = '₹' + total.toLocaleString();
+    totalEl.textContent = '₹' + effectiveTotal.toLocaleString();
   } else {
-    totalEl.textContent = '₹' + subtotal.toLocaleString() + ' + Delivery';
+    if (isFreeDel) {
+      totalEl.textContent = '₹' + subtotal.toLocaleString() + ' (Free Delivery)';
+    } else {
+      totalEl.textContent = '₹' + subtotal.toLocaleString() + ' + Delivery';
+    }
   }
 
   handlePaymentMethodChange(selectedPaymentMethod);
@@ -716,9 +982,12 @@ async function handlePlaceOrder(e) {
   }
 
   const fullAddress = `${house}, ${street}, Landmark: ${landmark}, ${city}, ${stateVal} - ${pin}`.replace(/^[,\s-]+|[,\s-]+$/g, '');
-  const delivery = rateInfo.fee;
+  const origDelivery = rateInfo.fee;
+  const isFreeDel = Boolean(appliedCoupon && (appliedCoupon.code === 'FREEDEL' || appliedCoupon.freeShipping));
+  const delivery = isFreeDel ? 0 : origDelivery;
   const subtotal = getCartSubtotal();
-  const total = subtotal + delivery;
+  const prodDiscount = (appliedCoupon && !isFreeDel) ? (appliedCoupon.discountAmount || 0) : 0;
+  const total = Math.max(0, subtotal - prodDiscount + delivery);
 
   const submitBtn = document.getElementById('place-order-btn');
   const btnText = document.getElementById('place-order-btn-text');
@@ -745,6 +1014,7 @@ async function handlePlaceOrder(e) {
         state: stateVal,
         postal_code: pin,
         delivery_fee: delivery,
+        coupon_code: appliedCoupon ? appliedCoupon.code : null,
         notes: notes
       });
 
@@ -784,6 +1054,8 @@ async function handlePlaceOrder(e) {
 
             if (verifyRes && verifyRes.success) {
               clearCart();
+              appliedCoupon = null;
+              try { sessionStorage.removeItem('dazzle_checkout_coupon'); } catch(e) {}
               if (verifyRes.order && window.DazzleStore) {
                 const cur = DazzleStore.getOrders().filter(o => o.id !== verifyRes.order.id);
                 cur.unshift(verifyRes.order);
@@ -913,6 +1185,7 @@ async function handlePlaceOrder(e) {
         state: stateVal,
         postal_code: pin,
         delivery_fee: delivery,
+        coupon_code: appliedCoupon ? appliedCoupon.code : null,
         paymentMethod: 'Cash on Delivery',
         paymentStatus: 'Pending',
         total: total,
@@ -963,7 +1236,10 @@ async function handlePlaceOrder(e) {
         window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
         modal.classList.add('open');
       }
+   
       clearCart();
+      appliedCoupon = null;
+      try { sessionStorage.removeItem('dazzle_checkout_coupon'); } catch(e) {}
       document.body.style.overflow = 'hidden';
 
     } catch (err) {
@@ -1021,6 +1297,75 @@ document.addEventListener('DOMContentLoaded', () => {
     stateInput.addEventListener('input', renderCheckout);
     stateInput.addEventListener('change', renderCheckout);
   }
+
+  // Allow pressing Enter in coupon code input to apply coupon
+  const couponInput = document.getElementById('coupon-code-input');
+  if (couponInput) {
+    couponInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleApplyCoupon();
+      }
+    });
+  }
+
+  // Restore and revalidate saved coupon from sessionStorage
+  try {
+    const savedCoupon = sessionStorage.getItem('dazzle_checkout_coupon');
+    if (savedCoupon) {
+      const code = savedCoupon.trim().toUpperCase();
+      const subtotal = getCartSubtotal();
+      const city = document.getElementById('ch-city')?.value?.trim() || '';
+      const stateVal = document.getElementById('ch-state')?.value?.trim() || '';
+      const rateInfo = calculateDeliveryRate(city, stateVal);
+      const deliveryFee = rateInfo.valid ? rateInfo.fee : 0;
+
+      (async () => {
+        try {
+          let res = null;
+          if (window.DazzleStore && typeof window.DazzleStore.validateCoupon === 'function') {
+            res = await window.DazzleStore.validateCoupon({
+              code,
+              orderTotal: subtotal,
+              deliveryFee,
+              city,
+              state: stateVal
+            });
+          } else {
+            const baseUrl = (typeof API_BASE_URL !== 'undefined') ? API_BASE_URL : 'https://dazzle-backend-69un.onrender.com';
+            const r = await fetch(`${baseUrl}/api/offers/coupons/validate`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ code, orderTotal: subtotal, deliveryFee, city, state: stateVal })
+            });
+            res = await r.json();
+          }
+
+          if (res && res.valid) {
+            appliedCoupon = {
+              code: code,
+              type: res.discountType || res.coupon?.type || (code === 'FREEDEL' ? 'free_delivery' : 'percent'),
+              discountAmount: Number(res.discountAmount || 0),
+              deliveryDiscount: Number(res.deliveryDiscount || 0),
+              freeShipping: Boolean(res.freeShipping || code === 'FREEDEL'),
+              minOrder: Number(res.coupon?.minOrder || 0),
+              message: res.message
+            };
+            updateCouponUI(true);
+          } else {
+            sessionStorage.removeItem('dazzle_checkout_coupon');
+            appliedCoupon = null;
+            updateCouponUI(false);
+          }
+        } catch (e) {
+          sessionStorage.removeItem('dazzle_checkout_coupon');
+          appliedCoupon = null;
+          updateCouponUI(false);
+        }
+        renderCheckout();
+      })();
+    }
+  } catch (e) {}
 });
 </script>
 </body>
