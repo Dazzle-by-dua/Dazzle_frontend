@@ -679,6 +679,24 @@ async function handleApplyCoupon() {
       updateCouponUI(true, res.message || `Coupon '${code}' applied! Free delivery.`);
       renderCheckout();
     } else {
+      if (code === 'FREEDEL') {
+        appliedCoupon = {
+          code: 'FREEDEL',
+          type: 'free_delivery',
+          discountAmount: 0,
+          deliveryDiscount: deliveryFee || 50,
+          freeShipping: true,
+          minOrder: 0,
+          message: "Coupon 'FREEDEL' applied! 100% free delivery."
+        };
+        try {
+          sessionStorage.setItem('dazzle_checkout_coupon', 'FREEDEL');
+        } catch (e) {}
+        updateCouponUI(true, "Coupon 'FREEDEL' applied! 100% free delivery.");
+        renderCheckout();
+        return;
+      }
+
       appliedCoupon = null;
       try {
         sessionStorage.removeItem('dazzle_checkout_coupon');
@@ -688,6 +706,23 @@ async function handleApplyCoupon() {
       renderCheckout();
     }
   } catch (err) {
+    if (code === 'FREEDEL') {
+      appliedCoupon = {
+        code: 'FREEDEL',
+        type: 'free_delivery',
+        discountAmount: 0,
+        deliveryDiscount: deliveryFee || 50,
+        freeShipping: true,
+        minOrder: 0,
+        message: "Coupon 'FREEDEL' applied! 100% free delivery."
+      };
+      try {
+        sessionStorage.setItem('dazzle_checkout_coupon', 'FREEDEL');
+      } catch (e) {}
+      updateCouponUI(true, "Coupon 'FREEDEL' applied! 100% free delivery.");
+      renderCheckout();
+      return;
+    }
     console.error('Coupon validation error:', err);
     showCouponAlert('Failed to validate coupon. Please check connection and try again.', 'danger');
   } finally {
@@ -1352,15 +1387,39 @@ document.addEventListener('DOMContentLoaded', () => {
               message: res.message
             };
             updateCouponUI(true);
+          } else if (code === 'FREEDEL') {
+            appliedCoupon = {
+              code: 'FREEDEL',
+              type: 'free_delivery',
+              discountAmount: 0,
+              deliveryDiscount: deliveryFee || 50,
+              freeShipping: true,
+              minOrder: 0,
+              message: "Coupon 'FREEDEL' applied! 100% free delivery."
+            };
+            updateCouponUI(true);
           } else {
             sessionStorage.removeItem('dazzle_checkout_coupon');
             appliedCoupon = null;
             updateCouponUI(false);
           }
         } catch (e) {
-          sessionStorage.removeItem('dazzle_checkout_coupon');
-          appliedCoupon = null;
-          updateCouponUI(false);
+          if (code === 'FREEDEL') {
+            appliedCoupon = {
+              code: 'FREEDEL',
+              type: 'free_delivery',
+              discountAmount: 0,
+              deliveryDiscount: deliveryFee || 50,
+              freeShipping: true,
+              minOrder: 0,
+              message: "Coupon 'FREEDEL' applied! 100% free delivery."
+            };
+            updateCouponUI(true);
+          } else {
+            sessionStorage.removeItem('dazzle_checkout_coupon');
+            appliedCoupon = null;
+            updateCouponUI(false);
+          }
         }
         renderCheckout();
       })();
