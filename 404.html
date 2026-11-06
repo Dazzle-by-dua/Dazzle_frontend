@@ -3,22 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Redirecting — Dazzle by Dua</title>
+<title>Page Not Found — Dazzle by Dua</title>
+<meta name="robots" content="noindex, nofollow">
 <script>
   (function() {
     var path = window.location.pathname;
     var lower = path.toLowerCase();
     var search = window.location.search || '';
     var hash = window.location.hash || '';
+    var base = (window.location.hostname.indexOf('github.io') !== -1) ? '/Dazzle_frontend/' : '/';
 
     // If the path contains admin (case-insensitive e.g. /Admin, /admin, /ADMIN)
     if (lower.indexOf('admin') !== -1) {
-      window.location.replace('/Dazzle_frontend/admin/' + search + hash);
+      window.location.replace(base + 'admin/' + search + hash);
       return;
     }
 
-    // Default redirect back to store
-    window.location.replace('/Dazzle_frontend/' + search + hash);
+    // Default redirect back to store root
+    window.location.replace(base + search + hash);
   })();
 </script>
 </head>

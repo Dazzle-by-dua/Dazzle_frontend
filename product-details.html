@@ -4,7 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product Details — Dazzle by Dua</title>
-<meta name="description" content="Explore fine handcrafted jewellery by Dazzle by Dua. Timeless elegance crafted with 18K champagne gold.">
+<meta name="description" content="Explore fine handcrafted jewellery by Dazzle by Dua. Timeless elegance crafted with 18K champagne gold and freshwater pearls.">
+<meta name="keywords" content="fine jewellery, handcrafted necklace, pearl earrings, anti-tarnish bracelet, minimalist ring, Dazzle by Dua">
+<meta name="author" content="Dazzle by Dua">
+<link rel="canonical" id="canonical-link" href="https://dazzlebydua.com/product-details.html">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="product">
+<meta property="og:site_name" content="Dazzle by Dua">
+<meta property="og:url" content="https://dazzlebydua.com/product-details.html">
+<meta property="og:title" content="Product Details — Dazzle by Dua">
+<meta property="og:description" content="Explore fine handcrafted jewellery by Dazzle by Dua. Timeless elegance crafted with 18K champagne gold and freshwater pearls.">
+<meta property="og:image" content="https://dazzlebydua.com/featured_collection.jpg">
+<meta property="og:locale" content="en_IN">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Product Details — Dazzle by Dua">
+<meta name="twitter:description" content="Explore fine handcrafted jewellery by Dazzle by Dua. Timeless elegance crafted with 18K champagne gold and freshwater pearls.">
+<meta name="twitter:image" content="https://dazzlebydua.com/featured_collection.jpg">
+
+<!-- Stylesheets -->
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -205,7 +225,6 @@
 </footer>
 
 <script src="script.js"></script>
-<script src="script.js"></script>
 <script>
 let currentProduct = null;
 let currentQuantity = 1;
@@ -272,11 +291,73 @@ function renderProductDetails() {
   };
 
   // Update Breadcrumbs & Title
-  document.title = currentProduct.name + " — Dazzle by Dua";
+  document.title = currentProduct.name + " | Dazzle by Dua Fine Jewellery";
   const crumbCat = document.getElementById("crumb-category");
   const crumbProd = document.getElementById("crumb-product");
   if (crumbCat) crumbCat.textContent = currentProduct.category;
   if (crumbProd) crumbProd.textContent = currentProduct.name;
+
+  // Dynamic SEO & Metadata updates
+  const metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc) metaDesc.setAttribute("content", info.description);
+  const canonicalLink = document.getElementById("canonical-link");
+  if (canonicalLink) canonicalLink.setAttribute("href", "https://dazzlebydua.com/product-details.html?id=" + currentProduct.id);
+
+  const setMeta = (prop, val) => {
+    let el = document.querySelector(`meta[property="${prop}"]`) || document.querySelector(`meta[name="${prop}"]`);
+    if (el) el.setAttribute("content", val);
+  };
+  setMeta("og:title", currentProduct.name + " | Dazzle by Dua");
+  setMeta("og:description", info.description);
+  setMeta("og:url", "https://dazzlebydua.com/product-details.html?id=" + currentProduct.id);
+  const primaryImgUrl = info.images[0] ? (info.images[0].startsWith("http") ? info.images[0] : ("https://dazzlebydua.com/" + info.images[0])) : "https://dazzlebydua.com/featured_collection.jpg";
+  setMeta("og:image", primaryImgUrl);
+  setMeta("twitter:title", currentProduct.name + " | Dazzle by Dua");
+  setMeta("twitter:description", info.description);
+  setMeta("twitter:image", primaryImgUrl);
+
+  // Dynamic Schema.org Product structured data injection
+  let schemaScript = document.getElementById("product-schema-jsonld");
+  if (!schemaScript) {
+    schemaScript = document.createElement("script");
+    schemaScript.type = "application/ld+json";
+    schemaScript.id = "product-schema-jsonld";
+    document.head.appendChild(schemaScript);
+  }
+  const prodSchema = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": currentProduct.name,
+    "image": info.images.map(img => img.startsWith("http") ? img : ("https://dazzlebydua.com/" + img)),
+    "description": info.description,
+    "sku": info.sku,
+    "category": currentProduct.category,
+    "brand": {
+      "@type": "Brand",
+      "name": "Dazzle by Dua"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": "https://dazzlebydua.com/product-details.html?id=" + currentProduct.id,
+      "priceCurrency": "INR",
+      "price": currentProduct.price,
+      "priceValidUntil": "2027-12-31",
+      "itemCondition": "https://schema.org/NewCondition",
+      "availability": currentProduct.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "Dazzle by Dua"
+      }
+    }
+  };
+  if (currentProduct.reviews > 0 && currentProduct.rating) {
+    prodSchema.aggregateRating = {
+      "@type": "AggregateRating",
+      "ratingValue": currentProduct.rating,
+      "reviewCount": currentProduct.reviews
+    };
+  }
+  schemaScript.textContent = JSON.stringify(prodSchema);
 
   // Badges & Discount
   const discountPct = Math.round(((currentProduct.oldPrice - currentProduct.price) / currentProduct.oldPrice) * 100);
@@ -289,7 +370,7 @@ function renderProductDetails() {
   // Gallery Thumbnails
   const thumbsHTML = info.images.map((img, i) => `
     <div class="gallery-thumb ${i === 0 ? 'active' : ''}" onclick="switchGalleryImage(this, '${img}')">
-      <img src="${img}" alt="${currentProduct.name} preview ${i+1}">
+      <img src="${img}" alt="${currentProduct.name} preview thumbnail ${i+1}">
     </div>
   `).join("");
 
@@ -300,7 +381,7 @@ function renderProductDetails() {
       <!-- Gallery Column -->
       <div class="product-gallery">
         <div class="gallery-main">
-          <img id="gallery-main-img" src="${info.images[0] || currentProduct.img}" alt="${currentProduct.name}">
+          <img id="gallery-main-img" src="${info.images[0] || currentProduct.img}" alt="${currentProduct.name} - Handcrafted Fine Jewellery">
           <div class="gallery-badges">
             ${badgesHTML}
             ${stockBadge}
@@ -716,4 +797,3 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
-

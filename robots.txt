@@ -1,0 +1,17 @@
+# Robots.txt for Dazzle by Dua (https://dazzlebydua.com)
+User-agent: *
+Allow: /
+
+# Disallow private, administrative, and customer-specific pages
+Disallow: /admin/
+Disallow: /cart.html
+Disallow: /checkout.html
+Disallow: /auth.html
+Disallow: /orders.html
+Disallow: /wishlist.html
+Disallow: /reset-password.html
+Disallow: /404.html
+
+# Sitemap location
+Sitemap: https://dazzlebydua.com/sitemap.xml
+
