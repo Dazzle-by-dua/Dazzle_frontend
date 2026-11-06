@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google Analytics 4 - Dazzle by Dua -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6KV8W32JNV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-6KV8W32JNV');
+</script>
+<script src="analytics.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shop Fine Jewellery &amp; Anti-Tarnish Pieces | Dazzle by Dua</title>
@@ -556,6 +566,12 @@ function renderShop() {
     if (emptyEl) emptyEl.style.display = 'none';
     grid.innerHTML = paginated.map(productCardHTML).join('');
   }
+
+  // Trigger GA4 view_item_list safely
+  if (typeof window.ga4ViewItemList === 'function' && paginated.length > 0) {
+    const listLabel = (catVal && catVal !== 'all') ? `Category: ${catVal}` : 'Shop All Jewellery';
+    try { window.ga4ViewItemList(paginated, listLabel); } catch (e) {}
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -581,6 +597,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const catParam = params.get('category');
   if (catParam && catSelect) {
     catSelect.value = catParam.toLowerCase();
+  }
+
+  // Safe GA4 search event if search query exists in URL
+  const searchQuery = params.get('q') || params.get('search') || params.get('query');
+  if (searchQuery && typeof window.ga4Search === 'function') {
+    try { window.ga4Search(searchQuery); } catch (e) {}
   }
   // Reset to page 1 on filter/sort change
   document.getElementById('category-select')?.addEventListener('change', () => { currentPage = 1; renderShop(); });

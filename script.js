@@ -1071,6 +1071,9 @@ function addToCart(productId, qty = 1) {
   saveState();
   updateNavBadges();
   showToast("✦ Added to cart — " + p.name + (num > 1 ? ` (x${num})` : ""));
+  if (typeof window.ga4AddToCart === "function") {
+    try { window.ga4AddToCart(p, num); } catch (e) {}
+  }
 }
 
 function buyNow(productId, qty = 1) {
@@ -1106,7 +1109,12 @@ function removeFromCart(productId) {
   state.cart = state.cart.filter(x => x.id !== productId);
   saveState();
   updateNavBadges();
-  if (p) showToast("Removed " + p.name + " from cart");
+  if (p) {
+    showToast("Removed " + p.name + " from cart");
+    if (typeof window.ga4RemoveFromCart === "function") {
+      try { window.ga4RemoveFromCart(p, p.qty || 1); } catch (e) {}
+    }
+  }
 }
 
 // ---- Wishlist Operations ----
@@ -1120,6 +1128,9 @@ function toggleWishlist(productId) {
   } else {
     state.wishlist.push(p);
     showToast("♥ Added to wishlist — " + p.name);
+    if (typeof window.ga4AddToWishlist === "function") {
+      try { window.ga4AddToWishlist(p); } catch (e) {}
+    }
   }
   saveState();
   updateNavBadges();

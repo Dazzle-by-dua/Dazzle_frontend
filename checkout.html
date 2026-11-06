@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google Analytics 4 - Dazzle by Dua -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6KV8W32JNV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-6KV8W32JNV');
+</script>
+<script src="analytics.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Checkout — Dazzle by Dua</title>
@@ -807,6 +817,16 @@ function handlePaymentMethodChange(method) {
     }
     if (icon) icon.className = 'fa fa-truck';
   }
+
+  // Trigger GA4 add_payment_info safely
+  if (window._lastTrackedPaymentMethod !== method) {
+    window._lastTrackedPaymentMethod = method;
+    if (typeof window.ga4AddPaymentInfo === 'function' && state.cart && state.cart.length > 0) {
+      try {
+        window.ga4AddPaymentInfo(method === 'razorpay' ? 'Razorpay Online' : 'Cash on Delivery', state.cart, total);
+      } catch (e) {}
+    }
+  }
 }
 
 function showPaymentAlert(message, type = 'warning') {
@@ -978,6 +998,16 @@ function renderCheckout() {
   }
 
   handlePaymentMethodChange(selectedPaymentMethod);
+
+  // Trigger GA4 begin_checkout safely once per page session when cart has items
+  if (!window._ga4BeginCheckoutFired && state.cart && state.cart.length > 0) {
+    window._ga4BeginCheckoutFired = true;
+    if (typeof window.ga4BeginCheckout === 'function') {
+      try {
+        window.ga4BeginCheckout(state.cart, effectiveTotal || subtotal, appliedCoupon ? appliedCoupon.code : null);
+      } catch (e) {}
+    }
+  }
 }
 
 async function handlePlaceOrder(e) {
@@ -1089,6 +1119,22 @@ async function handlePlaceOrder(e) {
             });
 
             if (verifyRes && verifyRes.success) {
+              // Trigger GA4 purchase event immediately after verified payment
+              if (typeof window.ga4Purchase === 'function') {
+                try {
+                  const finalPaidTotal = (rzpData && rzpData.amount) ? (rzpData.amount / 100) : total;
+                  window.ga4Purchase(
+                    rzpData.order_id,
+                    finalPaidTotal,
+                    [...state.cart],
+                    delivery,
+                    appliedCoupon ? appliedCoupon.code : null
+                  );
+                } catch (e) {
+                  console.warn('GA4 purchase event error:', e);
+                }
+              }
+
               clearCart();
               appliedCoupon = null;
               try { sessionStorage.removeItem('dazzle_checkout_coupon'); } catch(e) {}
@@ -1231,6 +1277,22 @@ async function handlePlaceOrder(e) {
       });
 
       const finalId = (newOrder && newOrder.id) ? newOrder.id : orderId;
+
+      // Trigger GA4 purchase event immediately after verified COD order creation
+      if (typeof window.ga4Purchase === 'function') {
+        try {
+          window.ga4Purchase(
+            finalId,
+            total,
+            [...state.cart],
+            delivery,
+            appliedCoupon ? appliedCoupon.code : null
+          );
+        } catch (e) {
+          console.warn('GA4 purchase event error:', e);
+        }
+      }
+
       if (newOrder && newOrder.id && window.DazzleStore) {
         const cur = DazzleStore.getOrders().filter(o => o.id !== newOrder.id);
         cur.unshift(newOrder);
