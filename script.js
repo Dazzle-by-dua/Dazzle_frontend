@@ -204,7 +204,7 @@ const DEFAULT_OFFERS = {
 const DEFAULT_HOMEPAGE = {
   announcement: {
     enabled: true,
-    text: "Free shipping on orders above ₹2500 | Use code DAZZLE10 for 10% off",
+    text: "Free shipping on orders above ₹1499 | Use code DAZZLE10 for 10% off",
     linkText: "View Offers →",
     linkUrl: "offers.html"
   },
