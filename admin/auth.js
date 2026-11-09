@@ -1,6 +1,6 @@
 /* ========================================================
    DAZZLE BY DUA - Admin Authentication Layer
-   Connects to Render Deployed REST API with JWT Auth
+   Connects to Render Deployed REST API with JWT Auth & HttpOnly Cookies
    ======================================================== */
 
 window.API_BASE_URL = window.API_BASE_URL || "https://dazzle-backend-69un.onrender.com";
@@ -10,8 +10,6 @@ window.AdminAuth = window.AdminAuth || {
 
   STORAGE_KEY: "dazzle_admin_session",
   API_BASE_URL: API_BASE_URL,
-
-
 
   // Check if an authenticated session exists in localStorage or sessionStorage
   getSession() {
@@ -44,6 +42,7 @@ window.AdminAuth = window.AdminAuth || {
       const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           username: cleanId,
           password: cleanPass,
@@ -53,12 +52,21 @@ window.AdminAuth = window.AdminAuth || {
 
       const data = await res.json().catch(() => ({}));
 
-      if (res.ok && data.success && data.token) {
+      if (res.ok && data.success) {
+        if (data.requires_2fa) {
+          return {
+            success: false,
+            requires_2fa: true,
+            temp_token: data.temp_token,
+            message: data.message || "Two-factor authentication code required."
+          };
+        }
+
         const sessionData = {
           user: (data.user && data.user.user) || "Dua",
           email: (data.user && data.user.email) || cleanId,
           role: (data.user && data.user.role) || "Master Administrator",
-          token: data.token,
+          token: data.token || null,
           loginTime: data.loginTime || new Date().toISOString()
         };
 
@@ -66,9 +74,13 @@ window.AdminAuth = window.AdminAuth || {
         localStorage.removeItem(this.STORAGE_KEY);
         sessionStorage.removeItem(this.STORAGE_KEY);
 
-        // Always persist to localStorage and sessionStorage for seamless multi-tab administration
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
-        sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
+        // Always persist session metadata for multi-tab administration
+        if (rememberMe) {
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
+        } else {
+          sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
+        }
 
         return {
           success: true,
@@ -84,26 +96,65 @@ window.AdminAuth = window.AdminAuth || {
       console.warn("Backend authentication connection error:", netErr);
       return {
         success: false,
-        message: "Failed to connect to authentication server at " + API_BASE_URL + ". Please check your network connection and verify backend is running."
+        message: "Failed to connect to authentication server at " + API_BASE_URL + ". Please check your network connection."
       };
+    }
+  },
+
+  // Complete 2FA login verification
+  async verify2FA(tempToken, code) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login/2fa`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          temp_token: tempToken,
+          code: String(code).trim()
+        })
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        const sessionData = {
+          user: (data.user && data.user.user) || "Dua",
+          email: (data.user && data.user.email) || "admin@dazzlebydua.com",
+          role: (data.user && data.user.role) || "Master Administrator",
+          token: data.token || null,
+          loginTime: data.loginTime || new Date().toISOString()
+        };
+
+        localStorage.removeItem(this.STORAGE_KEY);
+        sessionStorage.removeItem(this.STORAGE_KEY);
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
+        sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessionData));
+
+        return { success: true, user: sessionData };
+      }
+      return {
+        success: false,
+        message: data.detail || data.message || "Invalid two-factor authentication code."
+      };
+    } catch (err) {
+      return { success: false, message: "Connection error during two-factor verification." };
     }
   },
 
   // Clear session and notify backend
   async logout() {
     const token = this.getToken();
-    if (token) {
-      try {
-        await fetch(`${API_BASE_URL}/api/auth/logout`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          }
-        }).catch(() => {});
-      } catch (e) {
-        console.warn("Logout notification error:", e);
+    try {
+      const headers = { "Content-Type": "application/json" };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
       }
+      await fetch(`${API_BASE_URL}/api/auth/logout`, {
+        method: "POST",
+        headers,
+        credentials: "include"
+      }).catch(() => {});
+    } catch (e) {
+      console.warn("Logout notification error:", e);
     }
 
     try {
@@ -149,6 +200,18 @@ window.AdminAuth = window.AdminAuth || {
     AdminAuth.protectPage();
   }
 })();
+
+// Cross-tab logout synchronization: if another tab logs out, redirect to login
+window.addEventListener("storage", function(e) {
+  if (e.key === "dazzle_admin_session" && !e.newValue) {
+    const path = window.location.pathname.toLowerCase();
+    if (path.includes("/admin") && !path.endsWith("login.html") && !path.endsWith("login")) {
+      const idx = window.location.pathname.indexOf("/admin");
+      const prefix = idx >= 0 ? window.location.pathname.slice(0, idx) : "";
+      window.location.replace(prefix + "/admin/login.html");
+    }
+  }
+});
 
 // Expose globally
 var AdminAuth = window.AdminAuth;

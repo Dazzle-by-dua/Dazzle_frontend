@@ -6,6 +6,17 @@
 window.API_BASE_URL = window.API_BASE_URL || "https://dazzle-backend-69un.onrender.com";
 var API_BASE_URL = window.API_BASE_URL;
 
+// ---- HTML Sanitizer Helper (XSS Prevention) ----
+function escapeHtml(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 // ---- Default Initial Data ----
 const DEFAULT_PRODUCTS = [
   {
@@ -1246,19 +1257,24 @@ function handleCardClick(event, id) {
 
 // ---- Review Card HTML ----
 function reviewCardHTML(r) {
-  const initial = (r.name && r.name[0]) ? r.name[0].toUpperCase() : "D";
+  const safeName = escapeHtml(r.name || "Customer");
+  const initial = (safeName && safeName[0]) ? safeName[0].toUpperCase() : "D";
+  const safeDate = escapeHtml(r.date || "");
+  const safeText = escapeHtml(r.text || "");
+  const safeProduct = r.product ? escapeHtml(r.product) : "";
+
   return `
   <div class="review-card">
     <div class="review-header">
       <div class="reviewer-avatar">${initial}</div>
       <div>
-        <div class="reviewer-name">${r.name}</div>
+        <div class="reviewer-name">${safeName}</div>
         <div class="stars-row">${renderStars(r.rating || 5)}</div>
-        <div class="review-date">${r.date || ""}</div>
+        <div class="review-date">${safeDate}</div>
       </div>
     </div>
-    <p class="review-text">&ldquo;${r.text}&rdquo;</p>
-    ${r.product ? `<div style="font-size:0.75rem;color:var(--gold);margin-top:0.6rem;font-weight:600;"><i class="fa fa-gem" style="margin-right:4px;"></i>${r.product}</div>` : ''}
+    <p class="review-text">&ldquo;${safeText}&rdquo;</p>
+    ${safeProduct ? `<div style="font-size:0.75rem;color:var(--gold);margin-top:0.6rem;font-weight:600;"><i class="fa fa-gem" style="margin-right:4px;"></i>${safeProduct}</div>` : ''}
     ${r.verified ? '<div class="review-verified">✓ Verified Purchase</div>' : ''}
   </div>`;
 }
@@ -1403,23 +1419,29 @@ function renderOrdersPage() {
   container.innerHTML = filtered.map(order => {
     const itemsHTML = (order.items || []).map(item => `
       <div class="order-item">
-        <div class="order-item-img"><img src="${item.img || 'product_flower_necklace.jpg'}" alt="${item.name}"></div>
+        <div class="order-item-img"><img src="${escapeHtml(item.img || 'product_flower_necklace.jpg')}" alt="${escapeHtml(item.name || 'Jewellery')}"></div>
         <div>
-          <div class="order-item-name">${item.name}</div>
-          <div class="order-item-meta">Qty: ${item.qty || 1} ${item.variant ? '&nbsp;|&nbsp; ' + item.variant : ''}</div>
+          <div class="order-item-name">${escapeHtml(item.name || 'Jewellery')}</div>
+          <div class="order-item-meta">Qty: ${Number(item.qty) || 1} ${item.variant ? '&nbsp;|&nbsp; ' + escapeHtml(item.variant) : ''}</div>
         </div>
-        <div class="order-item-price">₹${Number(item.price * (item.qty || 1)).toLocaleString()}</div>
+        <div class="order-item-price">₹${Number((item.price || 0) * (item.qty || 1)).toLocaleString()}</div>
       </div>
     `).join("");
+
+    const safeOrderId = escapeHtml(order.id || '');
+    const safeCustomer = escapeHtml(order.customer || 'Customer');
+    const safeDate = escapeHtml(order.date || 'Recent');
+    const safeMethod = escapeHtml(order.paymentMethod || 'Online');
+    const safePayStatus = escapeHtml(order.paymentStatus || 'Pending');
 
     return `
       <div class="order-card" style="margin-bottom:1.5rem">
         <div class="order-header">
           <div>
-            <div class="order-id">Order #${order.id}</div>
-            <div class="order-date">Placed on ${order.date || 'Recent'} &bull; Customer: ${order.customer || 'Customer'}</div>
+            <div class="order-id">Order #${safeOrderId}</div>
+            <div class="order-date">Placed on ${safeDate} &bull; Customer: ${safeCustomer}</div>
           </div>
-          <span class="order-status ${getStatusClass(order.status)}">${order.status}</span>
+          <span class="order-status ${getStatusClass(order.status)}">${escapeHtml(order.status || '')}</span>
         </div>
         <div class="order-body">
           ${renderTracking(order.status)}
@@ -1429,16 +1451,16 @@ function renderOrdersPage() {
           <div class="order-footer">
             <div>
               <div class="order-total-label">
-                Order Total &bull; ${order.paymentMethod || 'Online'}
-                <span style="margin-left:6px;font-size:0.7rem;padding:2px 6px;border-radius:4px;font-weight:700;background:${(order.paymentStatus||'').toLowerCase()==='paid'?'#e6f4ea':'#fef7e0'};color:${(order.paymentStatus||'').toLowerCase()==='paid'?'#137333':'#b06000'}">
-                  ${(order.paymentStatus || 'Pending').toUpperCase()}
+                Order Total &bull; ${safeMethod}
+                <span style="margin-left:6px;font-size:0.7rem;padding:2px 6px;border-radius:4px;font-weight:700;background:${safePayStatus.toLowerCase()==='paid'?'#e6f4ea':'#fef7e0'};color:${safePayStatus.toLowerCase()==='paid'?'#137333':'#b06000'}">
+                  ${safePayStatus.toUpperCase()}
                 </span>
               </div>
               <div class="order-total-value">₹${Number(order.total || 0).toLocaleString()}</div>
-              ${order.razorpay_payment_id ? `<div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;font-family:monospace">Payment ID: ${order.razorpay_payment_id}</div>` : ''}
+              ${order.razorpay_payment_id ? `<div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;font-family:monospace">Payment ID: ${escapeHtml(order.razorpay_payment_id)}</div>` : ''}
             </div>
             <div class="order-actions">
-              <button class="btn btn-outline btn-sm" onclick="showToast('Invoice downloaded for Order #' + '${order.id}')">Invoice</button>
+              <button class="btn btn-outline btn-sm" onclick="showToast('Invoice downloaded for Order #' + '${safeOrderId}')">Invoice</button>
               ${((order.status || '').toLowerCase() === 'delivered')
                 ? `<a href="product-details.html?id=${(order.items && order.items[0]) ? (order.items[0].id || 1) : 1}&order_id=${encodeURIComponent(order.id || '')}" class="btn btn-gold btn-sm" style="display:inline-flex;align-items:center;gap:4px;"><i class="fa fa-pen"></i> Write Review &rarr;</a>`
                 : `<button class="btn btn-ghost btn-sm" onclick="showToast('Review writing becomes available once your piece is delivered.')">Rate & Review</button>`
@@ -2046,4 +2068,18 @@ document.addEventListener("click", () => {
     menu.classList.remove("show");
   }
 });
+
+// Multi-tab customer logout synchronization
+window.addEventListener("storage", function(e) {
+  if (e.key === "dazzle_customer_session" && !e.newValue) {
+    if (typeof updateNavAuthButton === "function") {
+      updateNavAuthButton();
+    }
+    const path = window.location.pathname.toLowerCase();
+    if (path.includes("orders.html")) {
+      window.location.replace("auth.html?redirect=orders.html");
+    }
+  }
+});
+
 
