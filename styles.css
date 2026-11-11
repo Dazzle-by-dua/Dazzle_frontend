@@ -1,4 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&family=Alex+Brush&family=Allura&family=Birthstone+Bounce:wght@400;500&family=Great+Vibes&family=Parisienne&display=swap");
+@import url("https://fonts.cdnfonts.com/css/brittany-signature");
+@import url("https://fonts.cdnfonts.com/css/brittany-signature-script");
+@import url("https://db.onlinewebfonts.com/c/fb9b63cd5bfad970c5b831b707166c31?family=Brittany+Signature+Script");
 :root{--ivory:#FFFDF8;--beige:#F7EFE3;--gold:#D4AF7C;--gold-hover:#B99461;--gold-light:#EDD9B3;--text-dark:#1A1A1A;--text-muted:#77736D;--text-light:#A09990;--black:#111111;--white:#FFFFFF;--border:#E8DDD0;--shadow-sm:0 2px 12px rgba(180,150,100,0.08);--shadow-md:0 8px 32px rgba(180,150,100,0.14);--shadow-lg:0 20px 60px rgba(180,150,100,0.18);--radius-sm:8px;--radius-md:16px;--radius-lg:24px;--radius-xl:40px;--transition:0.3s cubic-bezier(0.4,0,0.2,1);--nav-height:80px;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;min-height:100%;background-color:#FAF5ED;overflow-x:hidden;}
@@ -45,8 +48,8 @@ p{font-size:.95rem;color:var(--text-muted);}
 .nav-logo{display:flex;align-items:center;gap:0.65rem;text-decoration:none;}
 .nav-logo-img{width:42px;height:42px;object-fit:contain;flex-shrink:0;display:block;}
 .nav-logo-text{display:flex;flex-direction:column;}
-.nav-logo-name{font-family:"Playfair Display",serif;font-size:1.42rem;font-weight:700;color:var(--text-dark);letter-spacing:.02em;line-height:1.05;}
-.nav-logo-tagline{font-size:.6rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-top:2px;}
+.nav-logo-name{font-family:'Brittany Signature','Brittany Signature Script','Autography','Allura','Alex Brush','Parisienne','Birthstone Bounce','Great Vibes',cursive;font-size:1.82rem;font-weight:400;color:var(--black);letter-spacing:.01em;line-height:1.1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
+.nav-logo-tagline{font-size:.6rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-top:1px;}
 .nav-links{display:flex;align-items:center;gap:2.5rem;}
 .nav-link{font-size:.8rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);transition:color var(--transition);position:relative;}
 .nav-link::after{content:"";position:absolute;bottom:-4px;left:0;width:0;height:1.5px;background:var(--gold);transition:width var(--transition);}
@@ -426,7 +429,7 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
 .success-icon-wrap{width:76px;height:76px;border-radius:50%;background:rgba(76,175,80,.12);border:2px solid #4CAF50;color:#388E3C;font-size:2.2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;}
 
 @media(max-width:1100px){.grid-4,.features-grid,.cat-grid,.insta-grid{grid-template-columns:repeat(2,1fr);}.footer-inner{grid-template-columns:1fr 1fr;}.featured-inner{gap:2.5rem;}}
-@media(max-width:900px){.nav-links{display:none;}.hamburger{display:flex;}.contact-grid{grid-template-columns:1fr;}.reviews-grid{grid-template-columns:1fr 1fr;}.featured-inner{grid-template-columns:1fr;}.featured-img img{height:350px;}.product-detail-layout{grid-template-columns:1fr;gap:2.5rem;}.product-gallery{position:static;}.detail-perks{grid-template-columns:1fr;gap:.75rem;text-align:left;}.detail-perk{flex-direction:row;justify-content:flex-start;}.cart-layout,.checkout-layout{grid-template-columns:1fr;gap:2rem;}.cart-summary-box,.order-summary-card{position:static;}.cart-header-row{display:none;}.cart-item-row{grid-template-columns:1fr auto;gap:1rem;position:relative;padding:1.25rem 1rem;}.cart-item-info{grid-column:1/-1;}.cart-item-del{position:absolute;top:1rem;right:1rem;}}
+@media(max-width:900px){.nav-links{display:none;}.hamburger{display:flex;}.nav-logo-name{font-size:1.62rem;line-height:1.1;}.nav-logo-tagline{font-size:0.56rem;letter-spacing:0.2em;}.contact-grid{grid-template-columns:1fr;}.reviews-grid{grid-template-columns:1fr 1fr;}.featured-inner{grid-template-columns:1fr;}.featured-img img{height:350px;}.product-detail-layout{grid-template-columns:1fr;gap:2.5rem;}.product-gallery{position:static;}.detail-perks{grid-template-columns:1fr;gap:.75rem;text-align:left;}.detail-perk{flex-direction:row;justify-content:flex-start;}.cart-layout,.checkout-layout{grid-template-columns:1fr;gap:2rem;}.cart-summary-box,.order-summary-card{position:static;}.cart-header-row{display:none;}.cart-item-row{grid-template-columns:1fr auto;gap:1rem;position:relative;padding:1.25rem 1rem;}.cart-item-info{grid-column:1/-1;}.cart-item-del{position:absolute;top:1rem;right:1rem;}}
 @media(max-width:640px){
   :root{--nav-height:60px;}
 
@@ -458,8 +461,8 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
   .container{padding:0 1rem;}
   .nav-logo{gap:0.45rem;}
   .nav-logo-img{width:34px;height:34px;}
-  .nav-logo-name{font-size:1.18rem;}
-  .nav-logo-tagline{font-size:0.52rem;letter-spacing:0.18em;}
+  .nav-logo-name{font-size:1.45rem;line-height:1.1;}
+  .nav-logo-tagline{font-size:0.52rem;letter-spacing:0.18em;margin-top:0;}
   .section{padding:2rem 0;}
   section[style*="padding-top"],main[style*="padding-top"]{padding-top:1.25rem !important;}
   div[style*="margin-top:3.5rem"],div[style*="margin-top:4rem"],div[style*="margin-top:5rem"]{margin-top:1.75rem !important;}
@@ -630,8 +633,8 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
   .container{padding:0 0.65rem;}
   .nav-logo{gap:0.35rem;}
   .nav-logo-img{width:28px;height:28px;}
-  .nav-logo-name{font-size:1.02rem;}
-  .nav-logo-tagline{font-size:0.46rem;letter-spacing:0.14em;}
+  .nav-logo-name{font-size:1.24rem;line-height:1.1;}
+  .nav-logo-tagline{font-size:0.46rem;letter-spacing:0.14em;margin-top:0;}
   .grid-4{gap:0.45rem;}
   .product-body{padding:0.45rem 0.45rem 0.55rem;}
   .product-name{font-size:0.78rem;}
