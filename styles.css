@@ -45,11 +45,13 @@ p{font-size:.95rem;color:var(--text-muted);}
 .navbar{position:sticky;top:0;z-index:1000;background:#F5EBDD;border-bottom:1px solid rgba(212,175,124,0.3);height:var(--nav-height);display:flex;align-items:center;transition:all var(--transition);box-shadow:0 2px 10px rgba(45,36,30,0.04);}
 .navbar.scrolled{background:#F5EBDD;box-shadow:0 4px 18px rgba(45,36,30,0.08);border-bottom-color:rgba(212,175,124,0.38);}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;width:100%;}
-.nav-logo{display:flex;align-items:center;gap:0.65rem;text-decoration:none;}
+.nav-logo{display:flex;align-items:center;gap:0.5rem;text-decoration:none;}
 .nav-logo-img{width:42px;height:42px;object-fit:contain;flex-shrink:0;display:block;}
-.nav-logo-text{display:flex;flex-direction:column;}
-.nav-logo-name{font-family:'Brittany Signature','Brittany Signature Script','Autography','Allura','Alex Brush','Parisienne','Birthstone Bounce','Great Vibes',cursive;font-size:1.82rem;font-weight:400;color:var(--black);letter-spacing:.01em;line-height:1.1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
-.nav-logo-tagline{font-size:.6rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-top:1px;}
+.nav-logo-text{display:flex;flex-direction:column;justify-content:center;}
+.nav-logo-brand-img{height:52px;width:auto;max-width:220px;object-fit:contain;display:block;mix-blend-mode:multiply;filter:contrast(1.08);}
+/* Legacy text fallback (hidden when brand image loads) */
+.nav-logo-name{display:none;}
+.nav-logo-tagline{display:none;}
 .nav-links{display:flex;align-items:center;gap:2.5rem;}
 .nav-link{font-size:.8rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);transition:color var(--transition);position:relative;}
 .nav-link::after{content:"";position:absolute;bottom:-4px;left:0;width:0;height:1.5px;background:var(--gold);transition:width var(--transition);}
@@ -429,7 +431,7 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
 .success-icon-wrap{width:76px;height:76px;border-radius:50%;background:rgba(76,175,80,.12);border:2px solid #4CAF50;color:#388E3C;font-size:2.2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;}
 
 @media(max-width:1100px){.grid-4,.features-grid,.cat-grid,.insta-grid{grid-template-columns:repeat(2,1fr);}.footer-inner{grid-template-columns:1fr 1fr;}.featured-inner{gap:2.5rem;}}
-@media(max-width:900px){.nav-links{display:none;}.hamburger{display:flex;}.nav-logo-name{font-size:1.62rem;line-height:1.1;}.nav-logo-tagline{font-size:0.56rem;letter-spacing:0.2em;}.contact-grid{grid-template-columns:1fr;}.reviews-grid{grid-template-columns:1fr 1fr;}.featured-inner{grid-template-columns:1fr;}.featured-img img{height:350px;}.product-detail-layout{grid-template-columns:1fr;gap:2.5rem;}.product-gallery{position:static;}.detail-perks{grid-template-columns:1fr;gap:.75rem;text-align:left;}.detail-perk{flex-direction:row;justify-content:flex-start;}.cart-layout,.checkout-layout{grid-template-columns:1fr;gap:2rem;}.cart-summary-box,.order-summary-card{position:static;}.cart-header-row{display:none;}.cart-item-row{grid-template-columns:1fr auto;gap:1rem;position:relative;padding:1.25rem 1rem;}.cart-item-info{grid-column:1/-1;}.cart-item-del{position:absolute;top:1rem;right:1rem;}}
+@media(max-width:900px){.nav-links{display:none;}.hamburger{display:flex;}.nav-logo-brand-img{height:44px;max-width:180px;}.contact-grid{grid-template-columns:1fr;}.reviews-grid{grid-template-columns:1fr 1fr;}.featured-inner{grid-template-columns:1fr;}.featured-img img{height:350px;}.product-detail-layout{grid-template-columns:1fr;gap:2.5rem;}.product-gallery{position:static;}.detail-perks{grid-template-columns:1fr;gap:.75rem;text-align:left;}.detail-perk{flex-direction:row;justify-content:flex-start;}.cart-layout,.checkout-layout{grid-template-columns:1fr;gap:2rem;}.cart-summary-box,.order-summary-card{position:static;}.cart-header-row{display:none;}.cart-item-row{grid-template-columns:1fr auto;gap:1rem;position:relative;padding:1.25rem 1rem;}.cart-item-info{grid-column:1/-1;}.cart-item-del{position:absolute;top:1rem;right:1rem;}}
 @media(max-width:640px){
   :root{--nav-height:60px;}
 
@@ -461,6 +463,7 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
   .container{padding:0 1rem;}
   .nav-logo{gap:0.45rem;}
   .nav-logo-img{width:34px;height:34px;}
+  .nav-logo-brand-img{height:40px;max-width:160px;}
   .nav-logo-name{font-size:1.45rem;line-height:1.1;}
   .nav-logo-tagline{font-size:0.52rem;letter-spacing:0.18em;margin-top:0;}
   .section{padding:2rem 0;}
@@ -633,6 +636,7 @@ footer{background:var(--black);color:rgba(255,255,255,.75);padding:5rem 0 2rem;}
   .container{padding:0 0.65rem;}
   .nav-logo{gap:0.35rem;}
   .nav-logo-img{width:28px;height:28px;}
+  .nav-logo-brand-img{height:34px;max-width:130px;}
   .nav-logo-name{font-size:1.24rem;line-height:1.1;}
   .nav-logo-tagline{font-size:0.46rem;letter-spacing:0.14em;margin-top:0;}
   .grid-4{gap:0.45rem;}
