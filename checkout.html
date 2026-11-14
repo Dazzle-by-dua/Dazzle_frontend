@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <!-- Google Analytics 4 - Dazzle by Dua -->
@@ -614,10 +614,12 @@ function updateCouponUI(isApplied, msg) {
       appliedBox.style.display = 'flex';
       if (badgeEl) badgeEl.textContent = appliedCoupon.code;
       if (descEl) {
-        if (appliedCoupon.code === 'FREEDEL' || appliedCoupon.freeShipping) {
-          descEl.textContent = '100% Free Delivery';
+        if (appliedCoupon.discountAmount > 0 && appliedCoupon.freeShipping) {
+          descEl.textContent = `₹${appliedCoupon.discountAmount.toLocaleString()} Saved + Free Delivery`;
         } else if (appliedCoupon.discountAmount > 0) {
           descEl.textContent = `₹${appliedCoupon.discountAmount.toLocaleString()} Saved`;
+        } else if (appliedCoupon.code === 'FREEDEL' || appliedCoupon.freeShipping) {
+          descEl.textContent = '100% Free Delivery';
         } else {
           descEl.textContent = 'Coupon Applied';
         }
@@ -682,9 +684,10 @@ async function handleApplyCoupon() {
       appliedCoupon = {
         code: code,
         type: res.discountType || res.coupon?.type || (code === 'FREEDEL' ? 'free_delivery' : 'percent'),
+        discountPercent: Number(res.coupon?.discount || 0),
         discountAmount: Number(res.discountAmount || 0),
         deliveryDiscount: Number(res.deliveryDiscount || 0),
-        freeShipping: Boolean(res.freeShipping || code === 'FREEDEL'),
+        freeShipping: Boolean(res.freeShipping || code === 'FREEDEL' || res.discountType === 'free_delivery' || res.discountType === 'free_shipping'),
         minOrder: Number(res.coupon?.minOrder || 0),
         message: res.message
       };
@@ -692,7 +695,7 @@ async function handleApplyCoupon() {
         sessionStorage.setItem('dazzle_checkout_coupon', code);
       } catch (e) {}
 
-      updateCouponUI(true, res.message || `Coupon '${code}' applied! Free delivery.`);
+      updateCouponUI(true, res.message || `Coupon '${code}' applied successfully!`);
       renderCheckout();
     } else {
       if (code === 'FREEDEL') {
@@ -782,10 +785,15 @@ function handlePaymentMethodChange(method) {
   const isFreeDel = Boolean(appliedCoupon && (appliedCoupon.code === 'FREEDEL' || appliedCoupon.freeShipping));
   const effectiveDelivery = isFreeDel ? 0 : origDelivery;
   let prodDiscount = 0;
-  if (appliedCoupon && !isFreeDel) {
-    prodDiscount = appliedCoupon.discountAmount || 0;
+  if (appliedCoupon) {
+    if (appliedCoupon.type === 'percent' && appliedCoupon.discountPercent > 0) {
+      prodDiscount = Math.round((subtotal * appliedCoupon.discountPercent) / 100);
+    } else {
+      prodDiscount = appliedCoupon.discountAmount || 0;
+    }
   }
-  const total = Math.max(0, subtotal - prodDiscount + (rateInfo.valid ? effectiveDelivery : 0));
+  const discountedSubtotal = Math.max(0, subtotal - prodDiscount);
+  const total = Math.max(0, discountedSubtotal + (rateInfo.valid ? effectiveDelivery : 0));
 
   if (method === 'razorpay') {
     if (rzpCard) {
@@ -800,7 +808,7 @@ function handlePaymentMethodChange(method) {
       if (rateInfo.valid || isFreeDel) {
         btnText.innerHTML = `Pay Now &bull; ₹${total.toLocaleString()}`;
       } else {
-        btnText.innerHTML = `Pay Now &bull; ₹${subtotal.toLocaleString()} + Delivery`;
+        btnText.innerHTML = `Pay Now &bull; ₹${discountedSubtotal.toLocaleString()} + Delivery`;
       }
     }
     if (icon) icon.className = 'fa fa-lock';
@@ -817,7 +825,7 @@ function handlePaymentMethodChange(method) {
       if (rateInfo.valid || isFreeDel) {
         btnText.innerHTML = `Place COD Order &bull; ₹${total.toLocaleString()}`;
       } else {
-        btnText.innerHTML = 'Place COD Order';
+        btnText.innerHTML = `Place COD Order &bull; ₹${discountedSubtotal.toLocaleString()} + Delivery`;
       }
     }
     if (icon) icon.className = 'fa fa-truck';
@@ -914,13 +922,18 @@ function renderCheckout() {
   }
 
   let prodDiscount = 0;
-  if (appliedCoupon && !isFreeDel) {
-    prodDiscount = appliedCoupon.discountAmount || 0;
+  if (appliedCoupon) {
+    if (appliedCoupon.type === 'percent' && appliedCoupon.discountPercent > 0) {
+      prodDiscount = Math.round((subtotal * appliedCoupon.discountPercent) / 100);
+    } else {
+      prodDiscount = appliedCoupon.discountAmount || 0;
+    }
   }
 
+  const discountedSubtotal = Math.max(0, subtotal - prodDiscount);
   const effectiveTotal = rateInfo.valid
-    ? Math.max(0, subtotal - prodDiscount + effectiveDelivery)
-    : Math.max(0, subtotal - prodDiscount);
+    ? Math.max(0, discountedSubtotal + effectiveDelivery)
+    : discountedSubtotal;
 
   subtotalEl.textContent = '₹' + subtotal.toLocaleString();
 
@@ -949,15 +962,17 @@ function renderCheckout() {
   }
 
   if (discountRow) {
-    if (appliedCoupon) {
+    if (appliedCoupon && (prodDiscount > 0 || isFreeDel)) {
       discountRow.style.display = 'flex';
       if (couponNameEl) couponNameEl.textContent = appliedCoupon.code;
-      if (isFreeDel) {
+      if (prodDiscount > 0) {
+        if (discountValEl) {
+          discountValEl.textContent = `-₹${prodDiscount.toLocaleString()}${isFreeDel ? ' + Free Delivery' : ''}`;
+        }
+      } else if (isFreeDel) {
         if (discountValEl) {
           discountValEl.textContent = rateInfo.valid ? `-₹${origDelivery.toLocaleString()}` : '-₹0 (Free Delivery)';
         }
-      } else {
-        if (discountValEl) discountValEl.textContent = `-₹${prodDiscount.toLocaleString()}`;
       }
     } else {
       discountRow.style.display = 'none';
@@ -996,9 +1011,9 @@ function renderCheckout() {
     totalEl.textContent = '₹' + effectiveTotal.toLocaleString();
   } else {
     if (isFreeDel) {
-      totalEl.textContent = '₹' + subtotal.toLocaleString() + ' (Free Delivery)';
+      totalEl.textContent = '₹' + effectiveTotal.toLocaleString() + ' (Free Delivery)';
     } else {
-      totalEl.textContent = '₹' + subtotal.toLocaleString() + ' + Delivery';
+      totalEl.textContent = '₹' + effectiveTotal.toLocaleString() + ' + Delivery';
     }
   }
 
@@ -1057,7 +1072,14 @@ async function handlePlaceOrder(e) {
   const isFreeDel = Boolean(appliedCoupon && (appliedCoupon.code === 'FREEDEL' || appliedCoupon.freeShipping));
   const delivery = isFreeDel ? 0 : origDelivery;
   const subtotal = getCartSubtotal();
-  const prodDiscount = (appliedCoupon && !isFreeDel) ? (appliedCoupon.discountAmount || 0) : 0;
+  let prodDiscount = 0;
+  if (appliedCoupon) {
+    if (appliedCoupon.type === 'percent' && appliedCoupon.discountPercent > 0) {
+      prodDiscount = Math.round((subtotal * appliedCoupon.discountPercent) / 100);
+    } else {
+      prodDiscount = appliedCoupon.discountAmount || 0;
+    }
+  }
   const total = Math.max(0, subtotal - prodDiscount + delivery);
 
   const submitBtn = document.getElementById('place-order-btn');
@@ -1448,9 +1470,10 @@ document.addEventListener('DOMContentLoaded', () => {
             appliedCoupon = {
               code: code,
               type: res.discountType || res.coupon?.type || (code === 'FREEDEL' ? 'free_delivery' : 'percent'),
+              discountPercent: Number(res.coupon?.discount || 0),
               discountAmount: Number(res.discountAmount || 0),
               deliveryDiscount: Number(res.deliveryDiscount || 0),
-              freeShipping: Boolean(res.freeShipping || code === 'FREEDEL'),
+              freeShipping: Boolean(res.freeShipping || code === 'FREEDEL' || res.discountType === 'free_delivery' || res.discountType === 'free_shipping'),
               minOrder: Number(res.coupon?.minOrder || 0),
               message: res.message
             };
