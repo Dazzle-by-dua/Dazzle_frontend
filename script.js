@@ -768,6 +768,26 @@ window.DazzleStore = window.DazzleStore || {
   saveOffers(data) {
     this._set(this.KEYS.OFFERS, data);
   },
+  async getAvailableCoupons() {
+    try {
+      const res = await this._api('/api/offers/coupons/public', 'GET');
+      if (Array.isArray(res) && res.length > 0) return res;
+    } catch (e) {}
+    try {
+      const res = await this._api('/api/offers/coupons?active_only=true', 'GET');
+      if (Array.isArray(res) && res.length > 0) return res;
+    } catch (e) {}
+    const offs = this.getOffers();
+    return (offs && Array.isArray(offs.coupons)) ? offs.coupons.filter(c => c.active !== false) : [];
+  },
+  async getCoupons() {
+    try {
+      const res = await this._api('/api/offers/coupons', 'GET');
+      if (Array.isArray(res)) return res;
+    } catch (e) {}
+    const offs = this.getOffers();
+    return (offs && Array.isArray(offs.coupons)) ? offs.coupons : [];
+  },
   async addCoupon(coupon) {
     const res = await this._api('/api/offers/coupons', 'POST', coupon);
     try {

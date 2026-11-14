@@ -426,6 +426,9 @@
       async getCoupons() {
         return await request("/api/offers/coupons");
       },
+      async getAvailableCoupons() {
+        return await request("/api/offers/coupons/public");
+      },
       async createCoupon(coupon) {
         return await request("/api/offers/coupons", { method: "POST", body: coupon });
       },
