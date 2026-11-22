@@ -198,7 +198,6 @@
                 <label class="form-label" for="ch-pin">PIN Code *</label>
                 <input class="form-input" type="text" id="ch-pin" placeholder="560038" required pattern="[0-9]{6}" maxlength="6">
               </div>
-              <div class="form-group"></div>
             </div>
             <div class="form-group" style="margin-top:.5rem">
               <label class="form-label" for="ch-notes">Order Notes (Optional)</label>
@@ -209,17 +208,17 @@
               <div class="checkout-section-heading"><span>3</span> Payment Method</div>
             </div>
 
-            <div class="payment-methods-grid" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1.25rem">
+            <div class="payment-methods-grid">
               <!-- Online (Razorpay) -->
-              <label class="payment-method-card active" id="pay-card-razorpay" onclick="handlePaymentMethodChange('razorpay')" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border:2px solid var(--gold);border-radius:8px;cursor:pointer;background:rgba(197,168,128,0.06);transition:all 0.2s ease">
-                <div style="display:flex;align-items:center;gap:0.75rem">
+              <label class="payment-method-card active" id="pay-card-razorpay" onclick="handlePaymentMethodChange('razorpay')">
+                <div class="payment-method-header">
                   <input type="radio" name="payment_choice" id="pay-choice-razorpay" value="razorpay" checked onchange="handlePaymentMethodChange('razorpay')" style="accent-color:var(--gold);width:18px;height:18px">
-                  <div>
+                  <div class="payment-method-text">
                     <div style="font-weight:600;font-size:0.95rem;color:var(--text-dark)">Pay Online (Razorpay)</div>
-                    <div style="font-size:0.75rem;color:var(--text-muted)">UPI (GPay, PhonePe, Paytm), Credit / Debit Card, Net Banking, Wallets</div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);line-height:1.35;margin-top:2px">UPI (GPay, PhonePe, Paytm), Credit / Debit Card, Net Banking, Wallets</div>
                   </div>
                 </div>
-                <div style="display:flex;gap:0.35rem;align-items:center">
+                <div class="payment-method-badges">
                   <span style="font-size:0.65rem;background:#528FF0;color:#fff;font-weight:700;padding:2px 6px;border-radius:3px">UPI</span>
                   <span style="font-size:0.65rem;background:#1A1F71;color:#fff;font-weight:700;padding:2px 6px;border-radius:3px">CARDS</span>
                   <span style="font-size:0.65rem;background:#137333;color:#fff;font-weight:700;padding:2px 6px;border-radius:3px">100% SECURE</span>
@@ -227,15 +226,17 @@
               </label>
 
               <!-- Cash on Delivery -->
-              <label class="payment-method-card" id="pay-card-cod" onclick="handlePaymentMethodChange('cod')" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--white);transition:all 0.2s ease">
-                <div style="display:flex;align-items:center;gap:0.75rem">
+              <label class="payment-method-card" id="pay-card-cod" onclick="handlePaymentMethodChange('cod')">
+                <div class="payment-method-header">
                   <input type="radio" name="payment_choice" id="pay-choice-cod" value="cod" onchange="handlePaymentMethodChange('cod')" style="accent-color:var(--gold);width:18px;height:18px">
-                  <div>
+                  <div class="payment-method-text">
                     <div style="font-weight:600;font-size:0.95rem;color:var(--text-dark)">Cash on Delivery</div>
-                    <div style="font-size:0.75rem;color:var(--text-muted)">Pay with cash or UPI upon delivery at your doorstep</div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);line-height:1.35;margin-top:2px">Pay with cash or UPI upon delivery at your doorstep</div>
                   </div>
                 </div>
-                <span style="font-size:0.65rem;background:#2d3748;color:#fff;font-weight:700;padding:2px 6px;border-radius:3px">COD</span>
+                <div class="payment-method-badges">
+                  <span style="font-size:0.65rem;background:#2d3748;color:#fff;font-weight:700;padding:2px 6px;border-radius:3px">COD</span>
+                </div>
               </label>
             </div>
 
