@@ -442,6 +442,190 @@ window.AdminApp = window.AdminApp || {
     }
   },
 
+  // ========================================================
+  // Colour Variants Management (Image-Based)
+  // ========================================================
+  addColorVariant(initial = null) {
+    if (!this.currentColorVariants) this.currentColorVariants = [];
+    this.currentColorVariants.push(initial || {
+      color: "",
+      img: "",
+      images: []
+    });
+    this.renderColorVariants();
+  },
+
+  removeColorVariant(idx) {
+    if (this.currentColorVariants && idx >= 0 && idx < this.currentColorVariants.length) {
+      this.currentColorVariants.splice(idx, 1);
+      this.renderColorVariants();
+      this.showToast("Colour variant removed.");
+    }
+  },
+
+  updateColorVariantName(idx, val) {
+    if (this.currentColorVariants && this.currentColorVariants[idx]) {
+      this.currentColorVariants[idx].color = val;
+    }
+  },
+
+  async handleColorVariantPrimaryUpload(e, idx) {
+    const file = e.target.files && e.target.files[0];
+    if (!file || !this.currentColorVariants || !this.currentColorVariants[idx]) return;
+
+    const statusEl = document.getElementById("cv-status-" + idx);
+    if (statusEl) {
+      statusEl.className = "upload-status loading";
+      statusEl.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Uploading "' + file.name + '" to Cloudinary...';
+    }
+
+    try {
+      const data = await this.uploadToCloudinary(file, "dazzle_by_dua/products");
+      this.currentColorVariants[idx].img = data.secure_url;
+      this.renderColorVariants();
+      this.showToast('✦ "' + file.name + '" uploaded for colour variant!');
+
+      // If main product image was placeholder, also adopt this photo
+      const prodImgInput = document.getElementById("prod-img");
+      const prodImgPreview = document.getElementById("prod-img-preview");
+      if (prodImgInput && (!prodImgInput.value || prodImgInput.value === "product_flower_necklace.jpg" || !prodImgInput.value.startsWith("http"))) {
+        prodImgInput.value = data.secure_url;
+        if (prodImgPreview) prodImgPreview.src = data.secure_url;
+      }
+    } catch (err) {
+      console.error("Color variant primary upload error:", err);
+      if (statusEl) {
+        statusEl.className = "upload-status error";
+        statusEl.innerHTML = '<i class="fa fa-exclamation-circle"></i> ' + (err.message || 'Upload failed');
+      }
+      this.showToast("Upload failed: " + (err.message || err), "error");
+    } finally {
+      e.target.value = "";
+    }
+  },
+
+  removeColorVariantPrimary(idx) {
+    if (this.currentColorVariants && this.currentColorVariants[idx]) {
+      this.currentColorVariants[idx].img = "";
+      this.renderColorVariants();
+      this.showToast("Variant photo reset.");
+    }
+  },
+
+  async handleColorVariantGalleryUpload(e, idx) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length || !this.currentColorVariants || !this.currentColorVariants[idx]) return;
+
+    if (!Array.isArray(this.currentColorVariants[idx].images)) {
+      this.currentColorVariants[idx].images = [];
+    }
+
+    const statusEl = document.getElementById("cv-gallery-status-" + idx);
+    if (statusEl) {
+      statusEl.className = "upload-status loading";
+      statusEl.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Uploading ' + files.length + ' angle photo(s)...';
+    }
+
+    let successCount = 0;
+    for (const file of files) {
+      try {
+        const data = await this.uploadToCloudinary(file, "dazzle_by_dua/products");
+        this.currentColorVariants[idx].images.push(data.secure_url);
+        successCount++;
+        this.renderColorVariants();
+      } catch (err) {
+        console.error("Variant gallery upload error:", err);
+        this.showToast("Upload failed (" + file.name + "): " + err.message, "error");
+      }
+    }
+
+    if (successCount > 0) {
+      this.showToast("Added " + successCount + " angle photo(s) to colour variant.");
+    }
+    e.target.value = "";
+  },
+
+  removeColorVariantGalleryImage(vIdx, imgIdx) {
+    if (this.currentColorVariants && this.currentColorVariants[vIdx] && this.currentColorVariants[vIdx].images) {
+      this.currentColorVariants[vIdx].images.splice(imgIdx, 1);
+      this.renderColorVariants();
+      this.showToast("Angle photo removed.");
+    }
+  },
+
+  renderColorVariants() {
+    const listEl = document.getElementById("prod-color-variants-list");
+    if (!listEl) return;
+
+    if (!this.currentColorVariants || !this.currentColorVariants.length) {
+      listEl.innerHTML = '<div style="font-size:0.8rem;color:var(--text-muted);font-style:italic;padding:0.9rem;background:#fff;border-radius:6px;border:1px dashed #d8cfc4;text-align:center">No colour versions added yet. If this product comes in different colours (e.g. Gold, Silver, Rose Gold), click <strong>"+ Add Colour Variant"</strong> above to upload photos for each colour.</div>';
+      return;
+    }
+
+    listEl.innerHTML = this.currentColorVariants.map((cv, idx) => {
+      const hasImg = cv.img && cv.img.trim().length > 0;
+      const imgSrc = hasImg ? this.formatImgUrl(cv.img) : '';
+      const gallery = Array.isArray(cv.images) ? cv.images : [];
+
+      return '<div class="color-variant-card" style="background:#fff;border:1px solid #E0D6C8;border-radius:8px;padding:0.95rem;box-shadow:0 1px 4px rgba(0,0,0,0.03);position:relative;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.75rem;padding-bottom:0.6rem;border-bottom:1px solid #F0EAE1;">' +
+          '<div style="display:flex;align-items:center;gap:0.5rem;flex:1;">' +
+            '<span style="font-size:0.75rem;font-weight:700;color:var(--gold);background:#FAF5ED;padding:3px 8px;border-radius:4px;border:1px solid #ECD9C2;">#' + (idx + 1) + '</span>' +
+            '<input type="text" class="form-control" style="font-size:0.85rem;font-weight:600;padding:0.4rem 0.65rem;" placeholder="e.g. 18K Champagne Gold, Rose Gold, Sterling Silver" value="' + (cv.color || '').replace(/"/g, '&quot;') + '" oninput="AdminApp.updateColorVariantName(' + idx + ', this.value)">' +
+          '</div>' +
+          '<button type="button" class="btn btn-outline btn-sm" style="color:#C62828;border-color:rgba(198,40,40,0.25);padding:0.35rem 0.65rem;" onclick="AdminApp.removeColorVariant(' + idx + ')" title="Remove this colour variant">' +
+            '<i class="fa fa-trash"></i> Remove' +
+          '</button>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1.3fr;gap:0.9rem;align-items:start;">' +
+          '<div style="background:#FAF8F5;border:1px solid #ECE3D7;border-radius:6px;padding:0.7rem;">' +
+            '<div style="font-size:0.75rem;font-weight:600;color:var(--text-dark);margin-bottom:0.4rem;display:flex;align-items:center;gap:0.3rem;">' +
+              '<i class="fa fa-camera" style="color:var(--gold);font-size:0.7rem;"></i> Primary Photo for this Colour <span style="color:#C62828">*</span>' +
+            '</div>' +
+            '<div style="display:flex;align-items:center;gap:0.65rem;">' +
+              '<div style="width:64px;height:64px;border-radius:6px;border:1px solid #D5C7B4;background:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+                (hasImg ? '<img src="' + imgSrc + '" style="width:100%;height:100%;object-fit:cover" alt="Variant ' + (idx + 1) + '">' : '<span style="font-size:0.65rem;color:var(--text-muted);text-align:center;padding:2px;">No photo</span>') +
+              '</div>' +
+              '<div style="flex:1;">' +
+                '<input type="file" id="cv-file-input-' + idx + '" accept="image/*" style="display:none" onchange="AdminApp.handleColorVariantPrimaryUpload(event, ' + idx + ')">' +
+                '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;">' +
+                  '<button type="button" class="btn btn-gold btn-sm" style="font-size:0.72rem;padding:0.35rem 0.65rem;" onclick="document.getElementById(\'cv-file-input-' + idx + '\').click()">' +
+                    '<i class="fa fa-cloud-upload-alt"></i> ' + (hasImg ? 'Change Photo' : 'Upload Photo') +
+                  '</button>' +
+                  (hasImg ? '<button type="button" class="btn btn-outline btn-sm" style="font-size:0.72rem;padding:0.35rem 0.5rem;" onclick="AdminApp.removeColorVariantPrimary(' + idx + ')" title="Reset photo"><i class="fa fa-times"></i></button>' : '') +
+                '</div>' +
+                '<div id="cv-status-' + idx + '" class="upload-status" style="margin-top:0.3rem;font-size:0.7rem;">' +
+                  (hasImg ? '<span style="color:#2E7D32"><i class="fa fa-check"></i> Uploaded</span>' : '<span style="color:var(--text-muted)">JPG, PNG, WEBP</span>') +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div style="background:#FAF8F5;border:1px solid #ECE3D7;border-radius:6px;padding:0.7rem;">' +
+            '<div style="font-size:0.75rem;font-weight:600;color:var(--text-dark);margin-bottom:0.4rem;display:flex;align-items:center;justify-content:space-between;">' +
+              '<span><i class="fa fa-images" style="color:var(--gold);font-size:0.7rem;"></i> Additional Angles for this Colour</span>' +
+              '<span style="font-size:0.68rem;color:var(--text-muted);font-weight:normal">(Optional)</span>' +
+            '</div>' +
+            '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;min-height:36px;align-items:center;margin-bottom:0.4rem;">' +
+              (gallery.length ? gallery.map((gUrl, gIdx) => 
+                '<div style="position:relative;width:42px;height:42px;border-radius:4px;overflow:hidden;border:1px solid #D5C7B4;flex-shrink:0;">' +
+                  '<img src="' + this.formatImgUrl(gUrl) + '" style="width:100%;height:100%;object-fit:cover" alt="Angle ' + (gIdx + 1) + '">' +
+                  '<button type="button" onclick="AdminApp.removeColorVariantGalleryImage(' + idx + ', ' + gIdx + ')" title="Remove angle" style="position:absolute;top:0;right:0;background:rgba(198,40,40,0.85);color:#fff;border:none;width:14px;height:14px;font-size:9px;line-height:14px;text-align:center;cursor:pointer;padding:0;">&times;</button>' +
+                '</div>'
+              ).join('') : '<span style="font-size:0.7rem;color:var(--text-muted);font-style:italic">No additional angles uploaded</span>') +
+            '</div>' +
+            '<div>' +
+              '<input type="file" id="cv-gallery-file-input-' + idx + '" accept="image/*" multiple style="display:none" onchange="AdminApp.handleColorVariantGalleryUpload(event, ' + idx + ')">' +
+              '<button type="button" class="btn btn-outline btn-sm" style="font-size:0.72rem;padding:0.3rem 0.6rem;background:#fff;" onclick="document.getElementById(\'cv-gallery-file-input-' + idx + '\').click()">' +
+                '<i class="fa fa-plus-circle" style="color:var(--gold)"></i> Add Angle Photos' +
+              '</button>' +
+              '<div id="cv-gallery-status-' + idx + '" class="upload-status" style="margin-top:0.25rem;font-size:0.7rem;"></div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  },
+
   renderComboGallery() {
     const listEl = document.getElementById("combo-gallery-list");
     if (!listEl) return;
@@ -751,6 +935,8 @@ window.AdminApp = window.AdminApp || {
     // Initialize gallery list
     this.currentProductGallery = [];
     this.renderProductGallery();
+    this.currentColorVariants = [];
+    this.renderColorVariants();
 
     const statusEl = document.getElementById("prod-upload-status");
     if (statusEl) {
@@ -786,6 +972,18 @@ window.AdminApp = window.AdminApp || {
     document.getElementById("prod-material").value = p.material || "";
     document.getElementById("prod-dimensions").value = p.dimensions || "";
     document.getElementById("prod-variants").value = (p.variants || []).join(", ");
+    if (p.colorVariants && Array.isArray(p.colorVariants) && p.colorVariants.length > 0) {
+      this.currentColorVariants = JSON.parse(JSON.stringify(p.colorVariants));
+    } else if (p.variants && Array.isArray(p.variants) && p.variants.length > 0) {
+      this.currentColorVariants = p.variants.map((v, idx) => ({
+        color: v,
+        img: idx === 0 ? (p.img || '') : '',
+        images: []
+      }));
+    } else {
+      this.currentColorVariants = [];
+    }
+    this.renderColorVariants();
     document.getElementById("prod-desc").value = p.description || "";
 
     const preview = document.getElementById("prod-img-preview");
@@ -824,7 +1022,16 @@ window.AdminApp = window.AdminApp || {
     const material = document.getElementById("prod-material").value.trim();
     const dimensions = document.getElementById("prod-dimensions").value.trim();
     const variantsRaw = document.getElementById("prod-variants").value.trim();
-    const variants = variantsRaw ? variantsRaw.split(",").map(v => v.trim()).filter(Boolean) : ["18K Champagne Gold"];
+    const colorVariants = (this.currentColorVariants || [])
+      .map(cv => ({
+        color: (cv.color || '').trim(),
+        img: (cv.img || '').trim() || finalImg,
+        images: Array.isArray(cv.images) ? cv.images.filter(Boolean) : []
+      }))
+      .filter(cv => cv.color || cv.img);
+    const variants = colorVariants.length > 0
+      ? colorVariants.map(cv => cv.color || "Standard")
+      : (variantsRaw ? variantsRaw.split(",").map(v => v.trim()).filter(Boolean) : ["18K Champagne Gold"]);
     const desc = document.getElementById("prod-desc").value.trim();
 
     // Ensure main display image reflects gallery uploads if primary was default placeholder
@@ -848,6 +1055,7 @@ window.AdminApp = window.AdminApp || {
       material,
       dimensions,
       variants,
+      colorVariants,
       description: desc,
       images: (this.currentProductGallery && this.currentProductGallery.length) ? this.currentProductGallery : [finalImg]
     };

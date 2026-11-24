@@ -258,22 +258,23 @@ function renderCart() {
     <div class="cart-item-row" data-id="${item.id}">
       <div class="cart-item-info">
         <a href="product-details.html?id=${item.id}" class="cart-item-img">
-          <img src="${item.img}" alt="${item.name}">
+          <img src="${item.img}" alt="${escapeHtml(item.name)}">
         </a>
         <div>
-          <a href="product-details.html?id=${item.id}" class="cart-item-title">${item.name}</a>
+          <a href="product-details.html?id=${item.id}" class="cart-item-title">${escapeHtml(item.name)}</a>
+          ${item.variant ? `<div class="cart-item-variant" style="font-size:0.75rem;color:var(--gold);font-weight:600;margin-top:3px;letter-spacing:0.04em;display:flex;align-items:center;gap:4px;"><i class="fa fa-gem" style="font-size:0.68rem;opacity:0.85;"></i> Colour: ${escapeHtml(item.variant)}</div>` : ''}
         </div>
       </div>
       <div class="cart-item-price">₹${item.price.toLocaleString()}</div>
       <div>
         <div class="cart-qty-ctrl">
-          <button class="cart-qty-btn" onclick="changeQty(${item.id}, -1)" aria-label="Decrease">−</button>
+          <button class="cart-qty-btn" onclick="changeQty(${item.id}, -1, '${escapeHtml(item.variant || "")}')" aria-label="Decrease">−</button>
           <span class="cart-qty-val">${item.qty || 1}</span>
-          <button class="cart-qty-btn" onclick="changeQty(${item.id}, 1)" aria-label="Increase">+</button>
+          <button class="cart-qty-btn" onclick="changeQty(${item.id}, 1, '${escapeHtml(item.variant || "")}')" aria-label="Increase">+</button>
         </div>
       </div>
       <div class="cart-item-total">₹${itemTotal.toLocaleString()}</div>
-      <button class="cart-item-del" onclick="deleteItem(${item.id})" title="Remove" aria-label="Remove">
+      <button class="cart-item-del" onclick="deleteItem(${item.id}, '${escapeHtml(item.variant || "")}')" title="Remove" aria-label="Remove">
         <i class="fa fa-times"></i>
       </button>
     </div>`;
@@ -284,13 +285,13 @@ function renderCart() {
   totalEl.textContent = '₹' + subtotal.toLocaleString();
 }
 
-function changeQty(id, delta) {
-  updateCartQty(id, delta);
+function changeQty(id, delta, variant = null) {
+  updateCartQty(id, delta, variant || null);
   renderCart();
 }
 
-function deleteItem(id) {
-  removeFromCart(id);
+function deleteItem(id, variant = null) {
+  removeFromCart(id, variant || null);
   renderCart();
 }
 

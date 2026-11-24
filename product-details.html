@@ -243,6 +243,44 @@
 <script>
 let currentProduct = null;
 let currentQuantity = 1;
+let currentColorVariants = [];
+let selectedColorVariant = null;
+
+function selectProductColour(idx) {
+  if (!currentColorVariants || !currentColorVariants[idx]) return;
+  const cv = currentColorVariants[idx];
+  selectedColorVariant = cv;
+
+  // Highlight active colour thumbnail
+  document.querySelectorAll(".colour-thumb-item").forEach((el, i) => {
+    el.classList.toggle("active", i === idx);
+  });
+
+  // Update colour name label
+  const nameEl = document.getElementById("product-selected-colour-name");
+  if (nameEl) nameEl.textContent = cv.color || "Standard";
+
+  // Update main gallery image with smooth transition
+  const main = document.getElementById("gallery-main-img");
+  if (main && cv.img) {
+    main.style.opacity = "0.35";
+    setTimeout(() => {
+      main.src = cv.img;
+      main.style.opacity = "1";
+    }, 120);
+  }
+
+  // Update angle gallery thumbnails for this colour
+  const thumbsContainer = document.getElementById("gallery-thumbs-list");
+  if (thumbsContainer) {
+    const variantImages = (cv.images && cv.images.length) ? [cv.img, ...cv.images] : [cv.img || currentProduct.img];
+    thumbsContainer.innerHTML = variantImages.map((im, i) => `
+      <div class="gallery-thumb ${i === 0 ? "active" : ""}" onclick="switchGalleryImage(this, '${im}')">
+        <img src="${im}" alt="${escapeHtml(currentProduct.name)} - ${escapeHtml(cv.color)} angle ${i + 1}">
+      </div>
+    `).join("");
+  }
+}
 
 function getProductIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -274,12 +312,16 @@ function switchGalleryImage(thumb, src) {
 
 function handleDetailAddToCart() {
   if (!currentProduct) return;
-  addToCart(currentProduct.id, currentQuantity);
+  const variantColor = selectedColorVariant ? selectedColorVariant.color : null;
+  const variantImg = selectedColorVariant ? selectedColorVariant.img : null;
+  addToCart(currentProduct.id, currentQuantity, variantColor, variantImg);
 }
 
 function handleDetailBuyNow() {
   if (!currentProduct) return;
-  buyNow(currentProduct.id, currentQuantity);
+  const variantColor = selectedColorVariant ? selectedColorVariant.color : null;
+  const variantImg = selectedColorVariant ? selectedColorVariant.img : null;
+  buyNow(currentProduct.id, currentQuantity, variantColor, variantImg);
 }
 
 function handleDetailWishlist(btn) {
@@ -382,12 +424,48 @@ function renderProductDetails() {
     ? `<span class="badge" style="background:#E8F5E9;color:#2E7D32;border:1px solid #C8E6C9">&#10003; In Stock</span>`
     : `<span class="badge badge-oos">Out of Stock</span>`;
 
+  // Process Colour Variants
+  currentColorVariants = (currentProduct.colorVariants && Array.isArray(currentProduct.colorVariants) && currentProduct.colorVariants.length > 0)
+    ? currentProduct.colorVariants.filter(cv => (cv.color && cv.color.trim()) || (cv.img && cv.img.trim()))
+    : [];
+  selectedColorVariant = currentColorVariants.length > 0 ? currentColorVariants[0] : null;
+
+  // Initial gallery images: if active colour variant has photos, use those; else fallback to info.images
+  const initialImages = (selectedColorVariant && selectedColorVariant.img)
+    ? ((selectedColorVariant.images && selectedColorVariant.images.length) ? [selectedColorVariant.img, ...selectedColorVariant.images] : [selectedColorVariant.img])
+    : info.images;
+
   // Gallery Thumbnails
-  const thumbsHTML = info.images.map((img, i) => `
+  const thumbsHTML = initialImages.map((img, i) => `
     <div class="gallery-thumb ${i === 0 ? 'active' : ''}" onclick="switchGalleryImage(this, '${img}')">
-      <img src="${img}" alt="${currentProduct.name} preview thumbnail ${i+1}">
+      <img src="${img}" alt="${escapeHtml(currentProduct.name)} preview thumbnail ${i+1}">
     </div>
   `).join("");
+
+  // Colour Selection Section HTML
+  let colorVariantsSectionHTML = "";
+  if (currentColorVariants.length > 0) {
+    const colorThumbsHTML = currentColorVariants.map((cv, idx) => `
+      <div class="colour-thumb-item ${idx === 0 ? 'active' : ''}" onclick="selectProductColour(${idx})" title="${escapeHtml(cv.color)}">
+        <div class="colour-thumb-img-wrap">
+          <img src="${cv.img || currentProduct.img}" alt="${escapeHtml(currentProduct.name)} - ${escapeHtml(cv.color)}">
+        </div>
+        <span class="colour-thumb-name">${escapeHtml(cv.color)}</span>
+      </div>
+    `).join("");
+
+    colorVariantsSectionHTML = `
+      <div class="product-colours-section" id="product-colours-section">
+        <div class="product-colours-header">
+          <span class="product-colours-title">Available Colours:</span>
+          <span class="product-selected-colour-name" id="product-selected-colour-name">${escapeHtml(selectedColorVariant.color)}</span>
+        </div>
+        <div class="product-colour-thumbnails" id="product-colour-thumbnails">
+          ${colorThumbsHTML}
+        </div>
+      </div>
+    `;
+  }
 
   // Mount HTML
   const mount = document.getElementById("product-detail-mount");
@@ -396,15 +474,16 @@ function renderProductDetails() {
       <!-- Gallery Column -->
       <div class="product-gallery">
         <div class="gallery-main">
-          <img id="gallery-main-img" src="${info.images[0] || currentProduct.img}" alt="${currentProduct.name} - Handcrafted Fine Jewellery">
+          <img id="gallery-main-img" src="${initialImages[0] || currentProduct.img}" alt="${escapeHtml(currentProduct.name)} - Handcrafted Fine Jewellery">
           <div class="gallery-badges">
             ${badgesHTML}
             ${stockBadge}
           </div>
         </div>
-        <div class="gallery-thumbs">
+        <div class="gallery-thumbs" id="gallery-thumbs-list">
           ${thumbsHTML}
         </div>
+        ${colorVariantsSectionHTML}
       </div>
 
       <!-- Info Column -->

@@ -35,6 +35,23 @@ const DEFAULT_PRODUCTS = [
     dimensions: "Pendant 18mm x 18mm | Chain length: 42cm + 5cm extension",
     description: "An ode to blooming elegance, this Flower Pendant Necklace features delicately sculpted petals set with shimmering pavé accents, culminating in a radiant freshwater pearl at the center. Hand-crafted and finished in our signature 18K champagne gold vermeil.",
     variants: ["18K Champagne Gold", "Rose Gold Vermeil", "Sterling Silver"],
+    colorVariants: [
+      {
+        color: "18K Champagne Gold",
+        img: "product_flower_necklace.jpg",
+        images: ["product_flower_necklace.jpg", "hero_necklace.jpg"]
+      },
+      {
+        color: "Rose Gold Vermeil",
+        img: "hero_necklace.jpg",
+        images: ["hero_necklace.jpg", "featured_collection.jpg"]
+      },
+      {
+        color: "Sterling Silver",
+        img: "featured_collection.jpg",
+        images: ["featured_collection.jpg", "product_flower_necklace.jpg"]
+      }
+    ],
     images: ["product_flower_necklace.jpg", "hero_necklace.jpg", "featured_collection.jpg"]
   },
   {
@@ -1089,35 +1106,44 @@ function saveState() {
 }
 
 // ---- Cart Operations ----
-function addToCart(productId, qty = 1) {
+function addToCart(productId, qty = 1, variant = null, img = null) {
   const p = DazzleStore.getProductById(productId) || (window.PRODUCTS || []).find(x => x.id === productId);
   if (!p) return;
   const num = parseInt(qty, 10) || 1;
-  const existing = state.cart.find(x => x.id === p.id);
+  const variantKey = (variant && String(variant).trim().length > 0) ? String(variant).trim() : null;
+  const itemImg = (img && String(img).trim().length > 0) ? String(img).trim() : (p.img || "product_flower_necklace.jpg");
+  const existing = state.cart.find(x => x.id === p.id && (x.variant || null) === variantKey);
   if (existing) {
     existing.qty = (existing.qty || 1) + num;
+    if (itemImg && itemImg !== p.img) existing.img = itemImg;
   } else {
-    state.cart.push({ ...p, qty: num });
+    state.cart.push({ ...p, qty: num, variant: variantKey, img: itemImg });
   }
   saveState();
   updateNavBadges();
-  showToast("✦ Added to cart — " + p.name + (num > 1 ? ` (x${num})` : ""));
+  const variantLabel = variantKey ? ` (${variantKey})` : "";
+  showToast("✦ Added to cart — " + p.name + variantLabel + (num > 1 ? ` (x${num})` : ""));
   if (typeof window.ga4AddToCart === "function") {
     try { window.ga4AddToCart(p, num); } catch (e) {}
   }
 }
 
-function buyNow(productId, qty = 1) {
-  addToCart(productId, qty);
+function buyNow(productId, qty = 1, variant = null, img = null) {
+  addToCart(productId, qty, variant, img);
   window.location.href = "checkout.html";
 }
 
-function updateCartQty(productId, delta) {
-  const item = state.cart.find(x => x.id === productId);
+function updateCartQty(productId, delta, variant = null) {
+  const variantKey = (variant && String(variant).trim().length > 0) ? String(variant).trim() : null;
+  const item = state.cart.find(x => {
+    if (x.id !== productId) return false;
+    if (variantKey !== null) return (x.variant || null) === variantKey;
+    return true;
+  });
   if (!item) return;
   const newQty = (item.qty || 1) + delta;
   if (newQty <= 0) {
-    removeFromCart(productId);
+    removeFromCart(productId, item.variant || null);
   } else {
     item.qty = Math.min(99, newQty);
     saveState();
@@ -1135,13 +1161,23 @@ function clearCart() {
   updateNavBadges();
 }
 
-function removeFromCart(productId) {
-  const p = state.cart.find(x => x.id === productId);
-  state.cart = state.cart.filter(x => x.id !== productId);
+function removeFromCart(productId, variant = null) {
+  const variantKey = (variant && String(variant).trim().length > 0) ? String(variant).trim() : null;
+  const p = state.cart.find(x => {
+    if (x.id !== productId) return false;
+    if (variantKey !== null) return (x.variant || null) === variantKey;
+    return true;
+  });
+  if (variantKey !== null) {
+    state.cart = state.cart.filter(x => !(x.id === productId && (x.variant || null) === variantKey));
+  } else {
+    state.cart = state.cart.filter(x => x.id !== productId);
+  }
   saveState();
   updateNavBadges();
   if (p) {
-    showToast("Removed " + p.name + " from cart");
+    const variantLabel = p.variant ? ` (${p.variant})` : "";
+    showToast("Removed " + p.name + variantLabel + " from cart");
     if (typeof window.ga4RemoveFromCart === "function") {
       try { window.ga4RemoveFromCart(p, p.qty || 1); } catch (e) {}
     }

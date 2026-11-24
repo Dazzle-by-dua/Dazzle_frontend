@@ -1061,7 +1061,9 @@ async function handleApplyCoupon() {
       name: item.name || '',
       category: item.category || '',
       price: item.price || 0,
-      qty: item.qty || 1
+      qty: item.qty || 1,
+      variant: item.variant || '',
+      img: item.img || ''
     }));
 
     if (window.DazzleStore && typeof window.DazzleStore.validateCoupon === 'function') {
@@ -1461,7 +1463,7 @@ function showOrderSuccessModal({ orderId, customerName, address, dateStr, items,
   if (itemsEl && Array.isArray(items)) {
     itemsEl.innerHTML = items.map(it => `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f2f2f2;font-size:0.83rem">
-        <div><strong>${escapeHtml(it.name || 'Jewellery Item')}</strong> <span style="color:#777">&times; ${it.qty || 1}</span></div>
+        <div><strong>${escapeHtml(it.name || 'Jewellery Item')}</strong> <span style="color:#777">&times; ${it.qty || 1}</span>${it.variant ? ` <span style="font-size:0.75rem;color:var(--gold);font-weight:600;">(${escapeHtml(it.variant)})</span>` : ''}</div>
         <div style="font-weight:600;color:var(--text-dark)">₹${Number((it.price || 0) * (it.qty || 1)).toLocaleString()}</div>
       </div>
     `).join('');
